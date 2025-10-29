@@ -37,6 +37,15 @@ All colors MUST be HSL.
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    
+    /* Custom Brand Colors */
+    --brand-teal: 170 100% 39%;
+    --brand-purple: 273 68% 59%;
+    --brand-purple-alt: 258 90% 66%;
+    
+    /* Gradients */
+    --gradient-logo: linear-gradient(90deg, #00C9A7 0%, #9D4EDD 100%);
+    --gradient-button-hover: linear-gradient(90deg, #00C9A7 0%, #8B5CF6 100%);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +109,24 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+/* Custom gradient utilities */
+@layer utilities {
+  .gradient-logo {
+    background: var(--gradient-logo);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .gradient-button-hover {
+    background: var(--gradient-button-hover);
   }
 }

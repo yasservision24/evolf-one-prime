@@ -25,7 +25,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             </Badge>
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 md:mb-6 px-4">
-              Welcome to <span className="bg-gradient-to-r from-chart-2 to-chart-4 bg-clip-text text-transparent">EvOlf</span>
+              Welcome to <span className="gradient-logo">EvOlf</span>
             </h1>
             
             <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
