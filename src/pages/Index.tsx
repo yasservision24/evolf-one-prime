@@ -5,44 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { system } from '@/config/system';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'dataset' | 'model'>('home');
+  const navigate = useNavigate();
 
   const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
-    setCurrentView(page);
+    if (page === 'home') navigate('/');
+    else if (page === 'dataset') navigate('/dataset');
+    else if (page === 'model') navigate('/prediction');
   };
-
-  if (currentView === 'dataset') {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={handleNavigate} showSearch={true} />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl mb-4">Dataset Explorer</h1>
-            <p className="text-muted-foreground mb-4">Dataset page coming soon...</p>
-            <Button onClick={() => handleNavigate('home')} className="hover:bg-accent hover:text-accent-foreground transition-colors">Back to Home</Button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  if (currentView === 'model') {
-    return (
-      <>
-        <Header currentPage="model" onNavigate={handleNavigate} />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl mb-4">Prediction Model</h1>
-            <p className="text-muted-foreground mb-4">Model page coming soon...</p>
-            <Button onClick={() => handleNavigate('home')} className="hover:bg-accent hover:text-accent-foreground transition-colors">Back to Home</Button>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <div className="min-h-screen">
