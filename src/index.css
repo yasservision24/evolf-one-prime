@@ -17,7 +17,7 @@ All colors MUST be HSL.
     --popover: 0 0% 14.5%;
     --popover-foreground: 0 0% 98.5%;
 
-    --primary: 166 100% 39%;
+    --primary: 220 50% 55%;
     --primary-foreground: 0 0% 20.5%;
 
     --secondary: 0 0% 26.9%;
@@ -26,7 +26,7 @@ All colors MUST be HSL.
     --muted: 0 0% 26.9%;
     --muted-foreground: 0 0% 70.8%;
 
-    --accent: 274 77% 59%;
+    --accent: 0 0% 35%;
     --accent-foreground: 0 0% 98.5%;
 
     --destructive: 0 70% 50%;
@@ -39,17 +39,17 @@ All colors MUST be HSL.
     --radius: 0.5rem;
     
     /* Custom Brand Colors */
-    --brand-teal: 166 100% 39%;
-    --brand-purple: 274 77% 59%;
-    --brand-purple-alt: 261 74% 62%;
+    --brand-blue: 220 50% 55%;
+    --brand-blue-light: 220 60% 65%;
+    --brand-gray: 0 0% 35%;
     
     /* Gradients */
-    --gradient-logo: linear-gradient(90deg, #00C9A7 0%, #9D4EDD 100%);
-    --gradient-button-hover: linear-gradient(90deg, #00C9A7 0%, #8B5CF6 100%);
+    --gradient-logo: linear-gradient(90deg, #6B9BD1 0%, #4A5568 100%);
+    --gradient-button-hover: linear-gradient(90deg, #6B9BD1 0%, #5A6C7D 100%);
 
     --sidebar-background: 0 0% 20.5%;
     --sidebar-foreground: 0 0% 98.5%;
-    --sidebar-primary: 166 100% 39%;
+    --sidebar-primary: 220 50% 55%;
     --sidebar-primary-foreground: 0 0% 98.5%;
     --sidebar-accent: 0 0% 35%;
     --sidebar-accent-foreground: 0 0% 98.5%;
@@ -67,7 +67,7 @@ All colors MUST be HSL.
     --popover: 0 0% 14.5%;
     --popover-foreground: 0 0% 98.5%;
 
-    --primary: 166 100% 39%;
+    --primary: 220 50% 55%;
     --primary-foreground: 0 0% 20.5%;
 
     --secondary: 0 0% 26.9%;
@@ -76,7 +76,7 @@ All colors MUST be HSL.
     --muted: 0 0% 26.9%;
     --muted-foreground: 0 0% 70.8%;
 
-    --accent: 274 77% 59%;
+    --accent: 0 0% 35%;
     --accent-foreground: 0 0% 98.5%;
 
     --destructive: 0 70% 50%;
@@ -88,7 +88,7 @@ All colors MUST be HSL.
     
     --sidebar-background: 0 0% 20.5%;
     --sidebar-foreground: 0 0% 98.5%;
-    --sidebar-primary: 166 100% 39%;
+    --sidebar-primary: 220 50% 55%;
     --sidebar-primary-foreground: 0 0% 98.5%;
     --sidebar-accent: 0 0% 35%;
     --sidebar-accent-foreground: 0 0% 98.5%;
