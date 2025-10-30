@@ -40,8 +40,8 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     /* Custom Brand Colors */
-    --brand-teal: 222 86% 11%; /* updated to match primary/navy */
-    --brand-purple: 274 77% 59%;
+    --brand-teal: 166 100% 39%; /* #00C9A7 */
+    --brand-purple: 274 71% 59%; /* #9D4EDD */
     --brand-purple-alt: 261 74% 62%;
 
     /* Gradients */

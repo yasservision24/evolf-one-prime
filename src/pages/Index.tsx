@@ -116,7 +116,7 @@ const Index = () => {
 
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 max-w-5xl mx-auto">
             {/* Dataset Explorer Card */}
-            <Card className="flex flex-col flex-1 p-6 md:p-8 hover:shadow-2xl transition-all border-2 border-border hover:border-sidebar-primary bg-gradient-to-br from-secondary to-secondary/50 h-full">
+            <Card className="flex flex-col flex-1 p-6 md:p-8 hover:shadow-2xl transition-all border-2 border-border hover:border-[hsl(var(--brand-teal))] bg-gradient-to-br from-secondary to-secondary/50 h-full">
               <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg flex-shrink-0">
                 <Database className="h-6 w-6 md:h-7 md:w-7 text-primary-foreground" />
               </div>
@@ -156,7 +156,7 @@ const Index = () => {
             </Card>
 
             {/* Prediction Model Card */}
-            <Card className="flex flex-col flex-1 p-6 md:p-8 hover:shadow-2xl transition-all border-2 border-border hover:border-chart-4 bg-gradient-to-br from-secondary to-secondary/50 h-full">
+            <Card className="flex flex-col flex-1 p-6 md:p-8 hover:shadow-2xl transition-all border-2 border-border hover:border-[hsl(var(--brand-purple))] bg-gradient-to-br from-secondary to-secondary/50 h-full">
               <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-chart-4 to-chart-4/80 rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg flex-shrink-0">
                 <Brain className="h-6 w-6 md:h-7 md:w-7 text-primary-foreground" />
               </div>
