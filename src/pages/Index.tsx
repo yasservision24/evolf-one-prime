@@ -2,44 +2,50 @@ import { ArrowRight, Database, Brain, Beaker, FileText, Dna, TrendingUp, CheckCi
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Header } from '@/components/Header';
 import { system } from '@/config/system';
 import { useState } from 'react';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'landing' | 'dataset' | 'model'>('landing');
+  const [currentView, setCurrentView] = useState<'home' | 'dataset' | 'model'>('home');
 
-  const handleNavigate = (page: 'dataset' | 'model') => {
+  const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
     setCurrentView(page);
-    // TODO: Implement actual navigation or page switching logic
-    console.log(`Navigating to: ${page}`);
   };
 
   if (currentView === 'dataset') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl mb-4">Dataset Explorer</h1>
-          <p className="text-muted-foreground mb-4">Dataset page coming soon...</p>
-          <Button onClick={() => setCurrentView('landing')}>Back to Home</Button>
+      <>
+        <Header currentPage="dataset" onNavigate={handleNavigate} showSearch={true} />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl mb-4">Dataset Explorer</h1>
+            <p className="text-muted-foreground mb-4">Dataset page coming soon...</p>
+            <Button onClick={() => handleNavigate('home')} className="hover:bg-accent hover:text-accent-foreground transition-colors">Back to Home</Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (currentView === 'model') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl mb-4">Prediction Model</h1>
-          <p className="text-muted-foreground mb-4">Model page coming soon...</p>
-          <Button onClick={() => setCurrentView('landing')}>Back to Home</Button>
+      <>
+        <Header currentPage="model" onNavigate={handleNavigate} />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl mb-4">Prediction Model</h1>
+            <p className="text-muted-foreground mb-4">Model page coming soon...</p>
+            <Button onClick={() => handleNavigate('home')} className="hover:bg-accent hover:text-accent-foreground transition-colors">Back to Home</Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <div className="min-h-screen">
+      <Header currentPage="home" onNavigate={handleNavigate} />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-sidebar-primary to-background text-foreground">
         <div className="absolute inset-0 bg-grid-foreground/[0.05] bg-[size:30px_30px]" />
@@ -64,7 +70,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-10 md:mb-16 px-4">
               <Button 
                 size="lg" 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={() => handleNavigate('dataset')}
               >
                 <Database className="mr-2 h-5 w-5" />
@@ -74,7 +80,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-2 border-border bg-secondary backdrop-blur-sm text-foreground hover:bg-accent"
+                className="border-2 border-border bg-secondary backdrop-blur-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300"
                 onClick={() => handleNavigate('model')}
               >
                 <Brain className="mr-2 h-5 w-5" />
@@ -140,7 +146,7 @@ const Index = () => {
               </div>
 
               <Button
-                className="w-full bg-sidebar-primary hover:bg-sidebar-primary/90 text-primary-foreground shadow-md text-sm md:text-base mt-auto"
+                className="w-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-md text-sm md:text-base mt-auto transition-all duration-300 hover:shadow-lg"
                 onClick={() => handleNavigate('dataset')}
               >
                 Explore Database
@@ -180,7 +186,7 @@ const Index = () => {
               </div>
 
               <Button
-                className="w-full bg-chart-4 hover:bg-chart-4/90 text-primary-foreground shadow-md text-sm md:text-base mt-auto"
+                className="w-full bg-accent hover:bg-accent/80 text-accent-foreground shadow-md text-sm md:text-base mt-auto transition-all duration-300 hover:shadow-lg"
                 onClick={() => handleNavigate('model')}
               >
                 Try Prediction Model
@@ -313,7 +319,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
             <Button 
               size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl text-sm md:text-base"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 shadow-xl text-sm md:text-base transition-all duration-300 hover:shadow-2xl"
               onClick={() => handleNavigate('dataset')}
             >
               <Database className="mr-2 h-4 w-4 md:h-5 md:w-5" />
@@ -322,7 +328,7 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-2 border-border bg-secondary backdrop-blur-sm text-foreground hover:bg-accent text-sm md:text-base"
+              className="border-2 border-border bg-secondary backdrop-blur-sm text-foreground hover:bg-accent hover:text-accent-foreground text-sm md:text-base transition-all duration-300"
               onClick={() => handleNavigate('model')}
             >
               <Brain className="mr-2 h-4 w-4 md:h-5 md:w-5" />
