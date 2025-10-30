@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Dataset from "./pages/Dataset";
 import DatabaseDashboard from "./pages/dataset/DatabaseDashboard";
 import Prediction from "./pages/Prediction";
 import NotFound from "./pages/NotFound";
@@ -28,7 +27,6 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/dataset" element={<Dataset />} />
         <Route path="/dataset/dashboard" element={<DatabaseDashboard />} />
         <Route path="/prediction" element={<Prediction />} />
         <Route path="/documentation" element={<Documentation />} />

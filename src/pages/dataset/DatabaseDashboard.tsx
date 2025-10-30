@@ -8,9 +8,8 @@ import { Database, Download, Search, FileText, Filter, RefreshCw } from 'lucide-
 const DatabaseDashboard = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
+  const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
-    else if (page === 'dataset') navigate('/dataset');
     else if (page === 'model') navigate('/prediction');
   };
 

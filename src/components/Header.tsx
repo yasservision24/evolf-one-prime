@@ -1,12 +1,15 @@
 import { Menu, Brain, Database as DatabaseIcon } from 'lucide-react';
 import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   currentPage: 'home' | 'dataset' | 'model';
-  onNavigate: (page: 'home' | 'dataset' | 'model') => void;
+  onNavigate: (page: 'home' | 'model') => void;
 }
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
+  const navigate = useNavigate();
+  
   return (
     <header className="border-b border-border bg-background/100 backdrop-blur-md sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4">
@@ -35,7 +38,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => onNavigate('dataset')}
+                onClick={() => navigate('/dataset/dashboard')}
                 className={`hover:text-foreground ${
                   currentPage === 'dataset'
                     ? 'text-foreground font-extrabold'
