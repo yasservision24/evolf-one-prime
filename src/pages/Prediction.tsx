@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 const Prediction = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (page: 'home' | 'model') => {
+  const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
     if (page === 'home') navigate('/');
+    else if (page === 'dataset') navigate('/dataset');
     else if (page === 'model') navigate('/prediction');
   };
 

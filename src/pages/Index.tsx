@@ -10,8 +10,9 @@ import { useNavigate } from 'react-router-dom';
 const Index = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (page: 'home' | 'model') => {
+  const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
     if (page === 'home') navigate('/');
+    else if (page === 'dataset') navigate('/dataset');
     else if (page === 'model') navigate('/prediction');
   };
 
@@ -324,7 +325,7 @@ const Index = () => {
             <Button
                 size="lg"
                 className="bg-muted text-foreground hover:bg-[hsl(var(--brand-teal))] hover:text-white shadow-lg transition-all duration-300"
-                onClick={() => navigate('/dataset/dashboard')}
+                onClick={() => handleNavigate('dataset')}
               >
                 <Database className="mr-2 h-5 w-5" />
                 Explore Dataset
