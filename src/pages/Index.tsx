@@ -44,7 +44,7 @@ const Index = () => {
               <Button
                 size="lg"
                 className="bg-muted text-foreground hover:bg-[hsl(var(--brand-teal))] hover:text-white shadow-lg transition-all duration-300"
-                onClick={() => handleNavigate('dataset')}
+                onClick={() => navigate('/dataset/dashboard')}
               >
                 <Database className="mr-2 h-5 w-5" />
                 Explore Dataset
@@ -122,7 +122,7 @@ const Index = () => {
               <Button
                 className="w-full border border-[hsl(var(--brand-teal))] bg-transparent text-[hsl(var(--brand-teal))] font-medium text-sm md:text-base py-2.5 md:py-3 rounded-xl 
                 shadow-md transition-all duration-300 hover:bg-[hsl(var(--brand-teal))] hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal)/0.6)]"
-                onClick={() => handleNavigate('dataset')}
+                onClick={() => navigate('/dataset/dashboard')}
               >
                 Explore Database
                 <ArrowRight className="ml-2 h-4 w-4" />

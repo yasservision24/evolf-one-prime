@@ -18,10 +18,22 @@ const Dataset = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl mb-4">Dataset Explorer</h1>
-          <p className="text-muted-foreground mb-4">Dataset page coming soon...</p>
-          <Button onClick={() => navigate('/')} className="hover:bg-accent hover:text-accent-foreground transition-colors">
-            Back to Home
-          </Button>
+          <p className="text-muted-foreground mb-6">Explore our comprehensive GPCR database</p>
+          <div className="flex gap-4 justify-center">
+            <Button 
+              onClick={() => navigate('/dataset/dashboard')} 
+              className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+            >
+              View Database Dashboard
+            </Button>
+            <Button 
+              onClick={() => navigate('/')} 
+              variant="outline"
+              className="border-[hsl(var(--brand-teal))]/50 hover:bg-[hsl(var(--brand-teal))]/10"
+            >
+              Back to Home
+            </Button>
+          </div>
         </div>
       </div>
       <Footer />
