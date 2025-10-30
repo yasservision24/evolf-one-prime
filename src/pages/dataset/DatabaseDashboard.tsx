@@ -8,9 +8,8 @@ import { Database, Download, Search, FileText, Filter, RefreshCw } from 'lucide-
 const DatabaseDashboard = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (page: 'home' | 'dataset' | 'model') => {
+  const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
-    else if (page === 'dataset') navigate('/dataset');
     else if (page === 'model') navigate('/prediction');
   };
 
@@ -41,7 +40,7 @@ const DatabaseDashboard = () => {
 
   return (
     <>
-      <Header currentPage="dataset" onNavigate={handleNavigate} />
+      <Header currentPage="home" onNavigate={handleNavigate} />
       
       <main className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4">

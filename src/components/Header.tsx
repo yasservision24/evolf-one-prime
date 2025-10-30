@@ -1,9 +1,9 @@
-import { Menu, Brain, Database as DatabaseIcon } from 'lucide-react';
+import { Menu, Brain } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface HeaderProps {
-  currentPage: 'home' | 'dataset' | 'model';
-  onNavigate: (page: 'home' | 'dataset' | 'model') => void;
+  currentPage: 'home' | 'model';
+  onNavigate: (page: 'home' | 'model') => void;
 }
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -32,18 +32,6 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 }`}
               >
                 Home
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => onNavigate('dataset')}
-                className={`hover:text-foreground ${
-                  currentPage === 'dataset'
-                    ? 'text-foreground font-extrabold'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <DatabaseIcon className="h-4 w-4 mr-1" />
-                Dataset Explorer
               </Button>
               <Button
                 variant="ghost"
