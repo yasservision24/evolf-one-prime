@@ -14,7 +14,7 @@ const Dataset = () => {
 
   return (
     <>
-      <Header currentPage="dataset" onNavigate={handleNavigate} showSearch={true} />
+      <Header currentPage="dataset" onNavigate={handleNavigate} />
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl mb-4">Dataset Explorer</h1>
