@@ -8,17 +8,18 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 14.5%;
+    /* 🟦 Deep Navy Theme (#041938) */
+    --background: 222 86% 11%; /* #041938 */
     --foreground: 0 0% 98.5%;
 
-    --card: 0 0% 14.5%;
+    --card: 222 86% 11%;
     --card-foreground: 0 0% 98.5%;
 
-    --popover: 0 0% 14.5%;
+    --popover: 222 86% 11%;
     --popover-foreground: 0 0% 98.5%;
 
-    --primary: 166 100% 39%;
-    --primary-foreground: 0 0% 20.5%;
+    --primary: 222 86% 11%; /* #041938 */
+    --primary-foreground: 0 0% 98.5%;
 
     --secondary: 0 0% 26.9%;
     --secondary-foreground: 0 0% 98.5%;
@@ -32,24 +33,25 @@ All colors MUST be HSL.
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 70% 65%;
 
-    --border: 0 0% 52%;
+    --border: 0 0% 35%; /* slightly lighter for contrast */
     --input: 0 0% 26.9%;
     --ring: 0 0% 43.9%;
 
     --radius: 0.5rem;
-    
+
     /* Custom Brand Colors */
-    --brand-teal: 166 100% 39%;
+    --brand-teal: 222 86% 11%; /* updated to match primary/navy */
     --brand-purple: 274 77% 59%;
     --brand-purple-alt: 261 74% 62%;
-    
+
     /* Gradients */
     --gradient-logo: linear-gradient(90deg, #00C9A7 0%, #9D4EDD 100%);
     --gradient-button-hover: linear-gradient(90deg, #00C9A7 0%, #8B5CF6 100%);
 
-    --sidebar-background: 0 0% 20.5%;
+    /* Sidebar */
+    --sidebar-background: 222 86% 11%;
     --sidebar-foreground: 0 0% 98.5%;
-    --sidebar-primary: 166 100% 39%;
+    --sidebar-primary: 222 86% 11%;
     --sidebar-primary-foreground: 0 0% 98.5%;
     --sidebar-accent: 0 0% 35%;
     --sidebar-accent-foreground: 0 0% 98.5%;
@@ -58,17 +60,17 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 0 0% 14.5%;
+    --background: 222 86% 11%;
     --foreground: 0 0% 98.5%;
 
-    --card: 0 0% 14.5%;
+    --card: 222 86% 11%;
     --card-foreground: 0 0% 98.5%;
 
-    --popover: 0 0% 14.5%;
+    --popover: 222 86% 11%;
     --popover-foreground: 0 0% 98.5%;
 
-    --primary: 166 100% 39%;
-    --primary-foreground: 0 0% 20.5%;
+    --primary: 222 86% 11%;
+    --primary-foreground: 0 0% 98.5%;
 
     --secondary: 0 0% 26.9%;
     --secondary-foreground: 0 0% 98.5%;
@@ -82,13 +84,13 @@ All colors MUST be HSL.
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 70% 65%;
 
-    --border: 0 0% 52%;
+    --border: 0 0% 35%;
     --input: 0 0% 26.9%;
     --ring: 0 0% 43.9%;
-    
-    --sidebar-background: 0 0% 20.5%;
+
+    --sidebar-background: 222 86% 11%;
     --sidebar-foreground: 0 0% 98.5%;
-    --sidebar-primary: 166 100% 39%;
+    --sidebar-primary: 222 86% 11%;
     --sidebar-primary-foreground: 0 0% 98.5%;
     --sidebar-accent: 0 0% 35%;
     --sidebar-accent-foreground: 0 0% 98.5%;
@@ -105,7 +107,7 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground font-sans;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
   }
@@ -119,7 +121,7 @@ All colors MUST be HSL.
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .gradient-button-hover {
     background: var(--gradient-button-hover);
   }
