@@ -667,10 +667,10 @@ const DatabaseDashboard = () => {
 
           {/* Enhanced Search Bar */}
           <div className="mb-8">
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 overflow-visible">
+              <div className="flex flex-col gap-4 overflow-visible">
+                <div className="flex items-center gap-3 overflow-visible">
+                  <div className="relative flex-1 z-50">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))]" />
                     <Input
                       ref={searchInputRef}
