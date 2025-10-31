@@ -695,7 +695,7 @@ const DatabaseDashboard = () => {
                     
                     {/* Autocomplete Suggestions Dropdown */}
                     {showSuggestions && searchSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                         {isSearching && (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
@@ -705,7 +705,7 @@ const DatabaseDashboard = () => {
                         {!isSearching && searchSuggestions.map((suggestion, index) => (
                           <div
                             key={`${suggestion.EvOlf_ID}-${index}`}
-                            className="p-4 hover:bg-accent/50 cursor-pointer border-b border-border/50 last:border-b-0 transition-colors"
+                            className="p-4 hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0 transition-colors"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
                             <div className="flex items-start justify-between gap-3">
@@ -734,16 +734,16 @@ const DatabaseDashboard = () => {
                   </div>
                   <Button 
                     size="lg"
-                    className="h-14 px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                    className="h-14 px-4 sm:px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 min-w-[100px] sm:min-w-[120px]"
                     onClick={handleSearchSubmit}
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
-                      <Search className="w-5 h-5" />
+                      <Search className="w-5 h-5 sm:mr-2" />
                     )}
-                    {isLoading ? 'Searching...' : 'Search'}
+                    <span className="hidden sm:inline">{isLoading ? 'Searching...' : 'Search'}</span>
                   </Button>
                 </div>
 
