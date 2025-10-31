@@ -466,3 +466,40 @@ export async function fetchInteractions() {
   return await response.json();
 }
 
+/**
+ * Search dataset with autocomplete suggestions
+ * Endpoint: GET /search/?q={query}
+ * 
+ * Response Format:
+ * {
+ *   results: Array<{
+ *     EvOlf_ID: string,
+ *     Receptor: string,
+ *     Ligand: string,
+ *     Species: string
+ *   }>
+ * }
+ * 
+ * @param query - Search query string
+ * @returns Array of search results
+ */
+export async function searchDataset(query: string) {
+  if (!query || query.trim().length === 0) {
+    return { results: [] };
+  }
+
+  const queryParams = new URLSearchParams();
+  queryParams.append('q', query.trim());
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/search/?${queryParams.toString()}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to search dataset: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+

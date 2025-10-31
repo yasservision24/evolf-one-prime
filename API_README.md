@@ -6,9 +6,10 @@ Complete API reference for EvoLF dataset endpoints and prediction model with exa
 
 ## Table of Contents
 1. [Get Paginated Dataset](#1-get-paginated-dataset)
-2. [Download Selected Dataset Items](#2-download-selected-dataset-items)
-3. [Download Complete Dataset](#3-download-complete-dataset)
-4. [Prediction Model API](#4-prediction-model-api)
+2. [Search Dataset (Autocomplete)](#2-search-dataset-autocomplete)
+3. [Download Selected Dataset Items](#3-download-selected-dataset-items)
+4. [Download Complete Dataset](#4-download-complete-dataset)
+5. [Prediction Model API](#5-prediction-model-api)
 
 ---
 
@@ -217,7 +218,105 @@ data <- fromJSON(content(response, "text"))
 
 ---
 
-## 2. Download Selected Dataset Items
+## 2. Search Dataset (Autocomplete)
+
+Search the dataset with autocomplete suggestions for quick lookup of receptors, ligands, species, and EvOlf IDs.
+
+### Endpoint
+```
+GET /search/?q={query}
+```
+
+### Function Signature
+```typescript
+searchDataset(query: string): Promise<{ results: SearchResult[] }>
+```
+
+### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `q` | string | Yes | Search query string |
+
+### Example Request
+
+**JavaScript/TypeScript:**
+```javascript
+import { searchDataset } from '@/lib/api';
+
+// Search for "human"
+const response = await searchDataset('human');
+console.log(response.results);
+```
+
+**cURL:**
+```bash
+curl "http://localhost:8000/api/search/?q=human"
+```
+
+**Python:**
+```python
+import requests
+
+response = requests.get(
+    'http://localhost:8000/api/search/',
+    params={'q': 'human'},
+    headers={'Content-Type': 'application/json'}
+)
+results = response.json()
+```
+
+**R:**
+```r
+library(httr)
+library(jsonlite)
+
+response <- GET(
+  "http://localhost:8000/api/search/",
+  query = list(q = "human"),
+  add_headers("Content-Type" = "application/json")
+)
+data <- fromJSON(content(response, "text"))
+```
+
+### Response Structure
+
+**Success Response (200):**
+```json
+{
+  "results": [
+    {
+      "EvOlf_ID": "EvOlf0000008",
+      "Receptor": "OR8U3",
+      "Ligand": "Musk xylol",
+      "Species": "Human"
+    },
+    {
+      "EvOlf_ID": "EvOlf0000009",
+      "Receptor": "OR10P1",
+      "Ligand": "Musk xylol",
+      "Species": "Human"
+    }
+  ]
+}
+```
+
+**Empty Results Response (200):**
+```json
+{
+  "results": []
+}
+```
+
+### Notes
+- Search is performed across EvOlf IDs, receptor names, ligands, and species
+- Results are returned in order of relevance
+- Typically returns a limited number of suggestions (e.g., 10-20 results)
+- Empty query strings return empty results
+
+---
+
+## 3. Download Selected Dataset Items
 
 Export specific dataset items by their EvoLF IDs as a ZIP file.
 
@@ -340,7 +439,7 @@ EVOLF001234,5-HT2A Receptor,Homo sapiens,Class A,Serotonin,Point Mutation,F340A,
 
 ---
 
-## 3. Download Complete Dataset
+## 4. Download Complete Dataset
 
 Download the entire EvoLF dataset as a pre-generated ZIP file.
 
@@ -530,7 +629,7 @@ try {
 
 ---
 
-## 4. Prediction Model API
+## 5. Prediction Model API
 
 Submit GPCR-ligand binding affinity predictions using the evolf deep learning model. Predictions are processed asynchronously and results are available via job ID.
 

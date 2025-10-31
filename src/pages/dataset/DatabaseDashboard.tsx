@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, CheckCircle, ChevronDown, ArrowUpDown, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { fetchDatasetPaginated, downloadDatasetByIds, downloadCompleteDataset } from '@/lib/api';
+import { useState, useEffect, useRef } from 'react';
+import { fetchDatasetPaginated, downloadDatasetByIds, downloadCompleteDataset, searchDataset } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -99,6 +99,13 @@ const DatabaseDashboard = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const itemsPerPage = 20;
+  
+  // Autocomplete search state
+  const [searchSuggestions, setSearchSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchDebounceRef = useRef<NodeJS.Timeout>();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Statistics from backend
   const [statistics, setStatistics] = useState({
@@ -315,11 +322,65 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Handle search input change
+   * Fetch search suggestions
+   */
+  const fetchSearchSuggestions = async (query: string) => {
+    if (!query || query.trim().length === 0) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const data = await searchDataset(query);
+      setSearchSuggestions(data.results || []);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+      setSearchSuggestions([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  /**
+   * Handle search input change with debounce
    */
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    setCurrentPage(1); // Reset to first page on new search
+    
+    // Clear previous debounce timeout
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
+    // Debounce search suggestions
+    if (value.trim().length > 0) {
+      searchDebounceRef.current = setTimeout(() => {
+        fetchSearchSuggestions(value);
+      }, 300);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  /**
+   * Handle suggestion click
+   */
+  const handleSuggestionClick = (suggestion: any) => {
+    setSearchQuery(suggestion.Receptor || suggestion.Ligand || suggestion.Species || '');
+    setShowSuggestions(false);
+    setCurrentPage(1);
+  };
+
+  /**
+   * Handle search submit
+   */
+  const handleSearchSubmit = () => {
+    setShowSuggestions(false);
+    setCurrentPage(1);
   };
 
   /**
@@ -414,6 +475,20 @@ const DatabaseDashboard = () => {
   useEffect(() => {
     fetchDatasetItems();
   }, [currentPage, searchQuery, sortBy, sortOrder, selectedSpecies, selectedClasses, selectedMutations]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Dynamic statistics data from backend
   const stats = [
@@ -598,17 +673,69 @@ const DatabaseDashboard = () => {
                   <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))]" />
                     <Input
+                      ref={searchInputRef}
                       type="text"
                       placeholder="Search by EvOlf ID, receptor name, ligand, ChEMBL ID, species..."
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSearchSubmit();
+                        } else if (e.key === 'Escape') {
+                          setShowSuggestions(false);
+                        }
+                      }}
+                      onFocus={() => {
+                        if (searchSuggestions.length > 0) {
+                          setShowSuggestions(true);
+                        }
+                      }}
                       className="pl-12 h-14 text-base bg-background/50 border-border/50 focus:border-[hsl(var(--brand-teal))] transition-colors"
                     />
+                    
+                    {/* Autocomplete Suggestions Dropdown */}
+                    {showSuggestions && searchSuggestions.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                        {isSearching && (
+                          <div className="flex items-center justify-center p-4">
+                            <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
+                          </div>
+                        )}
+                        
+                        {!isSearching && searchSuggestions.map((suggestion, index) => (
+                          <div
+                            key={`${suggestion.EvOlf_ID}-${index}`}
+                            className="p-4 hover:bg-accent/50 cursor-pointer border-b border-border/50 last:border-b-0 transition-colors"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Badge variant="outline" className="text-xs bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
+                                    {suggestion.EvOlf_ID}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">{suggestion.Species}</span>
+                                </div>
+                                <p className="font-medium text-sm truncate">{suggestion.Receptor}</p>
+                                <p className="text-xs text-muted-foreground truncate mt-0.5">{suggestion.Ligand}</p>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <div className="p-2 bg-muted/30 text-center">
+                          <p className="text-xs text-muted-foreground">
+                            Showing {searchSuggestions.length} suggestion{searchSuggestions.length !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <Button 
                     size="lg"
                     className="h-14 px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
-                    onClick={() => fetchDatasetItems()}
+                    onClick={handleSearchSubmit}
                     disabled={isLoading}
                   >
                     {isLoading ? (
