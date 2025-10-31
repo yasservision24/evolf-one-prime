@@ -241,14 +241,17 @@ export async function fetchDatasetPaginated(
   const queryParams = new URLSearchParams();
   queryParams.append('page', page.toString());
   queryParams.append('limit', limit.toString());
-  if (search) queryParams.append('search', search);
+  if (search && search.trim()) queryParams.append('search', search.trim());
   queryParams.append('sortBy', sortBy);
   queryParams.append('sortOrder', sortOrder);
-  if (species && species !== 'all') queryParams.append('species', species);
-  if (classFilter && classFilter !== 'all') queryParams.append('class', classFilter);
-  if (mutationType && mutationType !== 'all') queryParams.append('mutationType', mutationType);
+  if (species) queryParams.append('species', species);
+  if (classFilter) queryParams.append('class', classFilter);
+  if (mutationType) queryParams.append('mutationType', mutationType);
 
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset?${queryParams.toString()}`, {
+  const url = `${API_CONFIG.BASE_URL}/dataset?${queryParams.toString()}`;
+  console.log('API Request URL:', url);
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: API_CONFIG.HEADERS,
   });

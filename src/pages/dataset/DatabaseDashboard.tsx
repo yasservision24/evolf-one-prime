@@ -144,9 +144,20 @@ const DatabaseDashboard = () => {
     setIsLoading(true);
     try {
       // Convert selected filters to comma-separated strings
-      const speciesFilter = selectedSpecies.length > 0 ? selectedSpecies.join(',') : 'all';
-      const classFilter = selectedClasses.length > 0 ? selectedClasses.join(',') : 'all';
-      const mutationFilter = selectedMutations.length > 0 ? selectedMutations.join(',') : 'all';
+      const speciesFilter = selectedSpecies.length > 0 ? selectedSpecies.join(',') : undefined;
+      const classFilter = selectedClasses.length > 0 ? selectedClasses.join(',') : undefined;
+      const mutationFilter = selectedMutations.length > 0 ? selectedMutations.join(',') : undefined;
+      
+      console.log('Fetching dataset with params:', {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
+        sortBy,
+        sortOrder,
+        species: speciesFilter,
+        class: classFilter,
+        mutationType: mutationFilter
+      });
       
       const data: PaginatedResponse<DatasetItem> = await fetchDatasetPaginated(
         currentPage,
@@ -215,11 +226,15 @@ const DatabaseDashboard = () => {
    * Handle sorting
    */
   const handleSort = (field: SortField) => {
+    console.log('Sorting by field:', field);
     if (sortBy === field) {
       // Toggle sort order if same field
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+      console.log('Toggling sort order to:', newOrder);
+      setSortOrder(newOrder);
     } else {
       // Set new sort field and default to ascending
+      console.log('Setting new sort field:', field, 'with order: asc');
       setSortBy(field);
       setSortOrder('asc');
     }
