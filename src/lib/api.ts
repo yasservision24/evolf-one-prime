@@ -216,20 +216,27 @@ export const api = {
 // ============================================================================
 
 /**
- * Fetch paginated dataset items
+ * Fetch paginated dataset items with filters
  * Endpoint: GET /dataset
  * @param page - Page number (default: 1)
  * @param limit - Items per page (default: 20)
  * @param search - Search query (optional)
- * @param sortBy - Sort field (default: 'dateAdded')
+ * @param sortBy - Sort field (default: 'evolfId')
  * @param sortOrder - Sort direction (default: 'desc')
+ * @param species - Filter by species (optional)
+ * @param classFilter - Filter by GPCR class (optional)
+ * @param mutationType - Filter by mutation type (optional)
+ * @returns Response with data, pagination, and statistics
  */
 export async function fetchDatasetPaginated(
   page: number = 1,
   limit: number = 20,
   search?: string,
   sortBy: string = 'evolfId',
-  sortOrder: 'asc' | 'desc' = 'desc'
+  sortOrder: 'asc' | 'desc' = 'desc',
+  species?: string,
+  classFilter?: string,
+  mutationType?: string
 ) {
   const queryParams = new URLSearchParams();
   queryParams.append('page', page.toString());
@@ -237,6 +244,9 @@ export async function fetchDatasetPaginated(
   if (search) queryParams.append('search', search);
   queryParams.append('sortBy', sortBy);
   queryParams.append('sortOrder', sortOrder);
+  if (species && species !== 'all') queryParams.append('species', species);
+  if (classFilter && classFilter !== 'all') queryParams.append('class', classFilter);
+  if (mutationType && mutationType !== 'all') queryParams.append('mutationType', mutationType);
 
   const response = await fetch(`${API_CONFIG.BASE_URL}/dataset?${queryParams.toString()}`, {
     method: 'GET',

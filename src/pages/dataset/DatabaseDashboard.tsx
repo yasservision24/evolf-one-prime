@@ -44,6 +44,12 @@ export interface PaginatedResponse<T> {
     totalItems: number;       // Total number of items across all pages
     totalPages: number;       // Total number of pages
   };
+  statistics?: {
+    totalRows: number;        // Total data rows
+    uniqueClasses: string[];  // Array of unique GPCR classes
+    uniqueSpecies: string[];  // Array of unique species
+    uniqueMutationTypes: string[]; // Array of unique mutation types
+  };
 }
 
 /**
@@ -74,10 +80,17 @@ const DatabaseDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [datasetItems, setDatasetItems] = useState<DatasetItem[]>([]);
-  const [allDatasetItems, setAllDatasetItems] = useState<DatasetItem[]>([]); // For client-side filtering
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const itemsPerPage = 20;
+  
+  // Statistics from backend
+  const [statistics, setStatistics] = useState({
+    totalRows: 0,
+    uniqueClasses: [] as string[],
+    uniqueSpecies: [] as string[],
+    uniqueMutationTypes: [] as string[]
+  });
 
   // Sorting state
   const [sortBy, setSortBy] = useState<SortField>('evolfId');
@@ -86,11 +99,8 @@ const DatabaseDashboard = () => {
   // Filter state
   const [speciesFilter, setSpeciesFilter] = useState<string>('all');
   const [classFilter, setClassFilter] = useState<string>('all');
+  const [mutationTypeFilter, setMutationTypeFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
-
-  // Available filter options
-  const [availableSpecies, setAvailableSpecies] = useState<string[]>([]);
-  const [availableClasses, setAvailableClasses] = useState<string[]>([]);
 
   // Calculate total pages
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -101,7 +111,7 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Fetch paginated dataset items
+   * Fetch paginated dataset items with backend filtering
    */
   const fetchDatasetItems = async () => {
     setIsLoading(true);
@@ -111,17 +121,23 @@ const DatabaseDashboard = () => {
         itemsPerPage,
         searchQuery,
         sortBy,
-        sortOrder
+        sortOrder,
+        speciesFilter,
+        classFilter,
+        mutationTypeFilter
       );
       
       setDatasetItems(data.data);
       setTotalItems(data.pagination.totalItems);
       
-      // If it's the initial load or search changed, fetch all data for client-side filtering
-      if (isInitialLoad || searchQuery) {
-        const allData = await fetchDatasetPaginated(1, 10000, searchQuery, 'evolfId', 'asc');
-        setAllDatasetItems(allData.data);
-        updateFilterOptions(allData.data);
+      // Update statistics if available
+      if (data.statistics) {
+        setStatistics({
+          totalRows: data.statistics.totalRows,
+          uniqueClasses: data.statistics.uniqueClasses,
+          uniqueSpecies: data.statistics.uniqueSpecies,
+          uniqueMutationTypes: data.statistics.uniqueMutationTypes
+        });
       }
     } catch (error) {
       console.error('Error fetching dataset:', error);
@@ -132,42 +148,11 @@ const DatabaseDashboard = () => {
       });
       
       setDatasetItems([]);
-      setAllDatasetItems([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
       setIsInitialLoad(false);
     }
-  };
-
-  /**
-   * Update available filter options from dataset
-   */
-  const updateFilterOptions = (data: DatasetItem[]) => {
-    const species = [...new Set(data.map(item => item.species))].sort();
-    const classes = [...new Set(data.map(item => item.class))].sort();
-    
-    setAvailableSpecies(species);
-    setAvailableClasses(classes);
-  };
-
-  /**
-   * Apply client-side filtering
-   */
-  const applyClientSideFilters = (data: DatasetItem[]) => {
-    let filteredData = [...data];
-
-    // Apply species filter
-    if (speciesFilter !== 'all') {
-      filteredData = filteredData.filter(item => item.species === speciesFilter);
-    }
-
-    // Apply class filter
-    if (classFilter !== 'all') {
-      filteredData = filteredData.filter(item => item.class === classFilter);
-    }
-
-    return filteredData;
   };
 
   /**
@@ -233,8 +218,6 @@ const DatabaseDashboard = () => {
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1); // Reset to first page on new search
-    setSpeciesFilter('all');
-    setClassFilter('all');
   };
 
   /**
@@ -250,11 +233,13 @@ const DatabaseDashboard = () => {
   /**
    * Handle filter changes
    */
-  const handleFilterChange = (type: 'species' | 'class', value: string) => {
+  const handleFilterChange = (type: 'species' | 'class' | 'mutation', value: string) => {
     if (type === 'species') {
       setSpeciesFilter(value);
-    } else {
+    } else if (type === 'class') {
       setClassFilter(value);
+    } else if (type === 'mutation') {
+      setMutationTypeFilter(value);
     }
     setCurrentPage(1); // Reset to first page when filters change
   };
@@ -265,6 +250,7 @@ const DatabaseDashboard = () => {
   const clearFilters = () => {
     setSpeciesFilter('all');
     setClassFilter('all');
+    setMutationTypeFilter('all');
     setCurrentPage(1);
   };
 
@@ -307,51 +293,40 @@ const DatabaseDashboard = () => {
     // navigate(`/dataset/${item.evolfId}`);
   };
 
-  // Apply client-side filtering when filters change
+  // Fetch data when page, search, sort, or filters change
   useEffect(() => {
-    if (allDatasetItems.length > 0) {
-      const filteredData = applyClientSideFilters(allDatasetItems);
-      setDatasetItems(filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
-      setTotalItems(filteredData.length);
-    }
-  }, [speciesFilter, classFilter, currentPage, allDatasetItems]);
+    fetchDatasetItems();
+  }, [currentPage, searchQuery, sortBy, sortOrder, speciesFilter, classFilter, mutationTypeFilter]);
 
-  // Fetch data when page, search, or sort changes
-  useEffect(() => {
-    if (!speciesFilter && !classFilter) {
-      fetchDatasetItems();
-    }
-  }, [currentPage, searchQuery, sortBy, sortOrder]);
-
-  // Fixed global statistics data
+  // Dynamic statistics data from backend
   const stats = [
     { 
       label: 'Total Interactions', 
-      value: '10,234', 
+      value: statistics.totalRows.toLocaleString(), 
       change: 'Curated records', 
       icon: Database, 
       color: 'text-[hsl(var(--brand-teal))]',
       bgColor: 'bg-[hsl(var(--brand-teal))]/10'
     },
     { 
-      label: 'GPCR Receptors', 
-      value: '487', 
-      change: 'Unique receptors', 
+      label: 'GPCR Classes', 
+      value: statistics.uniqueClasses.length.toString(), 
+      change: 'Unique classes', 
       icon: Dna, 
       color: 'text-green-400',
       bgColor: 'bg-green-400/10'
     },
     { 
-      label: 'Unique Ligands', 
-      value: '1,876', 
-      change: 'Distinct compounds', 
+      label: 'Species', 
+      value: statistics.uniqueSpecies.length.toString(), 
+      change: 'Organisms studied', 
       icon: FlaskConical, 
       color: 'text-[hsl(var(--brand-purple))]',
       bgColor: 'bg-[hsl(var(--brand-purple))]/10'
     },
     { 
-      label: 'Mutations Studied', 
-      value: '3,542', 
+      label: 'Mutation Types', 
+      value: statistics.uniqueMutationTypes.length.toString(), 
       change: 'Variants analyzed', 
       icon: CheckCircle, 
       color: 'text-red-400',
@@ -378,7 +353,7 @@ const DatabaseDashboard = () => {
   ];
 
   // Check if any filters are active
-  const areFiltersActive = speciesFilter !== 'all' || classFilter !== 'all';
+  const areFiltersActive = speciesFilter !== 'all' || classFilter !== 'all' || mutationTypeFilter !== 'all';
 
   return (
     <>
@@ -504,7 +479,7 @@ const DatabaseDashboard = () => {
                         className="w-full p-2 border border-border/50 rounded-md bg-background/50 focus:border-[hsl(var(--brand-teal))] focus:outline-none"
                       >
                         <option value="all">All Species</option>
-                        {availableSpecies.map((species) => (
+                        {statistics.uniqueSpecies.map((species) => (
                           <option key={species} value={species}>
                             {species}
                           </option>
@@ -521,9 +496,26 @@ const DatabaseDashboard = () => {
                         className="w-full p-2 border border-border/50 rounded-md bg-background/50 focus:border-[hsl(var(--brand-teal))] focus:outline-none"
                       >
                         <option value="all">All Classes</option>
-                        {availableClasses.map((cls) => (
+                        {statistics.uniqueClasses.map((cls) => (
                           <option key={cls} value={cls}>
                             {cls}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Mutation Type Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Mutation Type</label>
+                      <select
+                        value={mutationTypeFilter}
+                        onChange={(e) => handleFilterChange('mutation', e.target.value)}
+                        className="w-full p-2 border border-border/50 rounded-md bg-background/50 focus:border-[hsl(var(--brand-teal))] focus:outline-none"
+                      >
+                        <option value="all">All Types</option>
+                        {statistics.uniqueMutationTypes.map((mutation) => (
+                          <option key={mutation} value={mutation}>
+                            {mutation}
                           </option>
                         ))}
                       </select>
