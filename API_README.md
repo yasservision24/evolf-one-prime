@@ -1,6 +1,6 @@
 # EvoLF API Documentation
 
-Complete API reference for EvoLF dataset endpoints with examples and integration guides.
+Complete API reference for EvoLF dataset endpoints and prediction model with examples and integration guides.
 
 ---
 
@@ -8,6 +8,7 @@ Complete API reference for EvoLF dataset endpoints with examples and integration
 1. [Get Paginated Dataset](#1-get-paginated-dataset)
 2. [Download Selected Dataset Items](#2-download-selected-dataset-items)
 3. [Download Complete Dataset](#3-download-complete-dataset)
+4. [Prediction Model API](#4-prediction-model-api)
 
 ---
 
@@ -529,7 +530,250 @@ try {
 
 ---
 
+## 4. Prediction Model API
+
+Submit GPCR-ligand binding affinity predictions using the evolf deep learning model.
+
+### Endpoint
+```
+POST /predict
+```
+
+### Function Signature
+```typescript
+submitPrediction(data: {
+  receptor: {
+    sequence: string;
+    name?: string;
+  };
+  ligands: Array<{
+    smiles: string;
+    name?: string;
+  }>;
+  mutation?: string;
+})
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `receptor.sequence` | string | Yes | FASTA format receptor sequence |
+| `receptor.name` | string | No | Optional receptor identifier |
+| `ligands` | array | Yes | Array of ligand objects (max 10) |
+| `ligands[].smiles` | string | Yes | SMILES notation for ligand |
+| `ligands[].name` | string | No | Optional ligand identifier |
+| `mutation` | string | No | Point mutation (e.g., "L249A") |
+
+### SMILES CSV Format
+
+For bulk ligand upload, use CSV format:
+
+```csv
+smiles,ligand_name,description
+CCN1C=NC2=C1C(=O)N(C(=O)N2C)C,Caffeine,Adenosine receptor antagonist
+CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O,Propranolol,Beta-adrenergic receptor antagonist
+```
+
+**Download sample CSV:** [/samples/smiles_sample.csv](/samples/smiles_sample.csv)
+
+### Example Request
+
+**JavaScript/TypeScript:**
+```javascript
+import { submitPrediction } from '@/lib/api';
+
+const predictionData = {
+  receptor: {
+    sequence: ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
+    name: "Adenosine A2A Receptor"
+  },
+  ligands: [
+    {
+      smiles: "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      name: "Caffeine"
+    },
+    {
+      smiles: "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
+      name: "Propranolol"
+    }
+  ],
+  mutation: "L249A"
+};
+
+const result = await submitPrediction(predictionData);
+console.log('Prediction results:', result);
+```
+
+**cURL:**
+```bash
+curl -X POST "https://api.evolf.com/v1/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "receptor": {
+      "sequence": ">A2A_HUMAN\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
+      "name": "Adenosine A2A Receptor"
+    },
+    "ligands": [
+      {
+        "smiles": "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+        "name": "Caffeine"
+      }
+    ]
+  }'
+```
+
+**Python:**
+```python
+import requests
+
+prediction_data = {
+    "receptor": {
+        "sequence": ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
+        "name": "Adenosine A2A Receptor"
+    },
+    "ligands": [
+        {
+            "smiles": "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+            "name": "Caffeine"
+        },
+        {
+            "smiles": "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
+            "name": "Propranolol"
+        }
+    ],
+    "mutation": "L249A"
+}
+
+response = requests.post(
+    'https://api.evolf.com/v1/predict',
+    json=prediction_data,
+    headers={'Content-Type': 'application/json'}
+)
+
+result = response.json()
+print(f"Prediction ID: {result['predictionId']}")
+print(f"Processing time: {result['processingTime']}s")
+for pred in result['results']:
+    print(f"{pred['ligandName']}: {pred['predictedAffinity']} nM (confidence: {pred['confidenceScore']}%)")
+```
+
+**R:**
+```r
+library(httr)
+library(jsonlite)
+
+prediction_data <- list(
+  receptor = list(
+    sequence = ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
+    name = "Adenosine A2A Receptor"
+  ),
+  ligands = list(
+    list(
+      smiles = "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      name = "Caffeine"
+    )
+  ),
+  mutation = "L249A"
+)
+
+response <- POST(
+  "https://api.evolf.com/v1/predict",
+  body = prediction_data,
+  encode = "json",
+  add_headers("Content-Type" = "application/json")
+)
+
+result <- fromJSON(content(response, "text"))
+print(result$results)
+```
+
+### Response Format
+
+**Success Response (200 OK):**
+```json
+{
+  "predictionId": "pred_abc123xyz789",
+  "results": [
+    {
+      "ligandIndex": 0,
+      "ligandName": "Caffeine",
+      "smiles": "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      "predictedAffinity": 2.45,
+      "confidenceScore": 94.2,
+      "affinityClass": "High"
+    },
+    {
+      "ligandIndex": 1,
+      "ligandName": "Propranolol",
+      "smiles": "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
+      "predictedAffinity": 15.8,
+      "confidenceScore": 87.5,
+      "affinityClass": "Medium"
+    }
+  ],
+  "modelInfo": {
+    "version": "evolf-v2.1",
+    "trainingSetSize": 10234,
+    "performanceMetrics": {
+      "r2": 0.89,
+      "rmse": 0.65
+    }
+  },
+  "processingTime": 1.8,
+  "mutation": "L249A"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Validation error",
+  "status": 400,
+  "message": "Invalid FASTA format in receptor sequence",
+  "details": {
+    "field": "receptor.sequence",
+    "issue": "Missing header line starting with '>'"
+  }
+}
+```
+
+**Error Response (413 Payload Too Large):**
+```json
+{
+  "error": "Payload too large",
+  "status": 413,
+  "message": "Maximum 10 ligands allowed per request",
+  "details": {
+    "provided": 15,
+    "maximum": 10
+  }
+}
+```
+
+### Validation Rules
+
+- **Receptor sequence**: Must be valid FASTA format
+- **SMILES notation**: Must be chemically valid SMILES strings
+- **Ligand count**: Maximum 10 ligands per request
+- **Mutation format**: Must match pattern `[A-Z]\d+[A-Z]` (e.g., "L249A")
+
+### Affinity Classification
+
+| Class | Range (nM) | Description |
+|-------|------------|-------------|
+| High | < 10 | Strong binding affinity |
+| Medium | 10-100 | Moderate binding affinity |
+| Low | > 100 | Weak binding affinity |
+
+---
+
 ## Changelog
+
+### Version 1.1 (2024-01-20)
+- Added prediction model endpoint
+- Added SMILES CSV upload support
+- Enhanced error handling and validation
 
 ### Version 1.0 (2024-01-15)
 - Initial API release

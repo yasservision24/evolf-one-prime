@@ -320,12 +320,58 @@ export async function fetchDatasetStats() {
 }
 
 /**
- * Submit prediction request
+ * Submit prediction request with receptor and ligands
  * Endpoint: POST /predict
- * @param data - Prediction request data
- * @returns Prediction response
+ * 
+ * Request Body Format:
+ * {
+ *   receptor: {
+ *     sequence: string,        // FASTA format sequence
+ *     name?: string           // Optional receptor name
+ *   },
+ *   ligands: Array<{
+ *     smiles: string,         // SMILES notation
+ *     name?: string          // Optional ligand name
+ *   }>,
+ *   mutation?: string         // Optional mutation (e.g., "L249A")
+ * }
+ * 
+ * Response Format:
+ * {
+ *   predictionId: string,
+ *   results: Array<{
+ *     ligandIndex: number,
+ *     ligandName?: string,
+ *     smiles: string,
+ *     predictedAffinity: number,      // in nM
+ *     confidenceScore: number,         // 0-100
+ *     affinityClass: string           // "High" | "Medium" | "Low"
+ *   }>,
+ *   modelInfo: {
+ *     version: string,
+ *     trainingSetSize: number,
+ *     performanceMetrics: {
+ *       r2: number,
+ *       rmse: number
+ *     }
+ *   },
+ *   processingTime: number              // in seconds
+ * }
+ * 
+ * @param data - Prediction request data with receptor and ligands
+ * @returns Prediction response with results for all ligands
  */
-export async function submitPrediction(data: any) {
+export async function submitPrediction(data: {
+  receptor: {
+    sequence: string;
+    name?: string;
+  };
+  ligands: Array<{
+    smiles: string;
+    name?: string;
+  }>;
+  mutation?: string;
+}) {
   const response = await fetch(`${API_CONFIG.BASE_URL}/predict`, {
     method: 'POST',
     headers: API_CONFIG.HEADERS,
@@ -333,7 +379,12 @@ export async function submitPrediction(data: any) {
   });
 
   if (!response.ok) {
-    throw new ApiError(`Failed to submit prediction: ${response.statusText}`, response.status);
+    const errorData = await response.json().catch(() => ({}));
+    throw new ApiError(
+      errorData.message || `Failed to submit prediction: ${response.statusText}`,
+      response.status,
+      errorData
+    );
   }
 
   return await response.json();
