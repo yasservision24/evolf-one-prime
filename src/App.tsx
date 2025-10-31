@@ -8,7 +8,7 @@ import Prediction from "./pages/Prediction";
 import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
-import API from "./pages/API";
+
 import DownloadDataset from "./pages/DownloadDataset";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
@@ -30,9 +30,8 @@ const App = () => (
         <Route path="/dataset/dashboard" element={<DatabaseDashboard />} />
         <Route path="/prediction" element={<Prediction />} />
         <Route path="/documentation" element={<Documentation />} />
-        <Route path="/model-info" element={<ModelInfo />} />
-        <Route path="/api" element={<API />} />
-        <Route path="/download-dataset" element={<DownloadDataset />} />
+          <Route path="/model-info" element={<ModelInfo />} />
+          <Route path="/download-dataset" element={<DownloadDataset />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cite-us" element={<CiteUs />} />

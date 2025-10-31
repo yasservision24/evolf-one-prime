@@ -3,6 +3,49 @@
  * 
  * This file provides a complete API client for interacting with the backend.
  * It includes error handling, request timeouts, and type-safe methods.
+ * 
+ * ============================================================================
+ * REST API ENDPOINTS
+ * ============================================================================
+ * 
+ * Base URL: https://api.evolf.com/v1 (or set via VITE_API_BASE_URL env variable)
+ * 
+ * Available Endpoints:
+ * - GET  /interactions       - Retrieve interaction data
+ * - POST /predict           - Submit prediction requests
+ * - GET  /receptors         - List available GPCR receptors
+ * - GET  /dataset           - Get paginated dataset with filters
+ * - GET  /dataset/count     - Get total count of dataset items
+ * - GET  /dataset/:id       - Get single dataset item by ID
+ * - GET  /model/prediction/:id - Get prediction result by ID
+ * 
+ * ============================================================================
+ * AUTHENTICATION
+ * ============================================================================
+ * 
+ * API access requires authentication via API key.
+ * Include your key in the request header:
+ * 
+ *   Authorization: Bearer YOUR_API_KEY
+ * 
+ * ============================================================================
+ * RESPONSE FORMAT
+ * ============================================================================
+ * 
+ * All responses are returned in JSON format with standardized structure:
+ * 
+ * {
+ *   "status": "success",
+ *   "data": {...},
+ *   "meta": {...}
+ * }
+ * 
+ * ============================================================================
+ * CODE EXAMPLES
+ * ============================================================================
+ * 
+ * Sample code snippets available for Python, R, JavaScript, and cURL.
+ * Visit the GitHub repository for complete examples and client libraries.
  */
 
 // ============================================================================
