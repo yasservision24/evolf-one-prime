@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DatabaseDashboard from "./pages/dataset/DatabaseDashboard";
-import Prediction from "./pages/Prediction";
+import PredictionDashboard from "./pages/prediction/PredictionDashboard";
 import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
@@ -28,7 +28,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/dataset/dashboard" element={<DatabaseDashboard />} />
-        <Route path="/prediction" element={<Prediction />} />
+        <Route path="/prediction" element={<PredictionDashboard />} />
         <Route path="/documentation" element={<Documentation />} />
           <Route path="/model-info" element={<ModelInfo />} />
         <Route path="/faq" element={<FAQ />} />
