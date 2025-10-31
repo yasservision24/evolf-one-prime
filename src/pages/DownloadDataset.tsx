@@ -3,8 +3,31 @@ import { Footer } from '@/components/Footer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Database, FileText, CheckCircle2 } from 'lucide-react';
+import { downloadCompleteDataset } from '@/lib/api';
+import { toast } from 'sonner';
 
 const DownloadDataset = () => {
+  const handleDownloadComplete = async () => {
+    try {
+      toast.info('Preparing download...');
+      const blob = await downloadCompleteDataset();
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `evolf_complete_dataset.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Complete dataset downloaded');
+    } catch (error) {
+      console.error('Error downloading dataset:', error);
+      toast.error('Failed to download complete dataset');
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header currentPage="home" onNavigate={() => {}} />
@@ -40,16 +63,13 @@ const DownloadDataset = () => {
                   <span className="text-sm text-muted-foreground">Literature references</span>
                 </li>
               </ul>
-              <div className="flex gap-3">
-                <Button className="bg-accent hover:bg-accent/80">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download CSV (5.2 MB)
-                </Button>
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download JSON (8.7 MB)
-                </Button>
-              </div>
+              <Button 
+                className="bg-accent hover:bg-accent/80"
+                onClick={handleDownloadComplete}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download Complete Dataset (ZIP)
+              </Button>
             </Card>
 
             <Card className="p-6">

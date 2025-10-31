@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, CheckCircle, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchDatasetPaginated, downloadDataset as downloadDatasetAPI} from '@/lib/api';
+import { fetchDatasetPaginated, downloadDatasetByIds } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 // ============================================================================
@@ -38,6 +38,7 @@ export interface DatasetItem {
  */
 export interface PaginatedResponse<T> {
   data: T[];                  // Array of items for current page
+  all_evolf_ids?: string[];   // Array of all evolf IDs matching the current filters
   pagination: {
     currentPage: number;      // Current page number (1-indexed)
     itemsPerPage: number;     // Number of items per page
@@ -80,6 +81,7 @@ const DatabaseDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [datasetItems, setDatasetItems] = useState<DatasetItem[]>([]);
+  const [allEvolfIds, setAllEvolfIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const itemsPerPage = 20;
@@ -129,6 +131,7 @@ const DatabaseDashboard = () => {
       
       setDatasetItems(data.data);
       setTotalItems(data.pagination.totalItems);
+      setAllEvolfIds(data.all_evolf_ids || []);
       
       // Update statistics if available
       if (data.statistics) {
@@ -183,30 +186,30 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Download dataset as CSV/JSON
+   * Download dataset by evolf IDs (ZIP)
    */
-  const downloadDataset = async (format: 'csv' | 'json' = 'csv') => {
+  const downloadDataset = async () => {
     try {
-      const blob = await downloadDatasetAPI(format, searchQuery);
+      const blob = await downloadDatasetByIds(allEvolfIds);
       
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `evolf-dataset.${format}`;
+      a.download = `evolf-dataset-${allEvolfIds.length}-items.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
       toast({
-        title: 'Download Started',
-        description: `Dataset is being downloaded as ${format.toUpperCase()}.`,
+        title: 'Export Started',
+        description: `Exporting ${allEvolfIds.length} items as ZIP file.`,
       });
     } catch (error) {
-      console.error('Error downloading dataset:', error);
+      console.error('Error exporting dataset:', error);
       toast({
-        title: 'Download Failed',
-        description: 'Could not download dataset. Please try again.',
+        title: 'Export Failed',
+        description: 'Could not export dataset. Please try again.',
         variant: 'destructive',
       });
     }
@@ -428,11 +431,11 @@ const DatabaseDashboard = () => {
               </Button>
               <Button 
                 className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
-                onClick={() => downloadDataset('csv')}
-                disabled={datasetItems.length === 0}
+                onClick={downloadDataset}
+                disabled={allEvolfIds.length === 0}
               >
                 <Download className="w-4 h-4 mr-2" />
-                Export
+                Export ({allEvolfIds.length})
               </Button>
             </div>
           </div>
@@ -817,10 +820,11 @@ const DatabaseDashboard = () => {
             </Button>
             <Button 
               className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
-              onClick={() => downloadDataset('csv')}
+              onClick={downloadDataset}
+              disabled={allEvolfIds.length === 0}
             >
               <Download className="w-4 h-4" />
-              Download Data
+              Export ({allEvolfIds.length})
             </Button>
           </div>
         </div>

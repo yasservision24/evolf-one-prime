@@ -261,24 +261,38 @@ export async function fetchDatasetPaginated(
 }
 
 /**
- * Download dataset as CSV or JSON
- * Endpoint: GET /dataset/download
- * @param format - File format ('csv' or 'json')
- * @param search - Search filter (optional)
- * @returns Blob for download
+ * Download dataset by evolf IDs (returns ZIP)
+ * Endpoint: POST /dataset/export
+ * @param evolfIds - Array of evolf IDs to export
+ * @returns Blob (ZIP file) for download
  */
-export async function downloadDataset(format: 'csv' | 'json' = 'csv', search?: string) {
-  const queryParams = new URLSearchParams();
-  queryParams.append('format', format);
-  if (search) queryParams.append('search', search);
+export async function downloadDatasetByIds(evolfIds: string[]) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/export`, {
+    method: 'POST',
+    headers: API_CONFIG.HEADERS,
+    body: JSON.stringify({ evolfIds }),
+  });
 
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download?${queryParams.toString()}`, {
+  if (!response.ok) {
+    throw new ApiError(`Failed to export dataset: ${response.statusText}`, response.status);
+  }
+
+  return await response.blob();
+}
+
+/**
+ * Download complete dataset (returns ZIP)
+ * Endpoint: GET /dataset/download
+ * @returns Blob (ZIP file) for download
+ */
+export async function downloadCompleteDataset() {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download`, {
     method: 'GET',
     headers: API_CONFIG.HEADERS,
   });
 
   if (!response.ok) {
-    throw new ApiError(`Failed to download dataset: ${response.statusText}`, response.status);
+    throw new ApiError(`Failed to download complete dataset: ${response.statusText}`, response.status);
   }
 
   return await response.blob();
