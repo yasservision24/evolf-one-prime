@@ -228,7 +228,7 @@ export async function fetchDatasetPaginated(
   page: number = 1,
   limit: number = 20,
   search?: string,
-  sortBy: string = 'dateAdded',
+  sortBy: string = 'evolfId',
   sortOrder: 'asc' | 'desc' = 'desc'
 ) {
   const queryParams = new URLSearchParams();

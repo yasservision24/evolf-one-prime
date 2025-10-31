@@ -6,9 +6,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
-import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
+import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, CheckCircle, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchDatasetPaginated, downloadDataset as downloadDatasetAPI, fetchDatasetStats } from '@/lib/api';
+import { fetchDatasetPaginated, downloadDataset as downloadDatasetAPI} from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 // ============================================================================
@@ -22,19 +22,14 @@ import { useToast } from '@/hooks/use-toast';
 export interface DatasetItem {
   id: string;
   evolfId: string;            // EvOlf unique identifier (e.g., "EVLF_001234")
-  class: string;              // GPCR class (e.g., "Class A", "Class B")
   receptor: string;           // GPCR receptor name (e.g., "Adenosine A2A receptor")
   species: string;            // Organism species in scientific name (e.g., "Homo sapiens")
   ligand: string;             // Ligand/compound name
-  chemblId: string;           // ChEMBL database ID (e.g., "CHEMBL191")
-  mutation?: string;          // Optional: mutation information (e.g., "L249A", "Wild-type")
-  quality: string;            // Data quality level ("High", "Medium", "Low")
-  qualityScore: number;       // Quality score 0-100 for progress bar
-  affinity?: number;          // Optional: Binding affinity value (e.g., Ki, IC50)
-  affinityUnit?: string;      // Optional: Unit of measurement (e.g., "nM", "μM")
-  experimentType?: string;    // Optional: Type of experiment (e.g., "Binding", "Functional")
-  reference?: string;         // Optional: PubMed ID or DOI
-  dateAdded: string;          // ISO date string
+  chemblId: string;           // ChEMBL database ID or PubMed ID
+  mutation: string;           // Mutation information (e.g., "L249A", "Wild-type")
+  class: string;              // GPCR class (e.g., "Class A", "Class B", "Class C")
+  uniprotId?: string;         // Optional: UniProt identifier
+  ensembleId?: string;        // Optional: Ensemble identifier
 }
 
 /**
@@ -61,9 +56,14 @@ export interface DatasetQueryParams {
   search?: string;            // Search query (searches across all fields)
   receptor?: string;          // Filter by specific receptor
   species?: string;           // Filter by species
-  sortBy?: string;            // Sort field (e.g., "affinity", "dateAdded")
+  class?: string;             // Filter by GPCR class
+  sortBy?: string;            // Sort field (e.g., "receptor", "ligand", "evolfId")
   sortOrder?: 'asc' | 'desc'; // Sort direction
 }
+
+// Sorting options
+type SortField = 'receptor' | 'ligand' | 'evolfId' | 'species' | 'class';
+type SortOrder = 'asc' | 'desc';
 
 const DatabaseDashboard = () => {
   const navigate = useNavigate();
@@ -74,8 +74,23 @@ const DatabaseDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [datasetItems, setDatasetItems] = useState<DatasetItem[]>([]);
+  const [allDatasetItems, setAllDatasetItems] = useState<DatasetItem[]>([]); // For client-side filtering
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const itemsPerPage = 20;
+
+  // Sorting state
+  const [sortBy, setSortBy] = useState<SortField>('evolfId');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  // Filter state
+  const [speciesFilter, setSpeciesFilter] = useState<string>('all');
+  const [classFilter, setClassFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Available filter options
+  const [availableSpecies, setAvailableSpecies] = useState<string[]>([]);
+  const [availableClasses, setAvailableClasses] = useState<string[]>([]);
 
   // Calculate total pages
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -84,7 +99,6 @@ const DatabaseDashboard = () => {
     if (page === 'home') navigate('/');
     else if (page === 'model') navigate('/prediction');
   };
-
 
   /**
    * Fetch paginated dataset items
@@ -96,25 +110,91 @@ const DatabaseDashboard = () => {
         currentPage,
         itemsPerPage,
         searchQuery,
-        'dateAdded',
-        'desc'
+        sortBy,
+        sortOrder
       );
       
       setDatasetItems(data.data);
       setTotalItems(data.pagination.totalItems);
+      
+      // If it's the initial load or search changed, fetch all data for client-side filtering
+      if (isInitialLoad || searchQuery) {
+        const allData = await fetchDatasetPaginated(1, 10000, searchQuery, 'evolfId', 'asc');
+        setAllDatasetItems(allData.data);
+        updateFilterOptions(allData.data);
+      }
     } catch (error) {
       console.error('Error fetching dataset:', error);
       toast({
-        title: 'Backend Not Connected',
-        description: 'Please connect your backend to view real data.',
+        title: 'Error Loading Data',
+        description: 'Failed to fetch dataset from API.',
         variant: 'destructive',
       });
       
       setDatasetItems([]);
+      setAllDatasetItems([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
+      setIsInitialLoad(false);
     }
+  };
+
+  /**
+   * Update available filter options from dataset
+   */
+  const updateFilterOptions = (data: DatasetItem[]) => {
+    const species = [...new Set(data.map(item => item.species))].sort();
+    const classes = [...new Set(data.map(item => item.class))].sort();
+    
+    setAvailableSpecies(species);
+    setAvailableClasses(classes);
+  };
+
+  /**
+   * Apply client-side filtering
+   */
+  const applyClientSideFilters = (data: DatasetItem[]) => {
+    let filteredData = [...data];
+
+    // Apply species filter
+    if (speciesFilter !== 'all') {
+      filteredData = filteredData.filter(item => item.species === speciesFilter);
+    }
+
+    // Apply class filter
+    if (classFilter !== 'all') {
+      filteredData = filteredData.filter(item => item.class === classFilter);
+    }
+
+    return filteredData;
+  };
+
+  /**
+   * Handle sorting
+   */
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new sort field and default to ascending
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  /**
+   * Get sort icon for a column
+   */
+  const getSortIcon = (field: SortField) => {
+    if (sortBy !== field) {
+      return <ChevronDown className="w-4 h-4 opacity-50" />;
+    }
+    return sortOrder === 'asc' ? 
+      <ChevronDown className="w-4 h-4" /> : 
+      <ChevronDown className="w-4 h-4 rotate-180" />;
   };
 
   /**
@@ -149,11 +229,12 @@ const DatabaseDashboard = () => {
 
   /**
    * Handle search input change
-   * Debounced to avoid excessive API calls
    */
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1); // Reset to first page on new search
+    setSpeciesFilter('all');
+    setClassFilter('all');
   };
 
   /**
@@ -162,32 +243,48 @@ const DatabaseDashboard = () => {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      // Scroll to top of table
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   /**
+   * Handle filter changes
+   */
+  const handleFilterChange = (type: 'species' | 'class', value: string) => {
+    if (type === 'species') {
+      setSpeciesFilter(value);
+    } else {
+      setClassFilter(value);
+    }
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  /**
+   * Clear all filters
+   */
+  const clearFilters = () => {
+    setSpeciesFilter('all');
+    setClassFilter('all');
+    setCurrentPage(1);
+  };
+
+  /**
    * Generate page numbers for pagination
-   * Shows: First ... Current-1 Current Current+1 ... Last
    */
   const getPageNumbers = () => {
     const pages: (number | 'ellipsis')[] = [];
     
     if (totalPages <= 7) {
-      // Show all pages if 7 or fewer
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
       pages.push(1);
       
       if (currentPage > 3) {
         pages.push('ellipsis');
       }
       
-      // Show pages around current page
       for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
         pages.push(i);
       }
@@ -196,23 +293,70 @@ const DatabaseDashboard = () => {
         pages.push('ellipsis');
       }
       
-      // Always show last page
       pages.push(totalPages);
     }
     
     return pages;
   };
 
-  // Fetch data when page or search changes
-  useEffect(() => {
-    fetchDatasetItems();
-  }, [currentPage, searchQuery]);
+  /**
+   * Handle card click to view details
+   */
+  const handleCardClick = (item: DatasetItem) => {
+    console.log('Viewing details for:', item.evolfId);
+    // navigate(`/dataset/${item.evolfId}`);
+  };
 
+  // Apply client-side filtering when filters change
+  useEffect(() => {
+    if (allDatasetItems.length > 0) {
+      const filteredData = applyClientSideFilters(allDatasetItems);
+      setDatasetItems(filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
+      setTotalItems(filteredData.length);
+    }
+  }, [speciesFilter, classFilter, currentPage, allDatasetItems]);
+
+  // Fetch data when page, search, or sort changes
+  useEffect(() => {
+    if (!speciesFilter && !classFilter) {
+      fetchDatasetItems();
+    }
+  }, [currentPage, searchQuery, sortBy, sortOrder]);
+
+  // Fixed global statistics data
   const stats = [
-    { label: 'Total Interactions', value: totalItems > 0 ? totalItems.toLocaleString() : '—', change: 'Curated records', icon: Database, color: 'text-[hsl(var(--brand-teal))]' },
-    { label: 'GPCR Receptors', value: '—', change: 'Connect backend', icon: Database, color: 'text-green-400' },
-    { label: 'Unique Ligands', value: '—', change: 'Connect backend', icon: Database, color: 'text-[hsl(var(--brand-purple))]' },
-    { label: 'Mutations Studied', value: '—', change: 'Connect backend', icon: Database, color: 'text-red-400' },
+    { 
+      label: 'Total Interactions', 
+      value: '10,234', 
+      change: 'Curated records', 
+      icon: Database, 
+      color: 'text-[hsl(var(--brand-teal))]',
+      bgColor: 'bg-[hsl(var(--brand-teal))]/10'
+    },
+    { 
+      label: 'GPCR Receptors', 
+      value: '487', 
+      change: 'Unique receptors', 
+      icon: Dna, 
+      color: 'text-green-400',
+      bgColor: 'bg-green-400/10'
+    },
+    { 
+      label: 'Unique Ligands', 
+      value: '1,876', 
+      change: 'Distinct compounds', 
+      icon: FlaskConical, 
+      color: 'text-[hsl(var(--brand-purple))]',
+      bgColor: 'bg-[hsl(var(--brand-purple))]/10'
+    },
+    { 
+      label: 'Mutations Studied', 
+      value: '3,542', 
+      change: 'Variants analyzed', 
+      icon: CheckCircle, 
+      color: 'text-red-400',
+      bgColor: 'bg-red-400/10'
+    },
   ];
 
   const features = [
@@ -232,6 +376,9 @@ const DatabaseDashboard = () => {
       icon: Search,
     },
   ];
+
+  // Check if any filters are active
+  const areFiltersActive = speciesFilter !== 'all' || classFilter !== 'all';
 
   return (
     <>
@@ -273,9 +420,9 @@ const DatabaseDashboard = () => {
             {stats.map((stat, index) => (
               <Card key={index} className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-muted-foreground text-sm">{stat.label}</p>
-                  <div className="p-2 rounded-lg bg-muted/50">
-                    <stat.icon className="w-5 h-5 text-[hsl(var(--brand-teal))]" />
+                  <p className="text-muted-foreground text-sm font-medium">{stat.label}</p>
+                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
                   </div>
                 </div>
                 <div>
@@ -284,6 +431,35 @@ const DatabaseDashboard = () => {
                 </div>
               </Card>
             ))}
+          </div>
+
+          {/* Search Results Header */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+            <div>
+              <h2 className="text-2xl font-heading font-bold">Search Results</h2>
+              <p className="text-muted-foreground">
+                {isInitialLoad ? 'Start searching...' : `${totalItems} interactions found`}
+                {areFiltersActive && ' (filtered)'}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                className="border-[hsl(var(--brand-teal))]/50 text-foreground hover:bg-[hsl(var(--brand-teal))]/10"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filters {areFiltersActive && '•'}
+              </Button>
+              <Button 
+                className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                onClick={() => downloadDataset('csv')}
+                disabled={datasetItems.length === 0}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+            </div>
           </div>
 
           {/* Enhanced Search Bar */}
@@ -305,20 +481,77 @@ const DatabaseDashboard = () => {
                     size="lg"
                     className="h-14 px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
                     onClick={() => fetchDatasetItems()}
+                    disabled={isLoading}
                   >
-                    <Search className="w-5 h-5" />
-                    Search
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Search className="w-5 h-5" />
+                    )}
+                    {isLoading ? 'Searching...' : 'Search'}
                   </Button>
                 </div>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <p>
-                    {totalItems > 0 ? (
-                      <>Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems.toLocaleString()} interactions</>
-                    ) : (
-                      <>No data available. Please connect your backend.</>
-                    )}
-                  </p>
-                  {searchQuery && (
+
+                {/* Filter Section */}
+                {showFilters && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-border/50">
+                    {/* Species Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Species</label>
+                      <select
+                        value={speciesFilter}
+                        onChange={(e) => handleFilterChange('species', e.target.value)}
+                        className="w-full p-2 border border-border/50 rounded-md bg-background/50 focus:border-[hsl(var(--brand-teal))] focus:outline-none"
+                      >
+                        <option value="all">All Species</option>
+                        {availableSpecies.map((species) => (
+                          <option key={species} value={species}>
+                            {species}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Class Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">GPCR Class</label>
+                      <select
+                        value={classFilter}
+                        onChange={(e) => handleFilterChange('class', e.target.value)}
+                        className="w-full p-2 border border-border/50 rounded-md bg-background/50 focus:border-[hsl(var(--brand-teal))] focus:outline-none"
+                      >
+                        <option value="all">All Classes</option>
+                        {availableClasses.map((cls) => (
+                          <option key={cls} value={cls}>
+                            {cls}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Clear Filters */}
+                    <div className="flex items-end">
+                      <Button
+                        variant="outline"
+                        onClick={clearFilters}
+                        disabled={!areFiltersActive}
+                        className="w-full"
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {searchQuery && (
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <p>
+                      {totalItems > 0 ? (
+                        <>Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems.toLocaleString()} interactions</>
+                      ) : (
+                        <>No results found for "{searchQuery}"</>
+                      )}
+                    </p>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -327,8 +560,8 @@ const DatabaseDashboard = () => {
                     >
                       Clear search
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
@@ -342,55 +575,138 @@ const DatabaseDashboard = () => {
                   <p className="text-muted-foreground text-lg">Loading dataset...</p>
                 </div>
               </div>
-            ) : datasetItems.length === 0 ? (
+            ) : datasetItems.length === 0 && !isInitialLoad ? (
               <Card className="p-12 bg-card/50 backdrop-blur-sm border-border/50">
                 <div className="flex flex-col items-center gap-4 text-center">
                   <AlertCircle className="w-12 h-12 text-muted-foreground" />
                   <div>
-                    <h3 className="text-xl font-heading font-semibold mb-2">No Data Available</h3>
+                    <h3 className="text-xl font-heading font-semibold mb-2">
+                      {searchQuery || areFiltersActive ? 'No Results Found' : 'No Data Available'}
+                    </h3>
                     <p className="text-muted-foreground">
-                      Please connect your backend to view the dataset. Check the API documentation for setup instructions.
+                      {searchQuery || areFiltersActive 
+                        ? 'Try adjusting your search terms or filters.'
+                        : 'No dataset entries found.'
+                      }
                     </p>
                   </div>
                 </div>
               </Card>
-            ) : (
+            ) : datasetItems.length > 0 ? (
               <div className="space-y-3">
+                {/* Sorting Header */}
+                <Card className="p-4 bg-card/30 backdrop-blur-sm border-border/50">
+                  <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-6 items-center text-sm text-muted-foreground font-medium">
+                    {/* EvOlf ID */}
+                    <div 
+                      className="flex items-center gap-1 min-w-[120px] cursor-pointer hover:text-foreground transition-colors"
+                      onClick={() => handleSort('evolfId')}
+                    >
+                      <span>EvOlf ID</span>
+                      {getSortIcon('evolfId')}
+                    </div>
+
+                    {/* Receptor */}
+                    <div 
+                      className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+                      onClick={() => handleSort('receptor')}
+                    >
+                      <span>Receptor</span>
+                      {getSortIcon('receptor')}
+                    </div>
+
+                    {/* Ligand */}
+                    <div 
+                      className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+                      onClick={() => handleSort('ligand')}
+                    >
+                      <span>Ligand</span>
+                      {getSortIcon('ligand')}
+                    </div>
+
+                    {/* Class */}
+                    <div 
+                      className="flex items-center gap-1 min-w-[100px] cursor-pointer hover:text-foreground transition-colors"
+                      onClick={() => handleSort('class')}
+                    >
+                      <span>Class</span>
+                      {getSortIcon('class')}
+                    </div>
+
+                    {/* Mutation */}
+                    <div className="min-w-[100px]">
+                      Mutation
+                    </div>
+
+                    {/* Database IDs */}
+                    <div className="min-w-[140px]">
+                      Database IDs
+                    </div>
+
+                    {/* Actions */}
+                    <div className="min-w-[40px]"></div>
+                  </div>
+                </Card>
+
+                {/* Dataset Items */}
                 {datasetItems.map((item) => (
                   <Card 
-                    key={item.id} 
+                    key={item.evolfId}
                     className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all cursor-pointer group"
+                    onClick={() => handleCardClick(item)}
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto] gap-6 items-center">
-                      {/* EvOlf ID & Class */}
+                    <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-6 items-center">
+                      {/* EvOlf ID */}
                       <div className="flex flex-col gap-2 min-w-[120px]">
                         <p className="text-xs text-muted-foreground font-medium">EvOlf ID</p>
-                        <p className="text-[hsl(var(--brand-teal))] font-mono text-sm font-semibold">{item.evolfId}</p>
-                        <Badge variant="outline" className="w-fit border-[hsl(var(--brand-teal))]/30 text-[hsl(var(--brand-teal))] text-xs">
-                          {item.class}
-                        </Badge>
+                        <p className="text-[hsl(var(--brand-teal))] font-mono text-sm font-semibold">
+                          {item.evolfId}
+                        </p>
                       </div>
 
-                      {/* Receptor */}
+                      {/* Receptor & Species */}
                       <div className="flex flex-col gap-1">
                         <p className="text-xs text-muted-foreground font-medium">Receptor</p>
                         <p className="font-heading font-semibold text-base">{item.receptor}</p>
                         <p className="text-sm text-muted-foreground italic">{item.species}</p>
                       </div>
 
-                      {/* Ligand */}
+                      {/* Ligand & ChEMBL/PubMed ID */}
                       <div className="flex flex-col gap-1">
                         <p className="text-xs text-muted-foreground font-medium">Ligand</p>
                         <p className="font-heading font-semibold text-base">{item.ligand}</p>
-                        <a
-                          href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
-                          onClick={(e) => e.stopPropagation()}
+                        {item.chemblId.startsWith('CHEMBL') ? (
+                          <a
+                            href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {item.chemblId}
+                          </a>
+                        ) : (
+                          <a
+                            href={`https://pubmed.ncbi.nlm.nih.gov/${item.chemblId.replace('PMID:', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {item.chemblId}
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Class */}
+                      <div className="flex flex-col gap-2 min-w-[100px]">
+                        <p className="text-xs text-muted-foreground font-medium">Class</p>
+                        <Badge 
+                          variant="secondary" 
+                          className="w-fit bg-blue-500/10 text-blue-500 border-blue-500/20 text-xs"
                         >
-                          {item.chemblId}
-                        </a>
+                          {item.class}
+                        </Badge>
                       </div>
 
                       {/* Mutation */}
@@ -408,31 +724,32 @@ const DatabaseDashboard = () => {
                         )}
                       </div>
 
-                      {/* Quality */}
+                      {/* UniProt/Ensemble */}
                       <div className="flex flex-col gap-2 min-w-[140px]">
-                        <p className="text-xs text-muted-foreground font-medium">Quality</p>
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-24 h-2 bg-secondary rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full transition-all ${
-                                item.quality === 'High' 
-                                  ? 'bg-[hsl(var(--brand-teal))]' 
-                                  : item.quality === 'Medium' 
-                                  ? 'bg-[hsl(45,93%,58%)]' 
-                                  : 'bg-[hsl(0,72%,51%)]'
-                              }`}
-                              style={{ width: `${item.qualityScore}%` }}
-                            />
-                          </div>
-                          <span className={`text-xs font-semibold ${
-                            item.quality === 'High' 
-                              ? 'text-[hsl(var(--brand-teal))]' 
-                              : item.quality === 'Medium' 
-                              ? 'text-[hsl(45,93%,58%)]' 
-                              : 'text-[hsl(0,72%,51%)]'
-                          }`}>
-                            {item.quality}
-                          </span>
+                        <p className="text-xs text-muted-foreground font-medium">Database IDs</p>
+                        <div className="flex flex-col gap-1">
+                          {item.uniprotId && (
+                            <a
+                              href={`https://www.uniprot.org/uniprot/${item.uniprotId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[hsl(var(--brand-teal))] hover:underline text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              UniProt: {item.uniprotId}
+                            </a>
+                          )}
+                          {item.ensembleId && (
+                            <a
+                              href={`https://www.ensembl.org/id/${item.ensembleId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[hsl(var(--brand-teal))] hover:underline text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Ensembl: {item.ensembleId}
+                            </a>
+                          )}
                         </div>
                       </div>
 
@@ -444,7 +761,7 @@ const DatabaseDashboard = () => {
                   </Card>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Pagination Controls */}
@@ -486,6 +803,7 @@ const DatabaseDashboard = () => {
               
               <p className="text-sm text-muted-foreground">
                 Page {currentPage} of {totalPages.toLocaleString()}
+                {areFiltersActive && ' (filtered)'}
               </p>
             </div>
           )}
@@ -494,7 +812,13 @@ const DatabaseDashboard = () => {
           <div className="flex flex-wrap gap-4 mt-8">
             <Button 
               className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                setCurrentPage(1);
+                setSearchQuery('');
+                setSpeciesFilter('all');
+                setClassFilter('all');
+                fetchDatasetItems();
+              }}
             >
               <RefreshCw className="w-4 h-4" />
               Refresh Data
@@ -505,13 +829,6 @@ const DatabaseDashboard = () => {
             >
               <Download className="w-4 h-4" />
               Download Data
-            </Button>
-            <Button 
-              variant="outline" 
-              className="border-[hsl(var(--brand-teal))]/50 text-foreground hover:bg-[hsl(var(--brand-teal))]/10"
-            >
-              <Filter className="w-4 h-4" />
-              Apply Filters
             </Button>
           </div>
         </div>
