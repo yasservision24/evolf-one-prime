@@ -526,14 +526,14 @@ const DatabaseDashboard = () => {
           </div>
 
           {/* Search and Filter Controls */}
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-            <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
               {/* Sort Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="min-w-[180px] justify-between bg-background/50 border-border/50 hover:border-[hsl(var(--brand-teal))]/50"
+                    className="w-full sm:min-w-[180px] sm:w-auto justify-between bg-background/50 border-border/50 hover:border-[hsl(var(--brand-teal))]/50"
                   >
                     <div className="flex items-center gap-2">
                       <ArrowUpDown className="w-4 h-4" />
@@ -564,7 +564,7 @@ const DatabaseDashboard = () => {
               {/* Filters Button */}
               <Button 
                 variant="outline" 
-                className="border-border/50 bg-background/50 hover:border-[hsl(var(--brand-teal))]/50 hover:bg-[hsl(var(--brand-teal))]/10"
+                className="w-full sm:w-auto border-border/50 bg-background/50 hover:border-[hsl(var(--brand-teal))]/50 hover:bg-[hsl(var(--brand-teal))]/10"
                 onClick={() => setShowFilterModal(true)}
               >
                 <Filter className="w-4 h-4 mr-2" />
@@ -573,7 +573,7 @@ const DatabaseDashboard = () => {
 
               {/* Export Button */}
               <Button 
-                className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                className="w-full sm:w-auto bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
                 onClick={downloadDataset}
                 disabled={allEvolfIds.length === 0}
               >
@@ -582,7 +582,7 @@ const DatabaseDashboard = () => {
               </Button>
             </div>
 
-            <div>
+            <div className="text-center sm:text-left">
               <p className="text-muted-foreground text-sm">
                 {isInitialLoad ? 'Start searching...' : `${totalItems.toLocaleString()} interactions found`}
                 {areFiltersActive && ' (filtered)'}
@@ -672,9 +672,9 @@ const DatabaseDashboard = () => {
               </Card>
             ) : datasetItems.length > 0 ? (
               <div className="space-y-3">
-                {/* Sorting Header */}
-                <Card className="p-4 bg-card/30 backdrop-blur-sm border-border/50">
-                  <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-6 items-center text-sm text-muted-foreground font-medium">
+                {/* Sorting Header - Hidden on Mobile */}
+                <Card className="hidden md:block p-4 bg-card/30 backdrop-blur-sm border-border/50">
+                  <div className="grid grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-6 items-center text-sm text-muted-foreground font-medium">
                     {/* EvOlf ID */}
                     <div 
                       className="flex items-center gap-1 min-w-[120px] cursor-pointer hover:text-foreground transition-colors"
@@ -730,13 +730,13 @@ const DatabaseDashboard = () => {
                 {datasetItems.map((item) => (
                   <Card 
                     key={item.evolfId}
-                    className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all cursor-pointer group"
+                    className="p-4 md:p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all cursor-pointer group"
                     onClick={() => handleCardClick(item)}
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-6 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto,auto] gap-4 md:gap-6">
                       {/* EvOlf ID */}
-                      <div className="flex flex-col gap-2 min-w-[120px]">
-                        <p className="text-xs text-muted-foreground font-medium">EvOlf ID</p>
+                      <div className="flex flex-col gap-1 md:gap-2 md:min-w-[120px]">
+                        <p className="text-xs text-muted-foreground font-medium md:block">EvOlf ID</p>
                         <p className="text-[hsl(var(--brand-teal))] font-mono text-sm font-semibold">
                           {item.evolfId}
                         </p>
@@ -744,21 +744,21 @@ const DatabaseDashboard = () => {
 
                       {/* Receptor & Species */}
                       <div className="flex flex-col gap-1">
-                        <p className="text-xs text-muted-foreground font-medium">Receptor</p>
-                        <p className="font-heading font-semibold text-base">{item.receptor}</p>
-                        <p className="text-sm text-muted-foreground italic">{item.species}</p>
+                        <p className="text-xs text-muted-foreground font-medium md:block">Receptor</p>
+                        <p className="font-heading font-semibold text-sm md:text-base">{item.receptor}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground italic">{item.species}</p>
                       </div>
 
                       {/* Ligand & ChEMBL/PubMed ID */}
                       <div className="flex flex-col gap-1">
-                        <p className="text-xs text-muted-foreground font-medium">Ligand</p>
-                        <p className="font-heading font-semibold text-base">{item.ligand}</p>
+                        <p className="text-xs text-muted-foreground font-medium md:block">Ligand</p>
+                        <p className="font-heading font-semibold text-sm md:text-base">{item.ligand}</p>
                         {item.chemblId.startsWith('CHEMBL') ? (
                           <a
                             href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
+                            className="text-[hsl(var(--brand-teal))] hover:underline text-xs md:text-sm"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {item.chemblId}
@@ -768,7 +768,7 @@ const DatabaseDashboard = () => {
                             href={`https://pubmed.ncbi.nlm.nih.gov/${item.chemblId.replace('PMID:', '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
+                            className="text-[hsl(var(--brand-teal))] hover:underline text-xs md:text-sm"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {item.chemblId}
@@ -777,8 +777,8 @@ const DatabaseDashboard = () => {
                       </div>
 
                       {/* Class */}
-                      <div className="flex flex-col gap-2 min-w-[100px]">
-                        <p className="text-xs text-muted-foreground font-medium">Class</p>
+                      <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
+                        <p className="text-xs text-muted-foreground font-medium md:block">Class</p>
                         <Badge 
                           variant="secondary" 
                           className="w-fit bg-blue-500/10 text-blue-500 border-blue-500/20 text-xs"
@@ -788,8 +788,8 @@ const DatabaseDashboard = () => {
                       </div>
 
                       {/* Mutation */}
-                      <div className="flex flex-col gap-2 min-w-[100px]">
-                        <p className="text-xs text-muted-foreground font-medium">Mutation</p>
+                      <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
+                        <p className="text-xs text-muted-foreground font-medium md:block">Mutation</p>
                         {item.mutation && item.mutation !== 'Wild-type' ? (
                           <Badge 
                             variant="secondary" 
@@ -798,13 +798,13 @@ const DatabaseDashboard = () => {
                             {item.mutation}
                           </Badge>
                         ) : (
-                          <span className="text-sm text-muted-foreground">Wild-type</span>
+                          <span className="text-xs md:text-sm text-muted-foreground">Wild-type</span>
                         )}
                       </div>
 
                       {/* UniProt/Ensemble */}
-                      <div className="flex flex-col gap-2 min-w-[140px]">
-                        <p className="text-xs text-muted-foreground font-medium">Database IDs</p>
+                      <div className="flex flex-col gap-1 md:gap-2 md:min-w-[140px]">
+                        <p className="text-xs text-muted-foreground font-medium md:block">Database IDs</p>
                         <div className="flex flex-col gap-1">
                           {item.uniprotId && (
                             <a
@@ -831,8 +831,8 @@ const DatabaseDashboard = () => {
                         </div>
                       </div>
 
-                      {/* Arrow */}
-                      <div className="flex items-center justify-center">
+                      {/* Arrow - Hidden on Mobile */}
+                      <div className="hidden md:flex items-center justify-center">
                         <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[hsl(var(--brand-teal))] transition-colors" />
                       </div>
                     </div>

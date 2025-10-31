@@ -1,6 +1,13 @@
 import { Menu, Brain, Database as DatabaseIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 interface HeaderProps {
   currentPage: 'home' | 'dataset' | 'model';
@@ -64,9 +71,55 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
           </div>
 
           {/* Mobile Menu */}
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px]">
+              <SheetHeader>
+                <SheetTitle className="gradient-logo">EvOlf</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-4 mt-6">
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate('home')}
+                  className={`justify-start hover:text-foreground ${
+                    currentPage === 'home'
+                      ? 'text-foreground font-extrabold'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  Home
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate('/dataset/dashboard')}
+                  className={`justify-start hover:text-foreground ${
+                    currentPage === 'dataset'
+                      ? 'text-foreground font-extrabold'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <DatabaseIcon className="h-4 w-4 mr-2" />
+                  Dataset Explorer
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate('model')}
+                  className={`justify-start hover:text-foreground ${
+                    currentPage === 'model'
+                      ? 'text-foreground font-extrabold'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Prediction Model
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

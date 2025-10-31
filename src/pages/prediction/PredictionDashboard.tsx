@@ -92,7 +92,7 @@ const PredictionDashboard = () => {
     const headers = lines[0].toLowerCase().split(',');
     
     const smilesIdx = headers.findIndex(h => h.includes('smiles'));
-    const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('ligand'));
+    const nameIdx = headers.findIndex(h => h.includes('name'));
     
     if (smilesIdx === -1) {
       toast({

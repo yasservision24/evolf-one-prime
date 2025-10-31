@@ -1,11 +1,11 @@
-smiles,ligand_name,description
-CCN1C=NC2=C1C(=O)N(C(=O)N2C)C,Caffeine,Adenosine receptor antagonist
-CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O,Propranolol,Beta-adrenergic receptor antagonist
-CN1CCC2=C(C1)SC(=N2)N,Pramipexole,Dopamine receptor agonist
-COC1=C(C=C2C(=C1)C(=NC(=N2)N3CCN(CC3)C)N)OC,Prazosin,Alpha-1 adrenergic receptor antagonist
-CC(C)NCC(C1=CC(=C(C=C1)O)CO)O,Salbutamol,Beta-2 adrenergic receptor agonist
-CN1C=NC2=C1C(=O)N(C(=O)N2C)CC=C,Theophylline,Adenosine receptor antagonist
-C1CC(=O)NC(=O)C1N2C(=O)C3=CC=CC=C3C2=O,Thalidomide,Immunomodulatory drug
-CC(=O)OC1=CC=CC=C1C(=O)O,Aspirin,COX enzyme inhibitor
-CN1C2CCC1CC(C2)OC(=O)C(CO)C3=CC=CC=C3,Atropine,Muscarinic acetylcholine receptor antagonist
-COC(=O)C1=CC=CC=C1OC(=O)C,Aspirin methyl ester,COX enzyme inhibitor derivative
+smiles,name
+CCN1C=NC2=C1C(=O)N(C(=O)N2C)C,Caffeine
+CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O,Propranolol
+CN1CCC2=C(C1)SC(=N2)N,Pramipexole
+COC1=C(C=C2C(=C1)C(=NC(=N2)N3CCN(CC3)C)N)OC,Prazosin
+CC(C)NCC(C1=CC(=C(C=C1)O)CO)O,Salbutamol
+CN1C=NC2=C1C(=O)N(C(=O)N2C)CC=C,Theophylline
+C1CC(=O)NC(=O)C1N2C(=O)C3=CC=CC=C3C2=O,Thalidomide
+CC(=O)OC1=CC=CC=C1C(=O)O,Aspirin
+CN1C2CCC1CC(C2)OC(=O)C(CO)C3=CC=CC=C3,Atropine
+COC(=O)C1=CC=CC=C1OC(=O)C,
