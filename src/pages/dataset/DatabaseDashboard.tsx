@@ -8,8 +8,62 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getDatasetPaginated, DatasetItem } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Dataset Item Interface
+ * Represents a single GPCR receptor-ligand interaction record
+ */
+export interface DatasetItem {
+  id: string;
+  evolfId: string;            // EvOlf unique identifier (e.g., "EVLF_001234")
+  class: string;              // GPCR class (e.g., "Class A", "Class B")
+  receptor: string;           // GPCR receptor name (e.g., "Adenosine A2A receptor")
+  species: string;            // Organism species in scientific name (e.g., "Homo sapiens")
+  ligand: string;             // Ligand/compound name
+  chemblId: string;           // ChEMBL database ID (e.g., "CHEMBL191")
+  mutation?: string;          // Optional: mutation information (e.g., "L249A", "Wild-type")
+  quality: string;            // Data quality level ("High", "Medium", "Low")
+  qualityScore: number;       // Quality score 0-100 for progress bar
+  affinity?: number;          // Optional: Binding affinity value (e.g., Ki, IC50)
+  affinityUnit?: string;      // Optional: Unit of measurement (e.g., "nM", "μM")
+  experimentType?: string;    // Optional: Type of experiment (e.g., "Binding", "Functional")
+  reference?: string;         // Optional: PubMed ID or DOI
+  dateAdded: string;          // ISO date string
+}
+
+/**
+ * Paginated Response Interface
+ * Standard structure for paginated API responses
+ */
+export interface PaginatedResponse<T> {
+  data: T[];                  // Array of items for current page
+  pagination: {
+    currentPage: number;      // Current page number (1-indexed)
+    itemsPerPage: number;     // Number of items per page
+    totalItems: number;       // Total number of items across all pages
+    totalPages: number;       // Total number of pages
+  };
+}
+
+/**
+ * Dataset Search/Filter Parameters
+ * Used for server-side filtering and pagination
+ */
+export interface DatasetQueryParams {
+  page?: number;              // Page number (default: 1)
+  limit?: number;             // Items per page (default: 20)
+  search?: string;            // Search query (searches across all fields)
+  receptor?: string;          // Filter by specific receptor
+  species?: string;           // Filter by species
+  sortBy?: string;            // Sort field (e.g., "affinity", "dateAdded")
+  sortOrder?: 'asc' | 'desc'; // Sort direction
+}
 
 const DatabaseDashboard = () => {
   const navigate = useNavigate();
@@ -39,13 +93,18 @@ const DatabaseDashboard = () => {
   const fetchDatasetItems = async () => {
     setIsLoading(true);
     try {
-      const response = await getDatasetPaginated({
-        page: currentPage,
-        limit: itemsPerPage,
-        search: searchQuery || undefined,
-        sortBy: 'dateAdded',
-        sortOrder: 'desc',
-      });
+      // Build query string from parameters
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', currentPage.toString());
+      queryParams.append('limit', itemsPerPage.toString());
+      if (searchQuery) queryParams.append('search', searchQuery);
+      queryParams.append('sortBy', 'dateAdded');
+      queryParams.append('sortOrder', 'desc');
+      
+      const queryString = queryParams.toString();
+      const endpoint = `/dataset${queryString ? `?${queryString}` : ''}`;
+      
+      const response = await api.get<PaginatedResponse<DatasetItem>>(endpoint);
       
       setDatasetItems(response.data);
       setTotalItems(response.pagination.totalItems);
