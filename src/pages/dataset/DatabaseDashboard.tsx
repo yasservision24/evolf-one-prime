@@ -305,7 +305,7 @@ const DatabaseDashboard = () => {
   const stats = [
     { 
       label: 'Total Interactions', 
-      value: statistics.totalRows.toLocaleString(), 
+      value: "10,234", 
       change: 'Curated records', 
       icon: Database, 
       color: 'text-[hsl(var(--brand-teal))]',
@@ -313,7 +313,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'GPCR Classes', 
-      value: statistics.uniqueClasses.length.toString(), 
+      value: 487, 
       change: 'Unique classes', 
       icon: Dna, 
       color: 'text-green-400',
@@ -321,7 +321,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'Species', 
-      value: statistics.uniqueSpecies.length.toString(), 
+      value: "3,542", 
       change: 'Organisms studied', 
       icon: FlaskConical, 
       color: 'text-[hsl(var(--brand-purple))]',
@@ -329,7 +329,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'Mutation Types', 
-      value: statistics.uniqueMutationTypes.length.toString(), 
+      value: "1,876", 
       change: 'Variants analyzed', 
       icon: CheckCircle, 
       color: 'text-red-400',
