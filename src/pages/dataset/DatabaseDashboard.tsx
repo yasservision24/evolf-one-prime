@@ -695,7 +695,7 @@ const DatabaseDashboard = () => {
                     
                     {/* Autocomplete Suggestions Dropdown */}
                     {showSuggestions && searchSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-[100] max-h-96 overflow-y-auto">
                         {isSearching && (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
