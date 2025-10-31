@@ -223,7 +223,7 @@ export const api = {
  * @param search - Search query (optional)
  * @param sortBy - Sort field (default: 'evolfId')
  * @param sortOrder - Sort direction (default: 'desc')
- * @param species - Filter by species (optional)
+ * @param species - Filter by species (optional) 
  * @param classFilter - Filter by GPCR class (optional)
  * @param mutationType - Filter by mutation type (optional)
  * @returns Response with data, pagination, and statistics

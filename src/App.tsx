@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
 
-import DownloadDataset from "./pages/DownloadDataset";
+import DownloadDataset from "./pages/dataset/DownloadDataset";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import CiteUs from "./pages/CiteUs";
