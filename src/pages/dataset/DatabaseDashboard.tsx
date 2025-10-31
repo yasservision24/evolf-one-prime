@@ -670,7 +670,7 @@ const DatabaseDashboard = () => {
             <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 overflow-visible">
               <div className="flex flex-col gap-4 overflow-visible">
                 <div className="flex items-center gap-3 overflow-visible">
-                  <div className="relative flex-1 z-50">
+                  <div className="relative flex-1 z-[9999]">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))]" />
                     <Input
                       ref={searchInputRef}
@@ -695,7 +695,7 @@ const DatabaseDashboard = () => {
                     
                     {/* Autocomplete Suggestions Dropdown */}
                     {showSuggestions && searchSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-[100] max-h-96 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-[9999] max-h-96 overflow-y-auto">
                         {isSearching && (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
