@@ -367,12 +367,14 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Handle suggestion click
+   * Handle suggestion click - sets search term and triggers search
    */
   const handleSuggestionClick = (suggestion: any) => {
-    setSearchQuery(suggestion.Receptor || suggestion.Ligand || suggestion.Species || '');
+    const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || suggestion.EvOlf_ID || '';
+    setSearchQuery(searchTerm);
     setShowSuggestions(false);
     setCurrentPage(1);
+    // useEffect will automatically trigger fetchDatasetItems when searchQuery changes
   };
 
   /**
