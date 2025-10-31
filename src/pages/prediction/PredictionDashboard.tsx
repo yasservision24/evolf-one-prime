@@ -24,8 +24,6 @@ const PredictionDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [predicting, setPredicting] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<any>(null);
   
   // Receptor state
   const [receptorInput, setReceptorInput] = useState<'text' | 'file'>('text');
@@ -40,8 +38,6 @@ const PredictionDashboard = () => {
     { id: '1', smiles: 'CCN1C=NC2=C1C(=O)N(C(=O)N2C)C', name: 'Caffeine' }
   ]);
   const [ligandFile, setLigandFile] = useState<File | null>(null);
-  
-  const [mutation, setMutation] = useState('');
   
   const receptorFileRef = useRef<HTMLInputElement>(null);
   const ligandFileRef = useRef<HTMLInputElement>(null);
@@ -189,7 +185,6 @@ const PredictionDashboard = () => {
     }
 
     setPredicting(true);
-    setShowResults(false);
 
     try {
       const requestData = {
@@ -200,18 +195,18 @@ const PredictionDashboard = () => {
         ligands: validLigands.map(l => ({
           smiles: l.smiles,
           name: l.name || undefined
-        })),
-        mutation: mutation.trim() || undefined
+        }))
       };
 
       const result = await submitPrediction(requestData);
-      setResults(result);
-      setShowResults(true);
       
-      toast({
-        title: 'Prediction complete',
-        description: `Successfully predicted binding affinity for ${result.results.length} ligand(s)`,
-      });
+      if (result.jobId) {
+        toast({
+          title: 'Prediction submitted',
+          description: 'Redirecting to results page...',
+        });
+        navigate(`/prediction-result?job-id=${result.jobId}`);
+      }
     } catch (error: any) {
       toast({
         title: 'Prediction failed',
@@ -417,20 +412,6 @@ const PredictionDashboard = () => {
                       Enter ligands as SMILES notation
                     </p>
                   </div>
-
-                  <div>
-                    <Label htmlFor="mutation" className="text-sm md:text-base">Mutation (Optional)</Label>
-                    <Input
-                      id="mutation"
-                      placeholder="e.g., L249A"
-                      className="mt-2 text-sm"
-                      value={mutation}
-                      onChange={(e) => setMutation(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Specify point mutations in format: [Original][Position][New]
-                    </p>
-                  </div>
                 </div>
 
                 <Button 
@@ -452,72 +433,6 @@ const PredictionDashboard = () => {
                   )}
                 </Button>
               </Card>
-
-              {/* Results Section */}
-              {showResults && results && (
-                <Card className="p-4 md:p-6 border-2 border-border bg-gradient-to-br from-secondary to-background">
-                  <div className="flex items-center gap-2 mb-4 md:mb-6">
-                    <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-purple-600 dark:text-purple-400" />
-                    <h2 className="text-xl md:text-2xl text-foreground">Prediction Results</h2>
-                  </div>
-
-                  <div className="space-y-4">
-                    {results.results.map((result: any, index: number) => (
-                      <div key={index} className="p-4 bg-background rounded-lg border">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold">{result.ligandName || `Ligand ${index + 1}`}</h3>
-                            <p className="text-xs font-mono text-muted-foreground">{result.smiles}</p>
-                          </div>
-                          <Badge className="bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs">
-                            {result.affinityClass} Affinity
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mt-3">
-                          <div>
-                            <div className="text-xs text-muted-foreground">Predicted Affinity</div>
-                            <div className="text-2xl text-purple-600 dark:text-purple-400">
-                              {result.predictedAffinity} nM
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-muted-foreground">Confidence</div>
-                            <div className="text-2xl text-purple-600 dark:text-purple-400">
-                              {result.confidenceScore}%
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 md:mt-6 p-3 md:p-4 bg-background rounded-lg border">
-                    <div className="text-xs md:text-sm text-muted-foreground mb-2">Prediction Details</div>
-                    <div className="space-y-2 text-xs md:text-sm">
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">Model Version:</span>
-                        <span className="text-foreground">{results.modelInfo.version}</span>
-                      </div>
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">Training Set Size:</span>
-                        <span className="text-foreground">{results.modelInfo.trainingSetSize.toLocaleString()} interactions</span>
-                      </div>
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">Prediction Time:</span>
-                        <span className="text-foreground">{results.processingTime} seconds</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Alert className="mt-4 border-border bg-secondary">
-                    <AlertCircle className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-                    <AlertDescription className="text-xs md:text-sm text-muted-foreground">
-                      These predictions are for research purposes only. Experimental validation is recommended 
-                      before using results in drug development.
-                    </AlertDescription>
-                  </Alert>
-                </Card>
-              )}
             </div>
 
             {/* Info Sidebar */}

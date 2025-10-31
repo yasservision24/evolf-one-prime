@@ -532,14 +532,16 @@ try {
 
 ## 4. Prediction Model API
 
-Submit GPCR-ligand binding affinity predictions using the evolf deep learning model.
+Submit GPCR-ligand binding affinity predictions using the evolf deep learning model. Predictions are processed asynchronously and results are available via job ID.
 
-### Endpoint
+### Submit Prediction
+
+**Endpoint:**
 ```
 POST /predict
 ```
 
-### Function Signature
+**Function Signature:**
 ```typescript
 submitPrediction(data: {
   receptor: {
@@ -550,11 +552,10 @@ submitPrediction(data: {
     smiles: string;
     name?: string;
   }>;
-  mutation?: string;
 })
 ```
 
-### Request Body
+**Request Body:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -563,7 +564,6 @@ submitPrediction(data: {
 | `ligands` | array | Yes | Array of ligand objects (max 10) |
 | `ligands[].smiles` | string | Yes | SMILES notation for ligand |
 | `ligands[].name` | string | No | Optional ligand identifier |
-| `mutation` | string | No | Point mutation (e.g., "L249A") |
 
 ### SMILES CSV Format
 
@@ -581,8 +581,9 @@ CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O,Propranolol,Beta-adrenergic receptor 
 
 **JavaScript/TypeScript:**
 ```javascript
-import { submitPrediction } from '@/lib/api';
+import { submitPrediction, getPredictionJobStatus, downloadPredictionResults } from '@/lib/api';
 
+// Submit prediction
 const predictionData = {
   receptor: {
     sequence: ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
@@ -597,16 +598,33 @@ const predictionData = {
       smiles: "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
       name: "Propranolol"
     }
-  ],
-  mutation: "L249A"
+  ]
 };
 
 const result = await submitPrediction(predictionData);
-console.log('Prediction results:', result);
+console.log('Job ID:', result.jobId);
+// Save this URL to check results later
+const resultUrl = `https://yoursite.com/prediction-result?job-id=${result.jobId}`;
+
+// Check job status
+const jobStatus = await getPredictionJobStatus(result.jobId);
+console.log('Status:', jobStatus.status); // 'running', 'completed', or 'expired'
+
+// Download results when completed
+if (jobStatus.status === 'completed') {
+  const blob = await downloadPredictionResults(result.jobId);
+  // Save ZIP file
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `prediction_${result.jobId}.zip`;
+  link.click();
+}
 ```
 
 **cURL:**
 ```bash
+# Submit prediction
 curl -X POST "https://api.evolf.com/v1/predict" \
   -H "Content-Type: application/json" \
   -d '{
@@ -621,12 +639,21 @@ curl -X POST "https://api.evolf.com/v1/predict" \
       }
     ]
   }'
+
+# Check job status
+curl "https://api.evolf.com/v1/predict/job/JOB_ID_HERE"
+
+# Download results
+curl "https://api.evolf.com/v1/predict/download/JOB_ID_HERE" \
+  --output prediction_results.zip
 ```
 
 **Python:**
 ```python
 import requests
+import time
 
+# Submit prediction
 prediction_data = {
     "receptor": {
         "sequence": ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
@@ -641,8 +668,7 @@ prediction_data = {
             "smiles": "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
             "name": "Propranolol"
         }
-    ],
-    "mutation": "L249A"
+    ]
 }
 
 response = requests.post(
@@ -652,10 +678,35 @@ response = requests.post(
 )
 
 result = response.json()
-print(f"Prediction ID: {result['predictionId']}")
-print(f"Processing time: {result['processingTime']}s")
-for pred in result['results']:
-    print(f"{pred['ligandName']}: {pred['predictedAffinity']} nM (confidence: {pred['confidenceScore']}%)")
+job_id = result['jobId']
+print(f"Job ID: {job_id}")
+print(f"Result URL: https://yoursite.com/prediction-result?job-id={job_id}")
+
+# Poll for completion
+while True:
+    status_response = requests.get(
+        f'https://api.evolf.com/v1/predict/job/{job_id}',
+        headers={'Content-Type': 'application/json'}
+    )
+    status = status_response.json()
+    
+    if status['status'] == 'completed':
+        print("Prediction completed!")
+        # Download results
+        download_response = requests.get(
+            f'https://api.evolf.com/v1/predict/download/{job_id}',
+            headers={'Content-Type': 'application/json'}
+        )
+        with open(f'prediction_{job_id}.zip', 'wb') as f:
+            f.write(download_response.content)
+        print(f"Results saved to prediction_{job_id}.zip")
+        break
+    elif status['status'] == 'expired':
+        print("Job expired!")
+        break
+    else:
+        print("Still processing...")
+        time.sleep(5)
 ```
 
 **R:**
@@ -663,6 +714,7 @@ for pred in result['results']:
 library(httr)
 library(jsonlite)
 
+# Submit prediction
 prediction_data <- list(
   receptor = list(
     sequence = ">A2A_HUMAN Adenosine receptor A2a\nMPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS",
@@ -673,8 +725,7 @@ prediction_data <- list(
       smiles = "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
       name = "Caffeine"
     )
-  ),
-  mutation = "L249A"
+  )
 )
 
 response <- POST(
@@ -685,45 +736,93 @@ response <- POST(
 )
 
 result <- fromJSON(content(response, "text"))
-print(result$results)
+job_id <- result$jobId
+cat("Job ID:", job_id, "\n")
+cat("Result URL: https://yoursite.com/prediction-result?job-id=", job_id, "\n")
+
+# Check job status
+status_response <- GET(
+  paste0("https://api.evolf.com/v1/predict/job/", job_id),
+  add_headers("Content-Type" = "application/json")
+)
+status <- fromJSON(content(status_response, "text"))
+
+# Download results when completed
+if (status$status == "completed") {
+  download_response <- GET(
+    paste0("https://api.evolf.com/v1/predict/download/", job_id)
+  )
+  writeBin(content(download_response, "raw"), paste0("prediction_", job_id, ".zip"))
+}
 ```
 
-### Response Format
+### Submit Prediction Response
 
 **Success Response (200 OK):**
 ```json
 {
-  "predictionId": "pred_abc123xyz789",
-  "results": [
-    {
-      "ligandIndex": 0,
-      "ligandName": "Caffeine",
-      "smiles": "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
-      "predictedAffinity": 2.45,
-      "confidenceScore": 94.2,
-      "affinityClass": "High"
-    },
-    {
-      "ligandIndex": 1,
-      "ligandName": "Propranolol",
-      "smiles": "CC(C)NCC(COC1=CC=C(C=C1)COCCOC2=CC=CC=C2)O",
-      "predictedAffinity": 15.8,
-      "confidenceScore": 87.5,
-      "affinityClass": "Medium"
-    }
-  ],
-  "modelInfo": {
-    "version": "evolf-v2.1",
-    "trainingSetSize": 10234,
-    "performanceMetrics": {
-      "r2": 0.89,
-      "rmse": 0.65
-    }
-  },
-  "processingTime": 1.8,
-  "mutation": "L249A"
+  "jobId": "pred_abc123xyz789",
+  "message": "Prediction submitted successfully"
 }
 ```
+
+### Get Job Status
+
+**Endpoint:**
+```
+GET /predict/job/:jobId
+```
+
+**Response - Running:**
+```json
+{
+  "status": "running",
+  "jobId": "pred_abc123xyz789",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "expiresAt": "2024-01-30T10:30:00Z"
+}
+```
+
+**Response - Completed:**
+```json
+{
+  "status": "completed",
+  "jobId": "pred_abc123xyz789",
+  "results": {
+    "ligands": [
+      {
+        "name": "Caffeine",
+        "smiles": "CCN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+        "predictedAffinity": 2.45,
+        "confidenceScore": 94.2,
+        "affinityClass": "High"
+      }
+    ]
+  },
+  "createdAt": "2024-01-15T10:30:00Z",
+  "expiresAt": "2024-01-30T10:30:00Z"
+}
+```
+
+**Response - Expired:**
+```json
+{
+  "status": "expired",
+  "jobId": "pred_abc123xyz789",
+  "message": "Job has expired. Results are available for 15 days."
+}
+```
+
+### Download Results
+
+**Endpoint:**
+```
+GET /predict/download/:jobId
+```
+
+**Success Response (200 OK):**
+- **Content-Type:** `application/zip`
+- **Body:** ZIP file containing prediction results in CSV and JSON formats
 
 **Error Response (400 Bad Request):**
 ```json
@@ -756,7 +855,12 @@ print(result$results)
 - **Receptor sequence**: Must be valid FASTA format
 - **SMILES notation**: Must be chemically valid SMILES strings
 - **Ligand count**: Maximum 10 ligands per request
-- **Mutation format**: Must match pattern `[A-Z]\d+[A-Z]` (e.g., "L249A")
+
+### Job Retention
+
+- Results are kept for **15 days** from submission
+- After 15 days, jobs expire and results are no longer available
+- Job URLs remain valid until expiration: `/prediction-result?job-id=YOUR_JOB_ID`
 
 ### Affinity Classification
 

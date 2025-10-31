@@ -332,34 +332,17 @@ export async function fetchDatasetStats() {
  *   ligands: Array<{
  *     smiles: string,         // SMILES notation
  *     name?: string          // Optional ligand name
- *   }>,
- *   mutation?: string         // Optional mutation (e.g., "L249A")
+ *   }>
  * }
  * 
  * Response Format:
  * {
- *   predictionId: string,
- *   results: Array<{
- *     ligandIndex: number,
- *     ligandName?: string,
- *     smiles: string,
- *     predictedAffinity: number,      // in nM
- *     confidenceScore: number,         // 0-100
- *     affinityClass: string           // "High" | "Medium" | "Low"
- *   }>,
- *   modelInfo: {
- *     version: string,
- *     trainingSetSize: number,
- *     performanceMetrics: {
- *       r2: number,
- *       rmse: number
- *     }
- *   },
- *   processingTime: number              // in seconds
+ *   jobId: string,              // Job ID for tracking prediction
+ *   message: string             // Status message
  * }
  * 
  * @param data - Prediction request data with receptor and ligands
- * @returns Prediction response with results for all ligands
+ * @returns Prediction response with job ID
  */
 export async function submitPrediction(data: {
   receptor: {
@@ -370,7 +353,6 @@ export async function submitPrediction(data: {
     smiles: string;
     name?: string;
   }>;
-  mutation?: string;
 }) {
   const response = await fetch(`${API_CONFIG.BASE_URL}/predict`, {
     method: 'POST',
@@ -391,23 +373,62 @@ export async function submitPrediction(data: {
 }
 
 /**
- * Get prediction by ID
- * Endpoint: GET /model/prediction/:id
- * @param id - Prediction ID
- * @returns Prediction result
+ * Get prediction job status and results
+ * Endpoint: GET /predict/job/:jobId
+ * 
+ * Response Format:
+ * {
+ *   status: "running" | "completed" | "expired",
+ *   jobId: string,
+ *   results?: {
+ *     downloadUrl?: string,     // URL to download results ZIP
+ *     ligands: Array<{
+ *       name?: string,
+ *       smiles: string,
+ *       predictedAffinity: number,
+ *       confidenceScore: number,
+ *       affinityClass: string
+ *     }>
+ *   },
+ *   expiresAt?: string,         // ISO timestamp when job expires
+ *   createdAt?: string          // ISO timestamp when job was created
+ * }
+ * 
+ * @param jobId - Job ID from prediction submission
+ * @returns Job status and results
  */
-export async function getPredictionById(id: string) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/model/prediction/${id}`, {
+export async function getPredictionJobStatus(jobId: string) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/predict/job/${jobId}`, {
     method: 'GET',
     headers: API_CONFIG.HEADERS,
   });
 
   if (!response.ok) {
-    throw new ApiError(`Failed to fetch prediction: ${response.statusText}`, response.status);
+    throw new ApiError(`Failed to fetch prediction job: ${response.statusText}`, response.status);
   }
 
   return await response.json();
 }
+
+/**
+ * Download prediction results as ZIP
+ * Endpoint: GET /predict/download/:jobId
+ * @param jobId - Job ID from prediction submission
+ * @returns Blob (ZIP file) for download
+ */
+export async function downloadPredictionResults(jobId: string) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/predict/download/${jobId}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to download results: ${response.statusText}`, response.status);
+  }
+
+  return await response.blob();
+}
+
 
 /**
  * Fetch GPCR receptors list

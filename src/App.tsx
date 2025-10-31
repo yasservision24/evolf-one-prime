@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DatabaseDashboard from "./pages/dataset/DatabaseDashboard";
 import PredictionDashboard from "./pages/prediction/PredictionDashboard";
+import PredictionResult from "./pages/prediction/PredictionResult";
 import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
@@ -29,6 +30,7 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/dataset/dashboard" element={<DatabaseDashboard />} />
         <Route path="/prediction" element={<PredictionDashboard />} />
+        <Route path="/prediction-result" element={<PredictionResult />} />
         <Route path="/documentation" element={<Documentation />} />
           <Route path="/model-info" element={<ModelInfo />} />
         <Route path="/faq" element={<FAQ />} />
