@@ -666,12 +666,13 @@ const DatabaseDashboard = () => {
           </div>
 
           {/* Enhanced Search Bar */}
-          <div className="mb-8">
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 overflow-visible">
+                 
+          <div className="mb-8 relative z-[9999]">
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 overflow-visible relative">
               <div className="flex flex-col gap-4 overflow-visible">
-                <div className="flex items-center gap-3 overflow-visible">
-                  <div className="relative flex-1 z-[9999]">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))]" />
+                <div className="flex items-center gap-3 overflow-visible relative">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))] z-10" />
                     <Input
                       ref={searchInputRef}
                       type="text"
@@ -690,12 +691,12 @@ const DatabaseDashboard = () => {
                           setShowSuggestions(true);
                         }
                       }}
-                      className="pl-12 h-14 text-base bg-background/50 border-border/50 focus:border-[hsl(var(--brand-teal))] transition-colors"
+                      className="pl-12 h-14 text-base bg-background/50 border-border/50 focus:border-[hsl(var(--brand-teal))] transition-colors relative z-10"
                     />
                     
-                    {/* Autocomplete Suggestions Dropdown */}
+                    {/* Autocomplete Suggestions Dropdown - Moved to top layer */}
                     {showSuggestions && searchSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-[9999] max-h-96 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-[10000] max-h-96 overflow-y-auto">
                         {isSearching && (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
@@ -734,7 +735,7 @@ const DatabaseDashboard = () => {
                   </div>
                   <Button 
                     size="lg"
-                    className="h-14 px-4 sm:px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 min-w-[100px] sm:min-w-[120px]"
+                    className="h-14 px-4 sm:px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 min-w-[100px] sm:min-w-[120px] relative z-10"
                     onClick={handleSearchSubmit}
                     disabled={isLoading}
                   >
@@ -746,7 +747,6 @@ const DatabaseDashboard = () => {
                     <span className="hidden sm:inline">{isLoading ? 'Searching...' : 'Search'}</span>
                   </Button>
                 </div>
-
 
                 {searchQuery && (
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
