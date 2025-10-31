@@ -147,18 +147,20 @@ const DatabaseDashboard = () => {
   /**
    * Fetch paginated dataset items with backend filtering
    */
-  const fetchDatasetItems = async () => {
+  const fetchDatasetItems = async (overrideSearch?: string, overridePage?: number) => {
     setIsLoading(true);
     try {
       // Convert selected filters to comma-separated strings
       const speciesFilter = selectedSpecies.length > 0 ? selectedSpecies.join(',') : undefined;
       const classFilter = selectedClasses.length > 0 ? selectedClasses.join(',') : undefined;
       const mutationFilter = selectedMutations.length > 0 ? selectedMutations.join(',') : undefined;
+      const effectiveSearch = overrideSearch !== undefined ? overrideSearch : searchQuery;
+      const effectivePage = overridePage !== undefined ? overridePage : currentPage;
       
       console.log('Fetching dataset with params:', {
-        page: currentPage,
+        page: effectivePage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: effectiveSearch,
         sortBy,
         sortOrder,
         species: speciesFilter,
@@ -167,9 +169,9 @@ const DatabaseDashboard = () => {
       });
       
       const data: PaginatedResponse<DatasetItem> = await fetchDatasetPaginated(
-        currentPage,
+        effectivePage,
         itemsPerPage,
-        searchQuery,
+        effectiveSearch,
         sortBy,
         sortOrder,
         speciesFilter,
@@ -369,12 +371,13 @@ const DatabaseDashboard = () => {
   /**
    * Handle suggestion click - sets search term and triggers search
    */
-  const handleSuggestionClick = (suggestion: any) => {
+  const handleSuggestionClick = async (suggestion: any) => {
     const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || suggestion.EvOlf_ID || '';
     setSearchQuery(searchTerm);
     setShowSuggestions(false);
     setCurrentPage(1);
-    // useEffect will automatically trigger fetchDatasetItems when searchQuery changes
+    // Trigger search immediately with the new search term
+    await fetchDatasetItems(searchTerm, 1);
   };
 
   /**
