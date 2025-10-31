@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
-import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2 } from 'lucide-react';
+import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getDatasetPaginated, getDatasetCount, DatasetItem } from '@/lib/api';
+import { getDatasetPaginated, DatasetItem } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 const DatabaseDashboard = () => {
@@ -31,25 +31,6 @@ const DatabaseDashboard = () => {
     else if (page === 'model') navigate('/prediction');
   };
 
-  /**
-   * Fetch total count of items
-   * Called on initial load and when search query changes
-   */
-  const fetchTotalCount = async (search?: string) => {
-    try {
-      const count = await getDatasetCount(search);
-      setTotalItems(count);
-    } catch (error) {
-      console.error('Error fetching total count:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch dataset count. Using mock data.',
-        variant: 'destructive',
-      });
-      // Set mock count for demonstration
-      setTotalItems(10234);
-    }
-  };
 
   /**
    * Fetch paginated dataset items
@@ -72,25 +53,13 @@ const DatabaseDashboard = () => {
       console.error('Error fetching dataset:', error);
       toast({
         title: 'Backend Not Connected',
-        description: 'Displaying mock data. Connect your backend to see real data.',
-        variant: 'default',
+        description: 'Please connect your backend to view real data.',
+        variant: 'destructive',
       });
       
-      // Generate mock data for demonstration
-      const mockData: DatasetItem[] = Array.from({ length: itemsPerPage }, (_, i) => ({
-        id: `${(currentPage - 1) * itemsPerPage + i + 1}`,
-        receptor: ['5-HT2A', 'D2', 'M1', 'α2A', 'β2'][i % 5],
-        ligand: ['Serotonin', 'Dopamine', 'Acetylcholine', 'Norepinephrine', 'Epinephrine'][i % 5],
-        affinity: parseFloat((Math.random() * 100 + 1).toFixed(2)),
-        affinityUnit: 'nM',
-        species: ['Human', 'Rat', 'Mouse'][i % 3],
-        mutation: i % 3 === 0 ? 'D138A' : undefined,
-        experimentType: ['Binding', 'Functional'][i % 2],
-        reference: `PMID:${12345678 + i}`,
-        dateAdded: new Date(2024, 0, i + 1).toISOString(),
-      }));
-      
-      setDatasetItems(mockData);
+      // Clear data when backend is not available
+      setDatasetItems([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
@@ -152,21 +121,16 @@ const DatabaseDashboard = () => {
     return pages;
   };
 
-  // Fetch total count on mount and when search changes
-  useEffect(() => {
-    fetchTotalCount(searchQuery || undefined);
-  }, [searchQuery]);
-
   // Fetch data when page or search changes
   useEffect(() => {
     fetchDatasetItems();
   }, [currentPage, searchQuery]);
 
   const stats = [
-    { label: 'Total Interactions', value: '10,234', change: '+12% this month', icon: Database, color: 'text-[hsl(var(--brand-teal))]' },
-    { label: 'GPCR Receptors', value: '487', change: '15 species', icon: Database, color: 'text-green-400' },
-    { label: 'Unique Ligands', value: '3,542', change: 'From ChEMBL', icon: Database, color: 'text-[hsl(var(--brand-purple))]' },
-    { label: 'Mutations Studied', value: '1,876', change: 'Validated', icon: Database, color: 'text-red-400' },
+    { label: 'Total Interactions', value: totalItems > 0 ? totalItems.toLocaleString() : '—', change: 'Curated records', icon: Database, color: 'text-[hsl(var(--brand-teal))]' },
+    { label: 'GPCR Receptors', value: '—', change: 'Connect backend', icon: Database, color: 'text-green-400' },
+    { label: 'Unique Ligands', value: '—', change: 'Connect backend', icon: Database, color: 'text-[hsl(var(--brand-purple))]' },
+    { label: 'Mutations Studied', value: '—', change: 'Connect backend', icon: Database, color: 'text-red-400' },
   ];
 
   const features = [
@@ -240,94 +204,166 @@ const DatabaseDashboard = () => {
             ))}
           </div>
 
-          {/* Search Bar */}
+          {/* Enhanced Search Bar */}
           <div className="mb-8">
-            <div className="relative max-w-2xl">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by receptor, ligand, species, or reference..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 h-12 text-base"
-              />
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems.toLocaleString()} interactions
-            </p>
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--brand-teal))]" />
+                    <Input
+                      type="text"
+                      placeholder="Search by EvOlf ID, receptor name, ligand, ChEMBL ID, species..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="pl-12 h-14 text-base bg-background/50 border-border/50 focus:border-[hsl(var(--brand-teal))] transition-colors"
+                    />
+                  </div>
+                  <Button 
+                    size="lg"
+                    className="h-14 px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                    onClick={() => fetchDatasetItems()}
+                  >
+                    <Search className="w-5 h-5" />
+                    Search
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <p>
+                    {totalItems > 0 ? (
+                      <>Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems.toLocaleString()} interactions</>
+                    ) : (
+                      <>No data available. Please connect your backend.</>
+                    )}
+                  </p>
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSearchChange('')}
+                      className="text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80"
+                    >
+                      Clear search
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
           </div>
 
-          {/* Dataset Table */}
-          <Card className="mb-8 overflow-hidden">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="font-semibold">ID</TableHead>
-                    <TableHead className="font-semibold">Receptor</TableHead>
-                    <TableHead className="font-semibold">Ligand</TableHead>
-                    <TableHead className="font-semibold">Affinity</TableHead>
-                    <TableHead className="font-semibold">Species</TableHead>
-                    <TableHead className="font-semibold">Mutation</TableHead>
-                    <TableHead className="font-semibold">Type</TableHead>
-                    <TableHead className="font-semibold">Reference</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
-                        <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
-                          <span className="text-muted-foreground">Loading dataset...</span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : datasetItems.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
-                        <p className="text-muted-foreground">No data found</p>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    datasetItems.map((item) => (
-                      <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="font-mono text-xs">{item.id}</TableCell>
-                        <TableCell className="font-semibold text-[hsl(var(--brand-teal))]">{item.receptor}</TableCell>
-                        <TableCell>{item.ligand}</TableCell>
-                        <TableCell>
-                          <span className="font-mono">{item.affinity} {item.affinityUnit}</span>
-                        </TableCell>
-                        <TableCell>{item.species}</TableCell>
-                        <TableCell>
-                          {item.mutation ? (
-                            <span className="px-2 py-1 rounded-md bg-[hsl(var(--brand-purple))]/10 text-[hsl(var(--brand-purple))] text-xs font-mono">
-                              {item.mutation}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-sm">{item.experimentType}</span>
-                        </TableCell>
-                        <TableCell>
-                          <a
-                            href={`https://pubmed.ncbi.nlm.nih.gov/${item.reference.replace('PMID:', '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[hsl(var(--brand-teal))] hover:underline text-xs font-mono"
+          {/* Dataset Cards Grid */}
+          <div className="mb-8">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="flex flex-col items-center gap-4">
+                  <Loader2 className="w-10 h-10 animate-spin text-[hsl(var(--brand-teal))]" />
+                  <p className="text-muted-foreground text-lg">Loading dataset...</p>
+                </div>
+              </div>
+            ) : datasetItems.length === 0 ? (
+              <Card className="p-12 bg-card/50 backdrop-blur-sm border-border/50">
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <AlertCircle className="w-12 h-12 text-muted-foreground" />
+                  <div>
+                    <h3 className="text-xl font-heading font-semibold mb-2">No Data Available</h3>
+                    <p className="text-muted-foreground">
+                      Please connect your backend to view the dataset. Check the API documentation for setup instructions.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {datasetItems.map((item) => (
+                  <Card 
+                    key={item.id} 
+                    className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all cursor-pointer group"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,1fr,auto,auto,auto] gap-6 items-center">
+                      {/* EvOlf ID & Class */}
+                      <div className="flex flex-col gap-2 min-w-[120px]">
+                        <p className="text-xs text-muted-foreground font-medium">EvOlf ID</p>
+                        <p className="text-[hsl(var(--brand-teal))] font-mono text-sm font-semibold">{item.evolfId}</p>
+                        <Badge variant="outline" className="w-fit border-[hsl(var(--brand-teal))]/30 text-[hsl(var(--brand-teal))] text-xs">
+                          {item.class}
+                        </Badge>
+                      </div>
+
+                      {/* Receptor */}
+                      <div className="flex flex-col gap-1">
+                        <p className="text-xs text-muted-foreground font-medium">Receptor</p>
+                        <p className="font-heading font-semibold text-base">{item.receptor}</p>
+                        <p className="text-sm text-muted-foreground italic">{item.species}</p>
+                      </div>
+
+                      {/* Ligand */}
+                      <div className="flex flex-col gap-1">
+                        <p className="text-xs text-muted-foreground font-medium">Ligand</p>
+                        <p className="font-heading font-semibold text-base">{item.ligand}</p>
+                        <a
+                          href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[hsl(var(--brand-teal))] hover:underline text-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {item.chemblId}
+                        </a>
+                      </div>
+
+                      {/* Mutation */}
+                      <div className="flex flex-col gap-2 min-w-[100px]">
+                        <p className="text-xs text-muted-foreground font-medium">Mutation</p>
+                        {item.mutation && item.mutation !== 'Wild-type' ? (
+                          <Badge 
+                            variant="secondary" 
+                            className="w-fit bg-[hsl(var(--brand-purple))]/10 text-[hsl(var(--brand-purple))] border-[hsl(var(--brand-purple))]/20 font-mono text-xs"
                           >
-                            {item.reference}
-                          </a>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
+                            {item.mutation}
+                          </Badge>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Wild-type</span>
+                        )}
+                      </div>
+
+                      {/* Quality */}
+                      <div className="flex flex-col gap-2 min-w-[140px]">
+                        <p className="text-xs text-muted-foreground font-medium">Quality</p>
+                        <div className="flex items-center gap-2">
+                          <div className="relative w-24 h-2 bg-secondary rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full transition-all ${
+                                item.quality === 'High' 
+                                  ? 'bg-[hsl(var(--brand-teal))]' 
+                                  : item.quality === 'Medium' 
+                                  ? 'bg-[hsl(45,93%,58%)]' 
+                                  : 'bg-[hsl(0,72%,51%)]'
+                              }`}
+                              style={{ width: `${item.qualityScore}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-semibold ${
+                            item.quality === 'High' 
+                              ? 'text-[hsl(var(--brand-teal))]' 
+                              : item.quality === 'Medium' 
+                              ? 'text-[hsl(45,93%,58%)]' 
+                              : 'text-[hsl(0,72%,51%)]'
+                          }`}>
+                            {item.quality}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="flex items-center justify-center">
+                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[hsl(var(--brand-teal))] transition-colors" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Pagination Controls */}
           {!isLoading && datasetItems.length > 0 && (

@@ -38,14 +38,19 @@ export const API_CONFIG = {
  */
 export interface DatasetItem {
   id: string;
-  receptor: string;           // GPCR receptor name (e.g., "5-HT2A", "D2")
+  evolfId: string;            // EvOlf unique identifier (e.g., "EVLF_001234")
+  class: string;              // GPCR class (e.g., "Class A", "Class B")
+  receptor: string;           // GPCR receptor name (e.g., "Adenosine A2A receptor")
+  species: string;            // Organism species in scientific name (e.g., "Homo sapiens")
   ligand: string;             // Ligand/compound name
-  affinity: number;           // Binding affinity value (e.g., Ki, IC50)
-  affinityUnit: string;       // Unit of measurement (e.g., "nM", "μM")
-  species: string;            // Organism species (e.g., "Human", "Rat")
-  mutation?: string;          // Optional: mutation information
-  experimentType: string;     // Type of experiment (e.g., "Binding", "Functional")
-  reference: string;          // PubMed ID or DOI
+  chemblId: string;           // ChEMBL database ID (e.g., "CHEMBL191")
+  mutation?: string;          // Optional: mutation information (e.g., "L249A", "Wild-type")
+  quality: string;            // Data quality level ("High", "Medium", "Low")
+  qualityScore: number;       // Quality score 0-100 for progress bar
+  affinity?: number;          // Optional: Binding affinity value (e.g., Ki, IC50)
+  affinityUnit?: string;      // Optional: Unit of measurement (e.g., "nM", "μM")
+  experimentType?: string;    // Optional: Type of experiment (e.g., "Binding", "Functional")
+  reference?: string;         // Optional: PubMed ID or DOI
   dateAdded: string;          // ISO date string
 }
 
