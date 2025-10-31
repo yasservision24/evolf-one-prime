@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getDatasetPaginated, DatasetItem } from '@/lib/api';
+import { getDatasetPaginated, DatasetItem } from '@/utils/api';
 import { useToast } from '@/hooks/use-toast';
 
 const DatabaseDashboard = () => {
