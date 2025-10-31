@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { API_CONFIG } from '@/lib/api';
+import { fetchDatasetPaginated, downloadDataset as downloadDatasetAPI, fetchDatasetStats } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 // ============================================================================
@@ -87,32 +87,18 @@ const DatabaseDashboard = () => {
 
 
   /**
-   * API: Fetch paginated dataset items
-   * Endpoint: GET /api/dataset
-   * Query params: page, limit, search, sortBy, sortOrder
+   * Fetch paginated dataset items
    */
   const fetchDatasetItems = async () => {
     setIsLoading(true);
     try {
-      const queryParams = new URLSearchParams();
-      queryParams.append('page', currentPage.toString());
-      queryParams.append('limit', itemsPerPage.toString());
-      if (searchQuery) queryParams.append('search', searchQuery);
-      queryParams.append('sortBy', 'dateAdded');
-      queryParams.append('sortOrder', 'desc');
-      
-      const response = await fetch(`${API_CONFIG.BASE_URL}/dataset?${queryParams.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: PaginatedResponse<DatasetItem> = await response.json();
+      const data: PaginatedResponse<DatasetItem> = await fetchDatasetPaginated(
+        currentPage,
+        itemsPerPage,
+        searchQuery,
+        'dateAdded',
+        'desc'
+      );
       
       setDatasetItems(data.data);
       setTotalItems(data.pagination.totalItems);
@@ -132,28 +118,12 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * API: Download dataset as CSV/JSON
-   * Endpoint: GET /api/dataset/download
-   * Query params: format (csv/json), filters (optional)
+   * Download dataset as CSV/JSON
    */
   const downloadDataset = async (format: 'csv' | 'json' = 'csv') => {
     try {
-      const queryParams = new URLSearchParams();
-      queryParams.append('format', format);
-      if (searchQuery) queryParams.append('search', searchQuery);
+      const blob = await downloadDatasetAPI(format, searchQuery);
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download?${queryParams.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -174,32 +144,6 @@ const DatabaseDashboard = () => {
         description: 'Could not download dataset. Please try again.',
         variant: 'destructive',
       });
-    }
-  };
-
-  /**
-   * API: Get dataset statistics
-   * Endpoint: GET /api/dataset/stats
-   * Returns: Total receptors, ligands, mutations, etc.
-   */
-  const fetchDatasetStats = async () => {
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/stats`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const stats = await response.json();
-      return stats;
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      return null;
     }
   };
 

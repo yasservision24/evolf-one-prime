@@ -211,3 +211,159 @@ export const api = {
     apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
 };
 
+// ============================================================================
+// INDEPENDENT ENDPOINT FUNCTIONS
+// ============================================================================
+
+/**
+ * Fetch paginated dataset items
+ * Endpoint: GET /dataset
+ * @param page - Page number (default: 1)
+ * @param limit - Items per page (default: 20)
+ * @param search - Search query (optional)
+ * @param sortBy - Sort field (default: 'dateAdded')
+ * @param sortOrder - Sort direction (default: 'desc')
+ */
+export async function fetchDatasetPaginated(
+  page: number = 1,
+  limit: number = 20,
+  search?: string,
+  sortBy: string = 'dateAdded',
+  sortOrder: 'asc' | 'desc' = 'desc'
+) {
+  const queryParams = new URLSearchParams();
+  queryParams.append('page', page.toString());
+  queryParams.append('limit', limit.toString());
+  if (search) queryParams.append('search', search);
+  queryParams.append('sortBy', sortBy);
+  queryParams.append('sortOrder', sortOrder);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset?${queryParams.toString()}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch dataset: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Download dataset as CSV or JSON
+ * Endpoint: GET /dataset/download
+ * @param format - File format ('csv' or 'json')
+ * @param search - Search filter (optional)
+ * @returns Blob for download
+ */
+export async function downloadDataset(format: 'csv' | 'json' = 'csv', search?: string) {
+  const queryParams = new URLSearchParams();
+  queryParams.append('format', format);
+  if (search) queryParams.append('search', search);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download?${queryParams.toString()}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to download dataset: ${response.statusText}`, response.status);
+  }
+
+  return await response.blob();
+}
+
+/**
+ * Fetch dataset statistics
+ * Endpoint: GET /dataset/stats
+ * @returns Statistics object with total receptors, ligands, mutations, etc.
+ */
+export async function fetchDatasetStats() {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/stats`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch dataset stats: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Submit prediction request
+ * Endpoint: POST /predict
+ * @param data - Prediction request data
+ * @returns Prediction response
+ */
+export async function submitPrediction(data: any) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/predict`, {
+    method: 'POST',
+    headers: API_CONFIG.HEADERS,
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to submit prediction: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Get prediction by ID
+ * Endpoint: GET /model/prediction/:id
+ * @param id - Prediction ID
+ * @returns Prediction result
+ */
+export async function getPredictionById(id: string) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/model/prediction/${id}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch prediction: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetch GPCR receptors list
+ * Endpoint: GET /receptors
+ * @returns List of available receptors
+ */
+export async function fetchReceptors() {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/receptors`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch receptors: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetch interactions data
+ * Endpoint: GET /interactions
+ * @returns Interaction data
+ */
+export async function fetchInteractions() {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/interactions`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch interactions: ${response.statusText}`, response.status);
+  }
+
+  return await response.json();
+}
+
