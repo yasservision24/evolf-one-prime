@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, CheckCircle, ChevronDown, ArrowUpDown, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchDatasetPaginated, downloadDatasetByIds } from '@/lib/api';
+import { fetchDatasetPaginated, downloadDatasetByIds, downloadCompleteDataset } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -97,6 +97,7 @@ const DatabaseDashboard = () => {
   const [allEvolfIds, setAllEvolfIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
   const itemsPerPage = 20;
   
   // Statistics from backend
@@ -238,7 +239,7 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Download dataset by evolf IDs (ZIP)
+   * Download filtered dataset by evolf IDs (ZIP)
    */
   const downloadDataset = async () => {
     try {
@@ -264,6 +265,37 @@ const DatabaseDashboard = () => {
         description: 'Could not export dataset. Please try again.',
         variant: 'destructive',
       });
+    }
+  };
+
+  /**
+   * Download complete dataset (all data)
+   */
+  const handleDownloadAll = async () => {
+    try {
+      setIsDownloading(true);
+      const blob = await downloadCompleteDataset();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `evolf-complete-dataset-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        title: 'Complete Dataset Downloaded',
+        description: 'Successfully downloaded the complete EvOlf dataset.',
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'Download Failed',
+        description: 'Failed to download complete dataset. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -855,11 +887,11 @@ const DatabaseDashboard = () => {
             </Button>
             <Button 
               className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
-              onClick={downloadDataset}
-              disabled={allEvolfIds.length === 0}
+              onClick={handleDownloadAll}
+              disabled={isDownloading}
             >
               <Download className="w-4 h-4 mr-2" />
-              Download All Data ({allEvolfIds.length})
+              {isDownloading ? 'Downloading...' : 'Download All Data'}
             </Button>
           </div>
         </div>
