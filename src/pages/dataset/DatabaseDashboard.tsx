@@ -104,8 +104,10 @@ const DatabaseDashboard = () => {
   const [searchSuggestions, setSearchSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const searchDebounceRef = useRef<NodeJS.Timeout>();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
   
   // Statistics from backend
   const [statistics, setStatistics] = useState({
@@ -330,6 +332,7 @@ const DatabaseDashboard = () => {
     if (!query || query.trim().length === 0) {
       setSearchSuggestions([]);
       setShowSuggestions(false);
+      setFocusedSuggestionIndex(-1);
       return;
     }
 
@@ -338,9 +341,11 @@ const DatabaseDashboard = () => {
       const data = await searchDataset(query);
       setSearchSuggestions(data.results || []);
       setShowSuggestions(true);
+      setFocusedSuggestionIndex(-1); // Reset focus when new suggestions load
     } catch (error) {
       console.error('Error fetching search suggestions:', error);
       setSearchSuggestions([]);
+      setShowSuggestions(false);
     } finally {
       setIsSearching(false);
     }
@@ -351,6 +356,7 @@ const DatabaseDashboard = () => {
    */
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
+    setFocusedSuggestionIndex(-1); // Reset focus when typing
     
     // Clear previous debounce timeout
     if (searchDebounceRef.current) {
@@ -372,20 +378,87 @@ const DatabaseDashboard = () => {
    * Handle suggestion click - sets search term and triggers search
    */
   const handleSuggestionClick = async (suggestion: any) => {
+    // Extract search term from suggestion with better fallback logic
     const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || suggestion.EvOlf_ID || '';
+    
+    console.log('Suggestion clicked:', { suggestion, searchTerm });
+    
+    // Auto-fill search input
     setSearchQuery(searchTerm);
+    
+    // Hide suggestions dropdown
     setShowSuggestions(false);
+    setFocusedSuggestionIndex(-1);
+    
+    // Reset to first page for new search
     setCurrentPage(1);
+    
+    // Clear any existing debounce timeout
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    
     // Trigger search immediately with the new search term
-    await fetchDatasetItems(searchTerm, 1);
+    try {
+      await fetchDatasetItems(searchTerm, 1);
+      
+      // Show success feedback
+      toast({
+        title: 'Search Updated',
+        description: `Searching for: ${searchTerm}`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Error performing search after suggestion click:', error);
+    }
   };
 
   /**
-   * Handle search submit
+   * Enhanced search input key handlers
    */
-  const handleSearchSubmit = () => {
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (focusedSuggestionIndex >= 0 && searchSuggestions[focusedSuggestionIndex]) {
+        // If a suggestion is focused, select it
+        handleSuggestionClick(searchSuggestions[focusedSuggestionIndex]);
+      } else {
+        // Otherwise perform regular search
+        handleSearchSubmit();
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setFocusedSuggestionIndex(-1);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (showSuggestions && searchSuggestions.length > 0) {
+        const nextIndex = (focusedSuggestionIndex + 1) % searchSuggestions.length;
+        setFocusedSuggestionIndex(nextIndex);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (showSuggestions && searchSuggestions.length > 0) {
+        const prevIndex = focusedSuggestionIndex <= 0 ? searchSuggestions.length - 1 : focusedSuggestionIndex - 1;
+        setFocusedSuggestionIndex(prevIndex);
+      }
+    }
+  };
+
+  /**
+   * Improved search submit handler
+   */
+  const handleSearchSubmit = async () => {
     setShowSuggestions(false);
+    setFocusedSuggestionIndex(-1);
     setCurrentPage(1);
+    
+    // Clear debounce timeout when submitting manually
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    
+    // Trigger search with current query
+    await fetchDatasetItems(searchQuery, 1);
   };
 
   /**
@@ -484,8 +557,14 @@ const DatabaseDashboard = () => {
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+      if (
+        searchInputRef.current && 
+        !searchInputRef.current.contains(event.target as Node) &&
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(event.target as Node)
+      ) {
         setShowSuggestions(false);
+        setFocusedSuggestionIndex(-1);
       }
     };
 
@@ -671,7 +750,6 @@ const DatabaseDashboard = () => {
           </div>
 
           {/* Enhanced Search Bar */}
-                 
           <div className="mb-8 relative z-[9999]">
             <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 overflow-visible relative">
               <div className="flex flex-col gap-4 overflow-visible">
@@ -684,24 +762,21 @@ const DatabaseDashboard = () => {
                       placeholder="Search by EvOlf ID, receptor name, ligand, ChEMBL ID, species..."
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearchSubmit();
-                        } else if (e.key === 'Escape') {
-                          setShowSuggestions(false);
-                        }
-                      }}
+                      onKeyDown={handleSearchKeyDown}
                       onFocus={() => {
-                        if (searchSuggestions.length > 0) {
+                        if (searchQuery.trim().length > 0 && searchSuggestions.length > 0) {
                           setShowSuggestions(true);
                         }
                       }}
                       className="pl-12 h-14 text-base bg-background/50 border-border/50 focus:border-[hsl(var(--brand-teal))] transition-colors relative z-10"
                     />
                     
-                    {/* Autocomplete Suggestions Dropdown - Moved to top layer */}
+                    {/* Autocomplete Suggestions Dropdown */}
                     {showSuggestions && searchSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-[10000] max-h-96 overflow-y-auto">
+                      <div 
+                        ref={suggestionsRef}
+                        className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-[10000] max-h-96 overflow-y-auto"
+                      >
                         {isSearching && (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="w-5 h-5 animate-spin text-[hsl(var(--brand-teal))]" />
@@ -711,8 +786,11 @@ const DatabaseDashboard = () => {
                         {!isSearching && searchSuggestions.map((suggestion, index) => (
                           <div
                             key={`${suggestion.EvOlf_ID}-${index}`}
-                            className="p-4 hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0 transition-colors"
+                            className={`p-4 hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0 transition-colors ${
+                              focusedSuggestionIndex === index ? 'bg-accent' : ''
+                            }`}
                             onClick={() => handleSuggestionClick(suggestion)}
+                            onMouseEnter={() => setFocusedSuggestionIndex(index)}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
@@ -733,6 +811,7 @@ const DatabaseDashboard = () => {
                         <div className="p-2 bg-muted/30 text-center">
                           <p className="text-xs text-muted-foreground">
                             Showing {searchSuggestions.length} suggestion{searchSuggestions.length !== 1 ? 's' : ''}
+                            {searchSuggestions.length > 0 && ' - Press ↑↓ to navigate, Enter to select'}
                           </p>
                         </div>
                       </div>
@@ -765,7 +844,11 @@ const DatabaseDashboard = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleSearchChange('')}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setShowSuggestions(false);
+                        setFocusedSuggestionIndex(-1);
+                      }}
                       className="text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80"
                     >
                       Clear search
