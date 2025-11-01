@@ -546,7 +546,7 @@ const DatabaseDashboard = () => {
    */
   const handleCardClick = (item: DatasetItem) => {
     console.log('Viewing details for:', item.evolfId);
-    // navigate(`/dataset/${item.evolfId}`);
+    navigate(`/dataset/detail?evolfid=${item.evolfId}`);
   };
 
   // Fetch data when page, search, sort, or filters change
