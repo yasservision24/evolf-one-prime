@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { fetchDatasetEntry } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
 interface EntryData {
   evolfId: string;
@@ -134,26 +136,35 @@ export default function DatasetDetailView() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <>
+        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-muted-foreground mb-4">Entry not found</p>
-        <Button onClick={() => navigate('/database')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Database
-        </Button>
-      </div>
+      <>
+        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <p className="text-muted-foreground mb-4">Entry not found</p>
+          <Button onClick={() => navigate('/dataset/dashboard')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Database
+          </Button>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
       <div className="bg-secondary border-b border-border">
         <div className="container mx-auto px-4 py-3">
           <Button
@@ -519,6 +530,7 @@ export default function DatasetDetailView() {
           </TabsContent>
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 }
