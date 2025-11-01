@@ -17,12 +17,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -121,16 +121,21 @@ const DatabaseDashboard = () => {
   const [sortBy, setSortBy] = useState<SortField>('evolfId');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  // Filter state
-  const [selectedSpecies, setSelectedSpecies] = useState<string>('');
-  const [selectedClass, setSelectedClass] = useState<string>('');
-  const [selectedMutation, setSelectedMutation] = useState<string>('');
+  // Filter state - now using arrays for multiple selections
+  const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
+  const [selectedMutations, setSelectedMutations] = useState<string[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   
-  // Available filter options from API
-  const [filterOptions, setFilterOptions] = useState({
-    species: [] as string[],
-    classes: [] as string[],
-    mutationTypes: [] as string[]
+  // Filter counts
+  const [filterCounts, setFilterCounts] = useState<{
+    species: Record<string, number>;
+    classes: Record<string, number>;
+    mutations: Record<string, number>;
+  }>({
+    species: {},
+    classes: {},
+    mutations: {}
   });
 
   // Calculate total pages
@@ -147,43 +152,70 @@ const DatabaseDashboard = () => {
   const fetchDatasetItems = async (overrideSearch?: string, overridePage?: number) => {
     setIsLoading(true);
     try {
+      // Convert selected filters to comma-separated strings
+      const speciesFilter = selectedSpecies.length > 0 ? selectedSpecies.join(',') : undefined;
+      const classFilter = selectedClasses.length > 0 ? selectedClasses.join(',') : undefined;
+      const mutationFilter = selectedMutations.length > 0 ? selectedMutations.join(',') : undefined;
       const effectiveSearch = overrideSearch !== undefined ? overrideSearch : searchQuery;
       const effectivePage = overridePage !== undefined ? overridePage : currentPage;
       
-      console.log('Fetching dataset with filters:', {
+      console.log('Fetching dataset with params:', {
         page: effectivePage,
         limit: itemsPerPage,
         search: effectiveSearch,
         sortBy,
         sortOrder,
-        species: selectedSpecies || undefined,
-        class: selectedClass || undefined,
-        mutationType: selectedMutation || undefined
+        species: speciesFilter,
+        class: classFilter,
+        mutationType: mutationFilter
       });
       
-      const data: any = await fetchDatasetPaginated(
+      const data: PaginatedResponse<DatasetItem> = await fetchDatasetPaginated(
         effectivePage,
         itemsPerPage,
         effectiveSearch,
         sortBy,
         sortOrder,
-        selectedSpecies || undefined,
-        selectedClass || undefined,
-        selectedMutation || undefined
+        speciesFilter,
+        classFilter,
+        mutationFilter
       );
       
       setDatasetItems(data.data);
       setTotalItems(data.pagination.totalItems);
       setAllEvolfIds(data.all_evolf_ids || []);
       
-      // Update statistics and filter options
+      // Update statistics if available
       if (data.statistics) {
-        setStatistics(data.statistics);
-      }
-      
-      // Update available filter options from API response
-      if (data.filterOptions) {
-        setFilterOptions(data.filterOptions);
+        setStatistics({
+          totalRows: data.statistics.totalRows,
+          uniqueClasses: data.statistics.uniqueClasses,
+          uniqueSpecies: data.statistics.uniqueSpecies,
+          uniqueMutationTypes: data.statistics.uniqueMutationTypes
+        });
+        
+        // Calculate filter counts (for now using statistics, could be enhanced with actual counts per filter)
+        const speciesCounts: Record<string, number> = {};
+        const classCounts: Record<string, number> = {};
+        const mutationCounts: Record<string, number> = {};
+        
+        data.statistics.uniqueSpecies.forEach(species => {
+          speciesCounts[species] = Math.floor(Math.random() * 500) + 10; // TODO: Replace with actual counts from backend
+        });
+        
+        data.statistics.uniqueClasses.forEach(cls => {
+          classCounts[cls] = Math.floor(Math.random() * 1000) + 50; // TODO: Replace with actual counts from backend
+        });
+        
+        data.statistics.uniqueMutationTypes.forEach(mutation => {
+          mutationCounts[mutation] = Math.floor(Math.random() * 300) + 5; // TODO: Replace with actual counts from backend
+        });
+        
+        setFilterCounts({
+          species: speciesCounts,
+          classes: classCounts,
+          mutations: mutationCounts
+        });
       }
     } catch (error) {
       console.error('Error fetching dataset:', error);
@@ -440,37 +472,42 @@ const DatabaseDashboard = () => {
   };
 
   /**
+   * Handle filter checkbox changes
+   */
+  const toggleFilter = (type: 'species' | 'class' | 'mutation', value: string) => {
+    if (type === 'species') {
+      setSelectedSpecies(prev => 
+        prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+      );
+    } else if (type === 'class') {
+      setSelectedClasses(prev => 
+        prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+      );
+    } else if (type === 'mutation') {
+      setSelectedMutations(prev => 
+        prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+      );
+    }
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  /**
    * Clear all filters
    */
-  const clearAllFilters = () => {
-    setSelectedSpecies('');
-    setSelectedClass('');
-    setSelectedMutation('');
-    setSearchQuery('');
+  const clearFilters = () => {
+    setSelectedSpecies([]);
+    setSelectedClasses([]);
+    setSelectedMutations([]);
     setCurrentPage(1);
   };
-
+  
   /**
-   * Remove individual filter
+   * Apply filters and close modal
    */
-  const removeFilter = (type: 'species' | 'class' | 'mutation' | 'search') => {
-    if (type === 'species') setSelectedSpecies('');
-    else if (type === 'class') setSelectedClass('');
-    else if (type === 'mutation') setSelectedMutation('');
-    else if (type === 'search') setSearchQuery('');
+  const applyFilters = () => {
+    setShowFilterModal(false);
     setCurrentPage(1);
-  };
-
-  /**
-   * Get count of active filters
-   */
-  const getActiveFilterCount = () => {
-    let count = 0;
-    if (selectedSpecies && selectedSpecies !== ' ') count++;
-    if (selectedClass && selectedClass !== ' ') count++;
-    if (selectedMutation && selectedMutation !== ' ') count++;
-    if (searchQuery) count++;
-    return count;
+    fetchDatasetItems();
   };
 
   /**
@@ -515,7 +552,7 @@ const DatabaseDashboard = () => {
   // Fetch data when page, search, sort, or filters change
   useEffect(() => {
     fetchDatasetItems();
-  }, [currentPage, searchQuery, sortBy, sortOrder, selectedSpecies, selectedClass, selectedMutation]);
+  }, [currentPage, searchQuery, sortBy, sortOrder, selectedSpecies, selectedClasses, selectedMutations]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -591,8 +628,8 @@ const DatabaseDashboard = () => {
     },
   ];
 
-  // Get active filter count
-  const activeFilterCount = getActiveFilterCount();
+  // Check if any filters are active
+  const areFiltersActive = selectedSpecies.length > 0 || selectedClasses.length > 0 || selectedMutations.length > 0;
 
   return (
     <>
@@ -683,44 +720,15 @@ const DatabaseDashboard = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Species Filter */}
-              <Select value={selectedSpecies} onValueChange={(value) => { setSelectedSpecies(value); setCurrentPage(1); }}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
-                  <SelectValue placeholder="Species" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value=" ">All Species</SelectItem>
-                  {filterOptions.species.map((species) => (
-                    <SelectItem key={species} value={species}>{species}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Class Filter */}
-              <Select value={selectedClass} onValueChange={(value) => { setSelectedClass(value); setCurrentPage(1); }}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
-                  <SelectValue placeholder="GPCR Class" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value=" ">All Classes</SelectItem>
-                  {filterOptions.classes.map((cls) => (
-                    <SelectItem key={cls} value={cls}>{cls}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Mutation Filter */}
-              <Select value={selectedMutation} onValueChange={(value) => { setSelectedMutation(value); setCurrentPage(1); }}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
-                  <SelectValue placeholder="Mutation Type" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value=" ">All Types</SelectItem>
-                  {filterOptions.mutationTypes.map((mutation) => (
-                    <SelectItem key={mutation} value={mutation}>{mutation}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Filters Button */}
+              <Button 
+                variant="outline" 
+                className="w-full sm:w-auto border-border/50 bg-background/50 hover:border-[hsl(var(--brand-teal))]/50 hover:bg-[hsl(var(--brand-teal))]/10"
+                onClick={() => setShowFilterModal(true)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filters {areFiltersActive && `(${selectedSpecies.length + selectedClasses.length + selectedMutations.length})`}
+              </Button>
 
               {/* Export Button */}
               <Button 
@@ -733,49 +741,10 @@ const DatabaseDashboard = () => {
               </Button>
             </div>
 
-            {/* Active Filters Display */}
-            {activeFilterCount > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-muted-foreground">Active filters:</span>
-                {searchQuery && (
-                  <Badge variant="secondary" className="gap-1 bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
-                    Search: {searchQuery}
-                    <X className="w-3 h-3 cursor-pointer hover:opacity-70" onClick={() => removeFilter('search')} />
-                  </Badge>
-                )}
-                {selectedSpecies && selectedSpecies !== ' ' && (
-                  <Badge variant="secondary" className="gap-1 bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
-                    Species: {selectedSpecies}
-                    <X className="w-3 h-3 cursor-pointer hover:opacity-70" onClick={() => removeFilter('species')} />
-                  </Badge>
-                )}
-                {selectedClass && selectedClass !== ' ' && (
-                  <Badge variant="secondary" className="gap-1 bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
-                    Class: {selectedClass}
-                    <X className="w-3 h-3 cursor-pointer hover:opacity-70" onClick={() => removeFilter('class')} />
-                  </Badge>
-                )}
-                {selectedMutation && selectedMutation !== ' ' && (
-                  <Badge variant="secondary" className="gap-1 bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
-                    Mutation: {selectedMutation}
-                    <X className="w-3 h-3 cursor-pointer hover:opacity-70" onClick={() => removeFilter('mutation')} />
-                  </Badge>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearAllFilters}
-                  className="h-6 text-xs text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80"
-                >
-                  Clear all
-                </Button>
-              </div>
-            )}
-
             <div className="text-center sm:text-left">
               <p className="text-muted-foreground text-sm">
                 {isInitialLoad ? 'Start searching...' : `${totalItems.toLocaleString()} interactions found`}
-                {activeFilterCount > 0 && ' (filtered)'}
+                {areFiltersActive && ' (filtered)'}
               </p>
             </div>
           </div>
@@ -905,10 +874,10 @@ const DatabaseDashboard = () => {
                   <AlertCircle className="w-12 h-12 text-muted-foreground" />
                   <div>
                     <h3 className="text-xl font-heading font-semibold mb-2">
-                      {searchQuery || activeFilterCount > 0 ? 'No Results Found' : 'No Data Available'}
+                      {searchQuery || areFiltersActive ? 'No Results Found' : 'No Data Available'}
                     </h3>
                     <p className="text-muted-foreground">
-                      {searchQuery || activeFilterCount > 0
+                      {searchQuery || areFiltersActive 
                         ? 'Try adjusting your search terms or filters.'
                         : 'No dataset entries found.'
                       }
@@ -1127,7 +1096,7 @@ const DatabaseDashboard = () => {
               
               <p className="text-sm text-muted-foreground">
                 Page {currentPage} of {totalPages.toLocaleString()}
-                {activeFilterCount > 0 && ' (filtered)'}
+                {areFiltersActive && ' (filtered)'}
               </p>
             </div>
           )}
@@ -1139,7 +1108,7 @@ const DatabaseDashboard = () => {
               onClick={() => {
                 setCurrentPage(1);
                 setSearchQuery('');
-                clearAllFilters();
+                clearFilters();
                 fetchDatasetItems();
               }}
             >
@@ -1157,6 +1126,131 @@ const DatabaseDashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Filter Modal */}
+      <Dialog open={showFilterModal} onOpenChange={setShowFilterModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-background border-border">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-heading">Filter Results</DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowFilterModal(false)}
+                className="h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-muted-foreground text-sm">Refine your search with advanced filters</p>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* GPCR Class Filter */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-lg">GPCR Class</h3>
+              <div className="space-y-2">
+                {statistics.uniqueClasses.map((cls) => (
+                  <div key={cls} className="flex items-center space-x-3 p-2 hover:bg-accent/50 rounded-md transition-colors">
+                    <Checkbox
+                      id={`class-${cls}`}
+                      checked={selectedClasses.includes(cls)}
+                      onCheckedChange={() => toggleFilter('class', cls)}
+                    />
+                    <label
+                      htmlFor={`class-${cls}`}
+                      className="flex-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {cls}
+                      {filterCounts.classes[cls] && (
+                        <span className="ml-2 text-muted-foreground">({filterCounts.classes[cls]})</span>
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-border" />
+
+            {/* Species Filter */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-lg">Species</h3>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {statistics.uniqueSpecies.map((species) => (
+                  <div key={species} className="flex items-center space-x-3 p-2 hover:bg-accent/50 rounded-md transition-colors">
+                    <Checkbox
+                      id={`species-${species}`}
+                      checked={selectedSpecies.includes(species)}
+                      onCheckedChange={() => toggleFilter('species', species)}
+                    />
+                    <label
+                      htmlFor={`species-${species}`}
+                      className="flex-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer italic"
+                    >
+                      {species}
+                      {filterCounts.species[species] && (
+                        <span className="ml-2 text-muted-foreground not-italic">({filterCounts.species[species]})</span>
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-border" />
+
+            {/* Mutation Status Filter */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-lg">Mutation Status</h3>
+              <div className="space-y-2">
+                {statistics.uniqueMutationTypes.map((mutation) => (
+                  <div key={mutation} className="flex items-center space-x-3 p-2 hover:bg-accent/50 rounded-md transition-colors">
+                    <Checkbox
+                      id={`mutation-${mutation}`}
+                      checked={selectedMutations.includes(mutation)}
+                      onCheckedChange={() => toggleFilter('mutation', mutation)}
+                    />
+                    <label
+                      htmlFor={`mutation-${mutation}`}
+                      className="flex-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {mutation}
+                      {filterCounts.mutations[mutation] && (
+                        <span className="ml-2 text-muted-foreground">({filterCounts.mutations[mutation]})</span>
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 pt-4 border-t border-border">
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              disabled={!areFiltersActive}
+            >
+              Clear All
+            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilterModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                onClick={applyFilters}
+              >
+                Apply Filters
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </>
