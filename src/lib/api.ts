@@ -262,11 +262,27 @@ export async function fetchDatasetPaginated(
 
   const apiResponse = await response.json();
   
+  // Transform API response field names from API format to frontend format
+  const transformDataItem = (item: any) => ({
+    id: item.id?.toString() || '',
+    evolfId: item.EvOlf_ID || item.evolfId || '',
+    receptor: item.Receptor || item.receptor || '',
+    species: item.Species || item.species || '',
+    ligand: item.Ligand || item.ligand || '',
+    chemblId: item.ChEMBL_ID || item.chemblId || '',
+    mutation: item.Mutation || item.mutation || 'Wild-type',
+    class: item.Class || item.class || '',
+    uniprotId: item.UniProt_ID || item.uniprotId || '',
+    ensembleId: item.Ensembl_ID || item.ensembleId || ''
+  });
+  
   // Transform API response to match expected structure
   // API returns: { count, next, previous, results: { data, statistics } }
   // Transform to: { data, pagination, statistics, all_evolf_ids }
+  const transformedData = (apiResponse.results?.data || []).map(transformDataItem);
+  
   return {
-    data: apiResponse.results?.data || [],
+    data: transformedData,
     pagination: {
       currentPage: page,
       itemsPerPage: limit,
@@ -279,7 +295,7 @@ export async function fetchDatasetPaginated(
       uniqueSpecies: [],
       uniqueMutationTypes: []
     },
-    all_evolf_ids: apiResponse.results?.data?.map((item: any) => item.EvOlf_ID || item.evolfId) || [],
+    all_evolf_ids: transformedData.map(item => item.evolfId),
     // Add filter arrays for dropdown menus
     filterOptions: {
       classes: apiResponse.results?.statistics?.uniqueClasses || [],
