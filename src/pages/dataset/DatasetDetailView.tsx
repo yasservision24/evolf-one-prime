@@ -152,13 +152,11 @@ export default function DatasetDetailView() {
     icon 
   }: { 
     label: string; 
-    value: string | undefined; 
+    value: string; 
     copyable?: boolean; 
     fieldKey?: string;
     icon?: React.ReactNode;
   }) => {
-    if (!value) return null;
-    
     return (
       <div className="py-3 border-b border-border/50 last:border-0">
         <div className="text-sm text-muted-foreground mb-1.5 flex items-center gap-1">
@@ -167,7 +165,7 @@ export default function DatasetDetailView() {
         </div>
         <div className="flex items-start gap-2">
           <div className="text-foreground flex-1 break-all font-medium">{value}</div>
-          {copyable && (
+          {copyable && value !== 'N/A' && (
             <Button
               variant="ghost"
               size="sm"
@@ -341,17 +339,17 @@ export default function DatasetDetailView() {
                       <h3 className="text-lg font-semibold text-foreground">Receptor Summary</h3>
                     </div>
                     <div className="space-y-1">
-                      <InfoField label="Receptor Name" value={data.receptorName} />
-                      <InfoField label="Gene Symbol" value={data.geneSymbol} />
+                      <InfoField label="Receptor Name" value={data.receptorName || 'N/A'} />
+                      <InfoField label="Gene Symbol" value={data.geneSymbol || 'N/A'} />
                       <InfoField 
                         label="UniProt ID" 
-                        value={data.uniprotId} 
-                        copyable 
+                        value={data.uniprotId || 'N/A'} 
+                        copyable={!!data.uniprotId}
                         fieldKey="uniprot" 
                         icon={<FileText className="h-3 w-3" />} 
                       />
-                      <InfoField label="Receptor SubType" value={data.receptorSubType} />
-                      <InfoField label="Mutation Status" value={data.mutationStatus} />
+                      <InfoField label="Receptor SubType" value={data.receptorSubType || 'N/A'} />
+                      <InfoField label="Mutation Status" value={data.mutationStatus || 'Wild-type'} />
                       {data.mutation && <InfoField label="Mutation" value={data.mutation} />}
                       {data.mutationImpact && <InfoField label="Mutation Impact" value={data.mutationImpact} />}
                     </div>
@@ -364,23 +362,38 @@ export default function DatasetDetailView() {
                       <h3 className="text-lg font-semibold text-foreground">Ligand Summary</h3>
                     </div>
                     <div className="space-y-1">
-                      <InfoField label="Ligand Name" value={data.ligand} />
+                      <InfoField label="Ligand Name" value={data.ligand || 'N/A'} />
                       <InfoField 
                         label="ChEMBL ID" 
-                        value={data.chemblId} 
-                        copyable 
+                        value={data.chemblId || 'N/A'} 
+                        copyable={!!data.chemblId}
                         fieldKey="chembl-overview" 
                         icon={<Database className="h-3 w-3" />}
                       />
                       <InfoField 
                         label="PubChem CID" 
-                        value={data.cid} 
-                        copyable 
+                        value={data.cid || 'N/A'} 
+                        copyable={!!data.cid}
                         fieldKey="cid-overview" 
                       />
-                      <InfoField label="Molecular Weight" value={data.molecularWeight ? `${data.molecularWeight} g/mol` : undefined} />
-                      <InfoField label="LogP" value={data.logP} />
+                      <InfoField 
+                        label="Molecular Weight" 
+                        value={data.molecularWeight ? `${data.molecularWeight} g/mol` : 'N/A'} 
+                      />
+                      <InfoField label="LogP" value={data.logP || 'N/A'} />
                     </div>
+                    
+                    {data.smiles && (
+                      <>
+                        <Separator className="my-4" />
+                        <div>
+                          <div className="text-sm text-muted-foreground mb-2">2D Structure</div>
+                          <div className="bg-background/80 rounded-lg p-4 border border-border flex items-center justify-center min-h-[150px]">
+                            <p className="text-xs text-muted-foreground">Structure visualization placeholder</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </Card>
 
                   {/* Experimental Details Card */}
@@ -388,22 +401,22 @@ export default function DatasetDetailView() {
                     <h3 className="text-lg font-semibold text-foreground mb-6">Experimental Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                       <div className="space-y-1">
-                        <InfoField label="Experiment Method" value={data.experimentMethod} />
-                        <InfoField label="Expression System" value={data.expressionSystem} />
-                        <InfoField label="Temperature" value={data.temperature} />
-                        <InfoField label="pH" value={data.pH} />
+                        <InfoField label="Experiment Method" value={data.experimentMethod || 'N/A'} />
+                        <InfoField label="Expression System" value={data.expressionSystem || 'N/A'} />
+                        <InfoField label="Temperature" value={data.temperature || 'N/A'} />
+                        <InfoField label="pH" value={data.pH || 'N/A'} />
                       </div>
                       <div className="space-y-1">
                         <InfoField 
                           label="Reference (PMID)" 
-                          value={data.reference} 
-                          copyable 
+                          value={data.reference || 'N/A'} 
+                          copyable={!!data.reference}
                           fieldKey="pmid" 
                         />
                         <InfoField 
                           label="DOI" 
-                          value={data.doi} 
-                          copyable 
+                          value={data.doi || 'N/A'} 
+                          copyable={!!data.doi}
                           fieldKey="doi" 
                         />
                       </div>
@@ -429,15 +442,20 @@ export default function DatasetDetailView() {
                     <h3 className="text-lg font-semibold text-foreground mb-6">Receptor Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                       <div className="space-y-1">
-                        <InfoField label="Receptor Name" value={data.receptorName} />
-                        <InfoField label="Gene Symbol" value={data.geneSymbol} />
-                        <InfoField label="UniProt ID" value={data.uniprotId} copyable fieldKey="uniprot-detail" />
-                        <InfoField label="Class" value={data.class} />
+                        <InfoField label="Receptor Name" value={data.receptorName || 'N/A'} />
+                        <InfoField label="Gene Symbol" value={data.geneSymbol || 'N/A'} />
+                        <InfoField 
+                          label="UniProt ID" 
+                          value={data.uniprotId || 'N/A'} 
+                          copyable={!!data.uniprotId} 
+                          fieldKey="uniprot-detail" 
+                        />
+                        <InfoField label="Class" value={data.class || 'N/A'} />
                       </div>
                       <div className="space-y-1">
-                        <InfoField label="Species" value={data.species} />
-                        <InfoField label="Receptor SubType" value={data.receptorSubType} />
-                        <InfoField label="Chromosome Location" value={data.chromosomeLocation} />
+                        <InfoField label="Species" value={data.species || 'N/A'} />
+                        <InfoField label="Receptor SubType" value={data.receptorSubType || 'N/A'} />
+                        <InfoField label="Chromosome Location" value={data.chromosomeLocation || 'N/A'} />
                       </div>
                     </div>
                     
@@ -447,22 +465,32 @@ export default function DatasetDetailView() {
                       <h4 className="text-base font-semibold text-foreground mb-4">Mutation Information</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                         <div className="space-y-1">
-                          <InfoField label="Status" value={data.mutationStatus} />
-                          {data.mutation && <InfoField label="Mutation" value={data.mutation} />}
+                          <InfoField label="Status" value={data.mutationStatus || 'Wild-type'} />
+                          <InfoField label="Mutation" value={data.mutation || 'None'} />
                         </div>
-                        {data.mutationImpact && (
-                          <div className="space-y-1">
-                            <InfoField label="Impact" value={data.mutationImpact} />
-                          </div>
-                        )}
+                        <div className="space-y-1">
+                          <InfoField label="Impact" value={data.mutationImpact || 'N/A'} />
+                        </div>
                       </div>
                     </div>
+                    
+                    {data.receptorSequence && (
+                      <>
+                        <Separator className="my-6" />
+                        <div>
+                          <h4 className="text-base font-semibold text-foreground mb-4">Receptor Sequence</h4>
+                          <div className="bg-background/80 rounded-lg p-4 border border-border font-mono text-xs break-all max-h-48 overflow-y-auto">
+                            {data.receptorSequence}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </Card>
 
                   <Card className="p-6 bg-card/50 border-border">
                     <h3 className="text-lg font-semibold text-foreground mb-6">Quick Links</h3>
                     <div className="space-y-2">
-                      {data.uniprotId && (
+                      {data.uniprotId && data.uniprotId !== 'N/A' && (
                         <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                           <a href={`https://www.uniprot.org/uniprot/${data.uniprotId}`} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4 mr-2" />
@@ -470,7 +498,7 @@ export default function DatasetDetailView() {
                           </a>
                         </Button>
                       )}
-                      {data.geneSymbol && (
+                      {data.geneSymbol && data.geneSymbol !== 'N/A' && (
                         <>
                           <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                             <a href={`https://www.ncbi.nlm.nih.gov/gene/?term=${data.geneSymbol}`} target="_blank" rel="noopener noreferrer">
@@ -513,8 +541,8 @@ export default function DatasetDetailView() {
                   <Card className="p-6 lg:col-span-2 bg-card/50 border-border">
                     <h3 className="text-lg font-semibold text-foreground mb-6">Ligand Information</h3>
                     <div className="space-y-1">
-                      <InfoField label="Ligand Name" value={data.ligand} />
-                      <InfoField label="IUPAC Name" value={data.iupacName} />
+                      <InfoField label="Ligand Name" value={data.ligand || 'N/A'} />
+                      <InfoField label="IUPAC Name" value={data.iupacName || 'N/A'} />
                     </div>
                     
                     <Separator className="my-6" />
@@ -522,10 +550,13 @@ export default function DatasetDetailView() {
                     <h4 className="text-base font-semibold text-foreground mb-4">Chemical Properties</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                       <div className="space-y-1">
-                        <InfoField label="Molecular Weight" value={data.molecularWeight ? `${data.molecularWeight} g/mol` : undefined} />
+                        <InfoField 
+                          label="Molecular Weight" 
+                          value={data.molecularWeight ? `${data.molecularWeight} g/mol` : 'N/A'} 
+                        />
                       </div>
                       <div className="space-y-1">
-                        <InfoField label="LogP" value={data.logP} />
+                        <InfoField label="LogP" value={data.logP || 'N/A'} />
                       </div>
                     </div>
                     
@@ -533,9 +564,24 @@ export default function DatasetDetailView() {
                     
                     <h4 className="text-base font-semibold text-foreground mb-4">Chemical Identifiers</h4>
                     <div className="space-y-1">
-                      <InfoField label="SMILES" value={data.smiles} copyable fieldKey="smiles-detail" />
-                      <InfoField label="InChI" value={data.inchi} copyable fieldKey="inchi" />
-                      <InfoField label="InChIKey" value={data.inchiKey} copyable fieldKey="inchikey" />
+                      <InfoField 
+                        label="SMILES" 
+                        value={data.smiles || 'N/A'} 
+                        copyable={!!data.smiles} 
+                        fieldKey="smiles-detail" 
+                      />
+                      <InfoField 
+                        label="InChI" 
+                        value={data.inchi || 'N/A'} 
+                        copyable={!!data.inchi} 
+                        fieldKey="inchi" 
+                      />
+                      <InfoField 
+                        label="InChIKey" 
+                        value={data.inchiKey || 'N/A'} 
+                        copyable={!!data.inchiKey} 
+                        fieldKey="inchikey" 
+                      />
                     </div>
                     
                     <Separator className="my-6" />
@@ -543,18 +589,35 @@ export default function DatasetDetailView() {
                     <h4 className="text-base font-semibold text-foreground mb-4">Database References</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                       <div className="space-y-1">
-                        <InfoField label="ChEMBL ID" value={data.chemblId} copyable fieldKey="chembl-detail" />
+                        <InfoField 
+                          label="ChEMBL ID" 
+                          value={data.chemblId || 'N/A'} 
+                          copyable={!!data.chemblId} 
+                          fieldKey="chembl-detail" 
+                        />
                       </div>
                       <div className="space-y-1">
-                        <InfoField label="PubChem CID" value={data.cid} copyable fieldKey="cid-detail" />
+                        <InfoField 
+                          label="PubChem CID" 
+                          value={data.cid || 'N/A'} 
+                          copyable={!!data.cid} 
+                          fieldKey="cid-detail" 
+                        />
                       </div>
                     </div>
                   </Card>
 
                   <Card className="p-6 bg-card/50 border-border">
-                    <h3 className="text-lg font-semibold text-foreground mb-6">External Links</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-6">2D Structure</h3>
+                    <div className="bg-background/80 rounded-lg p-4 border border-border flex items-center justify-center min-h-[200px]">
+                      <p className="text-xs text-muted-foreground">Structure visualization placeholder</p>
+                    </div>
+                    
+                    <Separator className="my-6" />
+                    
+                    <h3 className="text-lg font-semibold text-foreground mb-4">External Links</h3>
                     <div className="space-y-2">
-                      {data.chemblId && (
+                      {data.chemblId && data.chemblId !== 'N/A' && (
                         <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                           <a 
                             href={`https://www.ebi.ac.uk/chembl/compound_report_card/${data.chemblId}`} 
@@ -566,7 +629,7 @@ export default function DatasetDetailView() {
                           </a>
                         </Button>
                       )}
-                      {data.cid && (
+                      {data.cid && data.cid !== 'N/A' && (
                         <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                           <a 
                             href={`https://pubchem.ncbi.nlm.nih.gov/compound/${data.cid}`} 
@@ -578,7 +641,7 @@ export default function DatasetDetailView() {
                           </a>
                         </Button>
                       )}
-                      {data.ligand && (
+                      {data.ligand && data.ligand !== 'N/A' && (
                         <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                           <a 
                             href={`https://www.drugbank.ca/drugs/search?q=${data.ligand}`} 
@@ -603,10 +666,13 @@ export default function DatasetDetailView() {
                       <h4 className="text-base font-semibold text-foreground mb-4">Interaction Parameters</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                         <div className="space-y-1">
-                          <InfoField label="Parameter Type" value={data.interactionParameter} />
+                          <InfoField label="Parameter Type" value={data.interactionParameter || 'N/A'} />
                         </div>
                         <div className="space-y-1">
-                          <InfoField label="Value" value={data.parameterValue && data.unit ? `${data.parameterValue} ${data.unit}` : undefined} />
+                          <InfoField 
+                            label="Value" 
+                            value={data.parameterValue && data.unit ? `${data.parameterValue} ${data.unit}` : 'N/A'} 
+                          />
                         </div>
                       </div>
                     </div>
@@ -617,12 +683,12 @@ export default function DatasetDetailView() {
                       <h4 className="text-base font-semibold text-foreground mb-4">Experimental Conditions</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                         <div className="space-y-1">
-                          <InfoField label="Method" value={data.experimentMethod} />
-                          <InfoField label="Expression System" value={data.expressionSystem} />
+                          <InfoField label="Method" value={data.experimentMethod || 'N/A'} />
+                          <InfoField label="Expression System" value={data.expressionSystem || 'N/A'} />
                         </div>
                         <div className="space-y-1">
-                          <InfoField label="Temperature" value={data.temperature} />
-                          <InfoField label="pH" value={data.pH} />
+                          <InfoField label="Temperature" value={data.temperature || 'N/A'} />
+                          <InfoField label="pH" value={data.pH || 'N/A'} />
                         </div>
                       </div>
                     </div>
@@ -633,22 +699,32 @@ export default function DatasetDetailView() {
                       <h4 className="text-base font-semibold text-foreground mb-4">References</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                         <div className="space-y-1">
-                          <InfoField label="PMID" value={data.reference} copyable fieldKey="ref-pmid" />
-                          <InfoField label="DOI" value={data.doi} copyable fieldKey="ref-doi" />
+                          <InfoField 
+                            label="PMID" 
+                            value={data.reference || 'N/A'} 
+                            copyable={!!data.reference} 
+                            fieldKey="ref-pmid" 
+                          />
+                          <InfoField 
+                            label="DOI" 
+                            value={data.doi || 'N/A'} 
+                            copyable={!!data.doi} 
+                            fieldKey="ref-doi" 
+                          />
                         </div>
                         <div className="space-y-1">
-                          <InfoField label="Model Version" value={data.model} />
+                          <InfoField label="Model Version" value={data.model || 'N/A'} />
                         </div>
                       </div>
                     </div>
-
+                    
                     {data.comments && (
                       <>
                         <Separator />
                         <div>
                           <h4 className="text-base font-semibold text-foreground mb-4">Additional Comments</h4>
                           <div className="bg-secondary/50 p-4 rounded-lg border border-border">
-                            <p className="text-muted-foreground text-sm leading-relaxed">{data.comments}</p>
+                            <p className="text-sm text-foreground leading-relaxed">{data.comments}</p>
                           </div>
                         </div>
                       </>
@@ -658,13 +734,73 @@ export default function DatasetDetailView() {
               </TabsContent>
 
               <TabsContent value="structures">
-                <Card className="p-6 bg-card/50 border-border">
-                  <h3 className="text-lg font-semibold text-foreground mb-6">3D Structures</h3>
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">3D structure visualization coming soon</p>
-                    <p className="text-sm text-muted-foreground mt-2">This tab will display interactive 3D molecular structures</p>
-                  </div>
-                </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="p-6 bg-card/50 border-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">Receptor 3D Structure</h3>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download PDB
+                      </Button>
+                    </div>
+                    <div className="bg-background/80 rounded-lg border border-border flex items-center justify-center min-h-[400px]">
+                      <p className="text-sm text-muted-foreground">3D structure viewer placeholder</p>
+                    </div>
+                    <div className="mt-4 p-3 bg-secondary/50 rounded-lg border border-border">
+                      <p className="text-xs text-foreground">
+                        <strong>UniProt:</strong> {data.uniprotId || 'N/A'} | <strong>PDB ID:</strong> N/A
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Interactive 3D viewer - Use mouse to rotate and zoom
+                      </p>
+                    </div>
+                  </Card>
+
+                  <Card className="p-6 bg-card/50 border-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">Ligand 3D Structure</h3>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download SDF
+                      </Button>
+                    </div>
+                    <div className="bg-background/80 rounded-lg border border-border flex items-center justify-center min-h-[400px]">
+                      <p className="text-sm text-muted-foreground">3D structure viewer placeholder</p>
+                    </div>
+                    <div className="mt-4 p-3 bg-secondary/50 rounded-lg border border-border">
+                      <p className="text-xs text-foreground">
+                        <strong>ChEMBL:</strong> {data.chemblId || 'N/A'} | <strong>PubChem CID:</strong> {data.cid || 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Interactive 3D viewer - Use mouse to rotate and zoom
+                      </p>
+                    </div>
+                  </Card>
+
+                  <Card className="p-6 lg:col-span-2 bg-card/50 border-border">
+                    <h3 className="text-lg font-semibold text-foreground mb-6">Structure Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                      <div className="space-y-1">
+                        <h4 className="text-base font-semibold text-foreground mb-3">Receptor Structure</h4>
+                        <InfoField label="Resolution" value="N/A" />
+                        <InfoField label="Method" value="N/A" />
+                        <InfoField label="Chains" value="N/A" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-base font-semibold text-foreground mb-3">Ligand Structure</h4>
+                        <InfoField 
+                          label="Molecular Weight" 
+                          value={data.molecularWeight ? `${data.molecularWeight} g/mol` : 'N/A'} 
+                        />
+                        <InfoField label="LogP" value={data.logP || 'N/A'} />
+                        <InfoField 
+                          label="SMILES" 
+                          value={data.smiles ? `${data.smiles.substring(0, 30)}...` : 'N/A'} 
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
               </TabsContent>
             </>
           )}
