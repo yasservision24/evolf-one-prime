@@ -44,33 +44,13 @@ export default function DatasetOverview() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API call when backend is ready
-        
-        // Mock data for placeholder structure
-        const mockData: DatasetDetail = {
-          evolfId: evolfId || '',
-          receptorName: 'Adenosine A2A receptor',
-          ligandName: 'ZM 241385',
-          class: 'Class A',
-          mutation: 'Wild-type',
-          species: 'Homo sapiens',
-          interactionType: 'Ki',
-          interactionValue: 0.8,
-          interactionUnit: 'nM',
-          quality: 'High',
-          qualityScore: 85,
-          geneSymbol: 'ADORA2A',
-          uniprotId: 'P29274',
-          chemblId: 'CHEMBL191',
-          pubchemCid: '3035979',
-        };
-        
-        setData(mockData);
+        // TODO: Implement API call to fetch dataset detail by evolfId
+        // const response = await fetchDatasetDetail(evolfId);
+        // setData(response);
         
         toast({
-          title: 'Info',
-          description: 'API not connected. Showing placeholder structure.',
-          variant: 'default',
+          title: 'Feature Coming Soon',
+          description: 'Dataset details will be available when the API is connected.',
         });
       } catch (error) {
         console.error('Failed to fetch entry:', error);

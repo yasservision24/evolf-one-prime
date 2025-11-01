@@ -43,24 +43,14 @@ export default function DatasetLigand() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Mock data
-        const mockData: DatasetDetail = {
-          evolfId: evolfId || '',
-          receptorName: 'Adenosine A2A receptor',
-          ligandName: 'ZM 241385',
-          class: 'Class A',
-          mutation: 'Wild-type',
-          chemblId: 'CHEMBL191',
-          pubchemCid: '3035979',
-          smiles: 'C1=CC(=CC=C1C(=O)NC2=NC(=NC=C2)NC3=CC=C(C=C3)C#N)C(F)(F)F',
-          molecularWeight: 411.38,
-          logP: 4.2,
-          hBondDonors: 2,
-          hBondAcceptors: 6,
-          rotableBonds: 5,
-        };
+        // TODO: Implement API call to fetch ligand data by evolfId
+        // const response = await fetchLigandData(evolfId);
+        // setData(response);
         
-        setData(mockData);
+        toast({
+          title: 'Feature Coming Soon',
+          description: 'Ligand details will be available when the API is connected.',
+        });
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({

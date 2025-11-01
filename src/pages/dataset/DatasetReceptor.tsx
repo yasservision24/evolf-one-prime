@@ -41,22 +41,14 @@ export default function DatasetReceptor() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Mock data
-        const mockData: DatasetDetail = {
-          evolfId: evolfId || '',
-          receptorName: 'Adenosine A2A receptor',
-          ligandName: 'ZM 241385',
-          class: 'Class A',
-          mutation: 'Wild-type',
-          geneSymbol: 'ADORA2A',
-          uniprotId: 'P29274',
-          receptorFamily: 'Adenosine receptor',
-          receptorSubtype: 'A2A',
-          mutationInfo: 'No mutations',
-          receptorSequence: 'MPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS',
-        };
+        // TODO: Implement API call to fetch receptor data by evolfId
+        // const response = await fetchReceptorData(evolfId);
+        // setData(response);
         
-        setData(mockData);
+        toast({
+          title: 'Feature Coming Soon',
+          description: 'Receptor details will be available when the API is connected.',
+        });
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({

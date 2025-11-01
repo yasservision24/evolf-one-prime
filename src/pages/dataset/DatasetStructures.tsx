@@ -39,20 +39,14 @@ export default function DatasetStructures() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Mock data
-        const mockData: DatasetDetail = {
-          evolfId: evolfId || '',
-          receptorName: 'Adenosine A2A receptor',
-          ligandName: 'ZM 241385',
-          class: 'Class A',
-          mutation: 'Wild-type',
-          pdbId: '3EML',
-          resolution: 2.6,
-          method: 'X-ray diffraction',
-          rfactor: 0.221,
-        };
+        // TODO: Implement API call to fetch structure data by evolfId
+        // const response = await fetchStructureData(evolfId);
+        // setData(response);
         
-        setData(mockData);
+        toast({
+          title: 'Feature Coming Soon',
+          description: '3D structure details will be available when the API is connected.',
+        });
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({

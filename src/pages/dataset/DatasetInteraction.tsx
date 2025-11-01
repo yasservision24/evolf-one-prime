@@ -42,24 +42,14 @@ export default function DatasetInteraction() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Mock data
-        const mockData: DatasetDetail = {
-          evolfId: evolfId || '',
-          receptorName: 'Adenosine A2A receptor',
-          ligandName: 'ZM 241385',
-          class: 'Class A',
-          mutation: 'Wild-type',
-          interactionType: 'Ki',
-          interactionValue: 0.8,
-          interactionUnit: 'nM',
-          assayType: 'Radioligand binding',
-          assayDescription: 'Inhibition of [3H]-CGS21680 binding to human A2A receptor',
-          temperature: '25°C',
-          pH: 7.4,
-          bufferSystem: 'Tris-HCl',
-        };
+        // TODO: Implement API call to fetch interaction data by evolfId
+        // const response = await fetchInteractionData(evolfId);
+        // setData(response);
         
-        setData(mockData);
+        toast({
+          title: 'Feature Coming Soon',
+          description: 'Interaction data details will be available when the API is connected.',
+        });
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
