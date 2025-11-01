@@ -156,71 +156,81 @@ export default function DatasetLigand() {
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
       
       {/* Header Section */}
-      <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4 py-6">
+      <div className="bg-card/30 border-b border-border">
+        <div className="container mx-auto px-6 py-6">
           <Button 
-            variant="ghost" 
+            variant="link" 
             size="sm" 
             onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-            className="mb-4"
+            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Overview
+            Back to results
           </Button>
 
-          <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-2xl font-semibold text-foreground">
+          <div className="flex items-center gap-3 mb-6 flex-wrap">
+            <h1 className="text-2xl font-normal text-foreground">
               {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
             </h1>
             {data?.class && (
-              <Badge variant="outline" className="bg-secondary/50">
+              <Badge variant="outline" className="bg-secondary/50 border-border">
                 {data.class}
               </Badge>
             )}
             {data?.mutation && (
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+              <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
                 {data.mutation}
               </Badge>
             )}
           </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex gap-1 border-t border-border pt-4 -mb-6">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Overview
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Receptor Details
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="bg-accent/10 text-foreground font-medium"
+            >
+              Ligand Details
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Interaction Data
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              3D Structures
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Pills */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-2 mb-6">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-          >
-            Overview
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
-          >
-            Receptor Details
-          </Button>
-          <Button variant="default" size="sm">
-            Ligand Details
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
-          >
-            Interaction Data
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
-          >
-            3D Structures
-          </Button>
-        </div>
+      {/* Content */}
+      <div className="container mx-auto px-6 py-8">
 
         {/* Ligand Details Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -139,32 +139,32 @@ export default function DatasetOverview() {
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
       
       {/* Header Section */}
-      <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4 py-6">
+      <div className="bg-card/30 border-b border-border">
+        <div className="container mx-auto px-6 py-6">
           {/* Back Button */}
           <Button 
-            variant="ghost" 
+            variant="link" 
             size="sm" 
             onClick={() => navigate('/dataset/dashboard')}
-            className="mb-4"
+            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Database
+            Back to results
           </Button>
 
           {/* Title Row */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3 flex-1">
-              <h1 className="text-2xl font-semibold text-foreground">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-3 flex-1 flex-wrap">
+              <h1 className="text-2xl font-normal text-foreground">
                 {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
               </h1>
               {data?.class && (
-                <Badge variant="outline" className="bg-secondary/50">
+                <Badge variant="outline" className="bg-secondary/50 border-border">
                   {data.class}
                 </Badge>
               )}
               {data?.mutation && (
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
                   {data.mutation}
                 </Badge>
               )}
@@ -172,30 +172,32 @@ export default function DatasetOverview() {
             
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Download className="h-4 w-4" />
                 Export
               </Button>
               {data?.uniprotId && (
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="ghost" size="sm" asChild>
                   <a 
                     href={`https://www.uniprot.org/uniprot/${data.uniprotId}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
+                    className="gap-2"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-4 w-4" />
                     UniProt
                   </a>
                 </Button>
               )}
               {data?.chemblId && (
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="ghost" size="sm" asChild>
                   <a 
                     href={`https://www.ebi.ac.uk/chembl/compound_report_card/${data.chemblId}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
+                    className="gap-2"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-4 w-4" />
                     ChEMBL
                   </a>
                 </Button>
@@ -204,10 +206,10 @@ export default function DatasetOverview() {
           </div>
           
           {/* Info Row */}
-          <div className="flex items-center gap-8 text-sm">
+          <div className="flex items-center flex-wrap gap-x-8 gap-y-2 text-sm mb-6">
             <div>
               <span className="text-muted-foreground">EvOlf ID: </span>
-              <span className="text-primary font-mono font-semibold">{data?.evolfId || 'N/A'}</span>
+              <span className="text-cyan-400 font-mono font-medium">{data?.evolfId || 'N/A'}</span>
             </div>
             {data?.species && (
               <div>
@@ -218,19 +220,19 @@ export default function DatasetOverview() {
             {data?.interactionType && data?.interactionValue && (
               <div>
                 <span className="text-muted-foreground">Interaction: </span>
-                <span className="text-foreground font-medium">
+                <span className="text-foreground font-normal">
                   {data.interactionType} = {data.interactionValue} {data.interactionUnit}
                 </span>
               </div>
             )}
             {data?.quality && (
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 text-green-500">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-sm">Quality: {data.quality}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500 ring-2 ring-green-500/30"></div>
+                  <span className="text-green-500 text-sm">Quality: {data.quality}</span>
                 </div>
                 {data.qualityScore && (
-                  <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
+                  <div className="w-28 h-2 bg-secondary/50 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-green-500 transition-all"
                       style={{ width: `${data.qualityScore}%` }}
@@ -240,44 +242,54 @@ export default function DatasetOverview() {
               </div>
             )}
           </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex gap-1 border-t border-border pt-4 -mb-6">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="bg-accent/10 text-foreground font-medium"
+            >
+              Overview
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Receptor Details
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/ligand?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Ligand Details
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Interaction Data
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              3D Structures
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Pills */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-2 mb-6">
-          <Button variant="default" size="sm">
-            Overview
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
-          >
-            Receptor Details
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/ligand?evolfid=${evolfId}`)}
-          >
-            Ligand Details
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
-          >
-            Interaction Data
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
-          >
-            3D Structures
-          </Button>
-        </div>
+      {/* Content */}
+      <div className="container mx-auto px-6 py-8">
 
         {/* Overview Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
