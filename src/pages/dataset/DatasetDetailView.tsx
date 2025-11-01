@@ -6,7 +6,13 @@ import { ArrowLeft, ExternalLink, Download, Copy, Check, FileText, Database, Tes
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { fetchDatasetEntry } from '@/lib/api';
+import { 
+  fetchDatasetEntry, 
+  fetchReceptorDetails, 
+  fetchLigandDetails, 
+  fetchInteractionDetails, 
+  fetch3DStructures 
+} from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -94,19 +100,43 @@ export default function DatasetDetailView() {
     const loadTabData = async () => {
       try {
         setTabLoading(true);
-        // In production, you would call different endpoints based on activeTab
-        // For example: fetchDatasetEntry(evolfId, activeTab)
-        const response = await fetchDatasetEntry(evolfId);
-        setData(response.entry || response);
+        
+        // Call different endpoints based on activeTab
+        switch (activeTab) {
+          case 'receptor':
+            const receptorData = await fetchReceptorDetails(evolfId);
+            setData(prev => ({ ...prev!, ...receptorData }));
+            break;
+          case 'ligand':
+            const ligandData = await fetchLigandDetails(evolfId);
+            setData(prev => ({ ...prev!, ...ligandData }));
+            break;
+          case 'interaction':
+            const interactionData = await fetchInteractionDetails(evolfId);
+            setData(prev => ({ ...prev!, ...interactionData }));
+            break;
+          case 'structures':
+            const structureData = await fetch3DStructures(evolfId);
+            setData(prev => ({ ...prev!, ...structureData }));
+            break;
+          default:
+            // Overview tab uses the initial data
+            break;
+        }
       } catch (error) {
         console.error('Failed to fetch tab data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load tab data. Please try again.',
+          variant: 'destructive',
+        });
       } finally {
         setTabLoading(false);
       }
     };
 
     loadTabData();
-  }, [activeTab]);
+  }, [activeTab, evolfId, toast]);
 
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -304,10 +334,11 @@ export default function DatasetDetailView() {
             <>
               <TabsContent value="overview">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Receptor Summary Card */}
                   <Card className="p-6 bg-card/50 border-border">
                     <div className="flex items-center gap-2 mb-6">
                       <Database className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-semibold text-foreground">Receptor Information</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Receptor Summary</h3>
                     </div>
                     <div className="space-y-1">
                       <InfoField label="Receptor Name" value={data.receptorName} />
@@ -319,52 +350,75 @@ export default function DatasetDetailView() {
                         fieldKey="uniprot" 
                         icon={<FileText className="h-3 w-3" />} 
                       />
-                      <InfoField label="Class" value={data.class} />
                       <InfoField label="Receptor SubType" value={data.receptorSubType} />
-                      <InfoField label="Species" value={data.species} />
                       <InfoField label="Mutation Status" value={data.mutationStatus} />
+                      {data.mutation && <InfoField label="Mutation" value={data.mutation} />}
+                      {data.mutationImpact && <InfoField label="Mutation Impact" value={data.mutationImpact} />}
                     </div>
                   </Card>
 
+                  {/* Ligand Summary Card */}
                   <Card className="p-6 bg-card/50 border-border">
                     <div className="flex items-center gap-2 mb-6">
                       <TestTube className="h-5 w-5 text-chart-2" />
-                      <h3 className="text-lg font-semibold text-foreground">Quick Links</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Ligand Summary</h3>
                     </div>
-                    <div className="space-y-2">
-                      {data.uniprotId && (
-                        <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                          <a href={`https://www.uniprot.org/uniprot/${data.uniprotId}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View in UniProt
-                          </a>
-                        </Button>
-                      )}
-                      {data.geneSymbol && (
-                        <>
-                          <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                            <a href={`https://www.ncbi.nlm.nih.gov/gene/?term=${data.geneSymbol}`} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              NCBI Gene
-                            </a>
-                          </Button>
-                          <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                            <a href={`https://www.genecards.org/cgi-bin/carddisp.pl?gene=${data.geneSymbol}`} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              GeneCards
-                            </a>
-                          </Button>
-                        </>
-                      )}
-                      {data.uniprotId && (
-                        <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                          <a href={`https://gpcrdb.org/protein/${data.uniprotId}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            GPCRdb
-                          </a>
-                        </Button>
-                      )}
+                    <div className="space-y-1">
+                      <InfoField label="Ligand Name" value={data.ligand} />
+                      <InfoField 
+                        label="ChEMBL ID" 
+                        value={data.chemblId} 
+                        copyable 
+                        fieldKey="chembl-overview" 
+                        icon={<Database className="h-3 w-3" />}
+                      />
+                      <InfoField 
+                        label="PubChem CID" 
+                        value={data.cid} 
+                        copyable 
+                        fieldKey="cid-overview" 
+                      />
+                      <InfoField label="Molecular Weight" value={data.molecularWeight ? `${data.molecularWeight} g/mol` : undefined} />
+                      <InfoField label="LogP" value={data.logP} />
                     </div>
+                  </Card>
+
+                  {/* Experimental Details Card */}
+                  <Card className="p-6 lg:col-span-2 bg-card/50 border-border">
+                    <h3 className="text-lg font-semibold text-foreground mb-6">Experimental Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                      <div className="space-y-1">
+                        <InfoField label="Experiment Method" value={data.experimentMethod} />
+                        <InfoField label="Expression System" value={data.expressionSystem} />
+                        <InfoField label="Temperature" value={data.temperature} />
+                        <InfoField label="pH" value={data.pH} />
+                      </div>
+                      <div className="space-y-1">
+                        <InfoField 
+                          label="Reference (PMID)" 
+                          value={data.reference} 
+                          copyable 
+                          fieldKey="pmid" 
+                        />
+                        <InfoField 
+                          label="DOI" 
+                          value={data.doi} 
+                          copyable 
+                          fieldKey="doi" 
+                        />
+                      </div>
+                    </div>
+                    {data.comments && (
+                      <>
+                        <Separator className="my-6" />
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-3">Comments</h4>
+                          <div className="bg-secondary/50 p-4 rounded-lg border border-border">
+                            <p className="text-sm text-foreground leading-relaxed">{data.comments}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </Card>
                 </div>
               </TabsContent>
