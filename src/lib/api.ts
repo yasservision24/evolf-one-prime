@@ -260,7 +260,27 @@ export async function fetchDatasetPaginated(
     throw new ApiError(`Failed to fetch dataset: ${response.statusText}`, response.status);
   }
 
-  return await response.json();
+  const apiResponse = await response.json();
+  
+  // Transform API response to match expected structure
+  // API returns: { count, next, previous, results: { data, statistics } }
+  // Transform to: { data, pagination, statistics, all_evolf_ids }
+  return {
+    data: apiResponse.results?.data || [],
+    pagination: {
+      currentPage: page,
+      itemsPerPage: limit,
+      totalItems: apiResponse.count || 0,
+      totalPages: Math.ceil((apiResponse.count || 0) / limit)
+    },
+    statistics: apiResponse.results?.statistics || {
+      totalRows: 0,
+      uniqueClasses: [],
+      uniqueSpecies: [],
+      uniqueMutationTypes: []
+    },
+    all_evolf_ids: apiResponse.results?.data?.map((item: any) => item.EvOlf_ID || item.evolfId) || []
+  };
 }
 
 /**
