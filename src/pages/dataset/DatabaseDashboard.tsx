@@ -999,7 +999,7 @@ const DatabaseDashboard = () => {
                       <div className="flex flex-col gap-1">
                         <p className="text-xs text-muted-foreground font-medium md:block">Ligand</p>
                         <p className="font-heading font-semibold text-sm md:text-base">{item.ligand}</p>
-                        {item.chemblId.startsWith('CHEMBL') ? (
+                        {item.chemblId && item.chemblId.startsWith('CHEMBL') ? (
                           <a
                             href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
                             target="_blank"
@@ -1009,7 +1009,7 @@ const DatabaseDashboard = () => {
                           >
                             {item.chemblId}
                           </a>
-                        ) : (
+                        ) : item.chemblId ? (
                           <a
                             href={`https://pubmed.ncbi.nlm.nih.gov/${item.chemblId.replace('PMID:', '')}`}
                             target="_blank"
@@ -1019,6 +1019,8 @@ const DatabaseDashboard = () => {
                           >
                             {item.chemblId}
                           </a>
+                        ) : (
+                          <span className="text-xs md:text-sm text-muted-foreground">N/A</span>
                         )}
                       </div>
 
