@@ -664,7 +664,7 @@ const DatabaseDashboard = () => {
                     <ChevronDown className="w-4 h-4 ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[200px] bg-background border-border z-50">
+                <DropdownMenuContent align="start" className="w-[200px] bg-background border-border z-[10000]">
                   <DropdownMenuItem onClick={() => handleSort('evolfId')} className="cursor-pointer">
                     EvOlf ID {sortBy === 'evolfId' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </DropdownMenuItem>
