@@ -55,14 +55,16 @@ fetchDatasetPaginated(
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `page` | number | No | 1 | Page number to retrieve |
-| `limit` | number | No | 20 | Number of items per page |
-| `search` | string | No | - | Search query for filtering results |
-| `sortBy` | string | No | 'evolfId' | Field to sort by |
+| `page` | number | No | 1 | Page number to retrieve (1-indexed) |
+| `limit` | number | No | 20 | Number of items per page (max: 100) |
+| `search` | string | No | - | Search query - searches across EvOlf ID, receptor, ligand, species, ChEMBL ID |
+| `sortBy` | string | No | 'evolfId' | Field to sort by ('evolfId', 'receptor', 'ligand', 'species', 'class') |
 | `sortOrder` | string | No | 'desc' | Sort direction ('asc' or 'desc') |
-| `species` | string | No | - | Filter by species name |
-| `classFilter` | string | No | - | Filter by GPCR class |
-| `mutationType` | string | No | - | Filter by mutation type |
+| `species` | string | No | - | **Server-side filter** by species name (e.g., 'Homo sapiens') |
+| `class` | string | No | - | **Server-side filter** by GPCR class (e.g., 'Class A', 'Class B1') |
+| `mutationType` | string | No | - | **Server-side filter** by mutation type (e.g., 'Wild-type', 'Point Mutation') |
+
+**Note:** All filters are applied **server-side** for optimal performance. The API returns only the filtered results along with filter statistics.
 
 ### Example Request
 
@@ -198,11 +200,20 @@ data <- fromJSON(content(response, "text"))
     "uniqueSpecies": ["Homo sapiens", "Mus musculus", "Rattus norvegicus"],
     "uniqueMutationTypes": ["Wild-type", "Point Mutation", "Deletion", "Insertion"]
   },
-  "all_evolf_ids": ["EVOLF001234", "EVOLF001235", "..."]
+  "all_evolf_ids": ["EVOLF001234", "EVOLF001235", "..."],
+  "filterOptions": {
+    "classes": ["Class A", "Class B1", "Class B2", "Class C", "Class F"],
+    "species": ["Homo sapiens", "Mus musculus", "Rattus norvegicus"],
+    "mutationTypes": ["Wild-type", "Point Mutation", "Deletion", "Insertion"]
+  }
 }
 ```
 
-**Note:** The `all_evolf_ids` array contains all EvoLF IDs that match the current filters (not just the current page), which is useful for downloading filtered datasets.
+**Important Notes:**
+- `all_evolf_ids`: Contains all EvOlf IDs matching current filters (not just the current page) - useful for filtered downloads
+- `statistics`: Reflects the **filtered** dataset statistics when filters are applied
+- `filterOptions`: Available filter values for dropdown menus - updates based on current data
+- **Server-side filtering** ensures fast performance even with large datasets
 
 **Error Response (400/500):**
 ```json
