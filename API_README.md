@@ -177,16 +177,12 @@ data <- fromJSON(content(response, "text"))
       "evolfId": "EVOLF001234",
       "receptor": "5-HT2A Receptor",
       "species": "Homo sapiens",
-      "gpcrClass": "Class A",
+      "class": "Class A",
       "ligand": "Serotonin",
-      "mutationType": "Point Mutation",
-      "mutationDetails": "F340A",
-      "wildtypeActivity": 8.5,
-      "mutantActivity": 6.2,
-      "foldChange": 0.73,
-      "reference": "Smith et al. 2023",
-      "pubmedId": "12345678",
-      "createdAt": "2024-01-15T10:30:00Z"
+      "mutation": "F340A",
+      "chemblId": "CHEMBL12345",
+      "uniprotId": "P28223",
+      "ensembleId": "ENSG00000149295"
     }
     // ... more items
   ],
@@ -194,18 +190,19 @@ data <- fromJSON(content(response, "text"))
     "currentPage": 1,
     "totalPages": 100,
     "totalItems": 2000,
-    "itemsPerPage": 20,
-    "hasNextPage": true,
-    "hasPreviousPage": false
+    "itemsPerPage": 20
   },
   "statistics": {
-    "totalReceptors": 150,
-    "totalLigands": 300,
-    "totalMutations": 2000,
-    "totalSpecies": 25
-  }
+    "totalRows": 2000,
+    "uniqueClasses": ["Class A", "Class B1", "Class B2", "Class C", "Class F"],
+    "uniqueSpecies": ["Homo sapiens", "Mus musculus", "Rattus norvegicus"],
+    "uniqueMutationTypes": ["Wild-type", "Point Mutation", "Deletion", "Insertion"]
+  },
+  "all_evolf_ids": ["EVOLF001234", "EVOLF001235", "..."]
 }
 ```
+
+**Note:** The `all_evolf_ids` array contains all EvoLF IDs that match the current filters (not just the current page), which is useful for downloading filtered datasets.
 
 **Error Response (400/500):**
 ```json

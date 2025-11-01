@@ -279,7 +279,13 @@ export async function fetchDatasetPaginated(
       uniqueSpecies: [],
       uniqueMutationTypes: []
     },
-    all_evolf_ids: apiResponse.results?.data?.map((item: any) => item.EvOlf_ID || item.evolfId) || []
+    all_evolf_ids: apiResponse.results?.data?.map((item: any) => item.EvOlf_ID || item.evolfId) || [],
+    // Add filter arrays for dropdown menus
+    filterOptions: {
+      classes: apiResponse.results?.statistics?.uniqueClasses || [],
+      species: apiResponse.results?.statistics?.uniqueSpecies || [],
+      mutationTypes: apiResponse.results?.statistics?.uniqueMutationTypes || []
+    }
   };
 }
 
