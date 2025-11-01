@@ -79,7 +79,46 @@ export default function DatasetDetailView() {
         // const response = await getDatasetById(evolfId);
         // setData(response);
         
-        // For now, show placeholder data structure
+        // Mock data for placeholder structure
+        const mockData: DatasetDetail = {
+          evolfId: evolfId || '',
+          receptorName: 'Adenosine A2A receptor',
+          ligandName: 'ZM 241385',
+          class: 'Class A',
+          mutation: 'Wild-type',
+          species: 'Homo sapiens',
+          interactionType: 'Ki',
+          interactionValue: 0.8,
+          interactionUnit: 'nM',
+          quality: 'High',
+          qualityScore: 85,
+          geneSymbol: 'ADORA2A',
+          uniprotId: 'P29274',
+          receptorFamily: 'Adenosine receptor',
+          receptorSubtype: 'A2A',
+          mutationInfo: 'No mutations',
+          receptorSequence: 'MPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS',
+          chemblId: 'CHEMBL191',
+          pubchemCid: '3035979',
+          smiles: 'C1=CC(=CC=C1C(=O)NC2=NC(=NC=C2)NC3=CC=C(C=C3)C#N)C(F)(F)F',
+          molecularWeight: 411.38,
+          logP: 4.2,
+          hBondDonors: 2,
+          hBondAcceptors: 6,
+          rotableBonds: 5,
+          assayType: 'Radioligand binding',
+          assayDescription: 'Inhibition of [3H]-CGS21680 binding to human A2A receptor',
+          temperature: '25°C',
+          pH: 7.4,
+          bufferSystem: 'Tris-HCl',
+          pdbId: '3EML',
+          resolution: 2.6,
+          method: 'X-ray diffraction',
+          rfactor: 0.221,
+        };
+        
+        setData(mockData);
+        
         toast({
           title: 'Info',
           description: 'API not connected. Showing placeholder structure.',
