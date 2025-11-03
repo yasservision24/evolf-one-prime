@@ -221,7 +221,7 @@ export const api = {
  * @param page - Page number (default: 1)
  * @param limit - Items per page (default: 20)
  * @param search - Search query (optional)
- * @param sortBy - Sort field (default: 'evolfId')
+ * @param sortBy - Sort field (default: 'EvOlf_ID')
  * @param sortOrder - Sort direction (default: 'desc')
  * @param species - Filter by species (optional) 
  * @param classFilter - Filter by GPCR class (optional)
@@ -232,17 +232,29 @@ export async function fetchDatasetPaginated(
   page: number = 1,
   limit: number = 20,
   search?: string,
-  sortBy: string = 'evolfId',
+  sortBy: string = 'EvOlf_ID',
   sortOrder: 'asc' | 'desc' = 'desc',
   species?: string,
   classFilter?: string,
   mutationType?: string
 ) {
+  // Map frontend field names to backend field names
+  const fieldMapping: Record<string, string> = {
+    'evolfId': 'EvOlf_ID',
+    'receptor': 'Receptor',
+    'ligand': 'Ligand',
+    'species': 'Species',
+    'class': 'Class',
+    'mutation': 'Mutation'
+  };
+  
+  const backendSortBy = fieldMapping[sortBy] || sortBy;
+  
   const queryParams = new URLSearchParams();
   queryParams.append('page', page.toString());
   queryParams.append('limit', limit.toString());
   if (search && search.trim()) queryParams.append('search', search.trim());
-  queryParams.append('sortBy', sortBy);
+  queryParams.append('sortBy', backendSortBy);
   queryParams.append('sortOrder', sortOrder);
   if (species) queryParams.append('species', species);
   if (classFilter) queryParams.append('class', classFilter);
