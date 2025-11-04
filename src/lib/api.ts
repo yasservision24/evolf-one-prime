@@ -308,11 +308,11 @@ export async function fetchDatasetPaginated(
       uniqueMutationTypes: []
     },
     all_evolf_ids: apiResponse.all_evolf_ids || transformedData.map(item => item.evolfId),
-    // Filter options for dropdown menus
-    filterOptions: apiResponse.filterOptions || {
-      classes: [],
-      species: [],
-      mutationTypes: []
+    // Map API filterOptions (uniqueX) to frontend format (x)
+    filterOptions: {
+      classes: apiResponse.filterOptions?.uniqueClasses || [],
+      species: apiResponse.filterOptions?.uniqueSpecies || [],
+      mutationTypes: apiResponse.filterOptions?.uniqueMutationTypes || []
     }
   };
 }
