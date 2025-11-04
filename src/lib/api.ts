@@ -275,44 +275,44 @@ export async function fetchDatasetPaginated(
   const apiResponse = await response.json();
   
   // Transform API response field names from API format to frontend format
+  // API returns camelCase fields with class_field instead of class
   const transformDataItem = (item: any) => ({
     id: item.id?.toString() || '',
-    evolfId: item.EvOlf_ID || item.evolfId || '',
-    receptor: item.Receptor || item.receptor || '',
-    species: item.Species || item.species || '',
-    ligand: item.Ligand || item.ligand || '',
-    chemblId: item.ChEMBL_ID || item.chemblId || '',
-    mutation: item.Mutation || item.mutation || 'Wild-type',
-    class: item.Class || item.class || '',
-    uniprotId: item.UniProt_ID || item.uniprotId || '',
-    ensembleId: item.Ensembl_ID || item.ensembleId || ''
+    evolfId: item.evolfId || '',
+    receptor: item.receptor || '',
+    species: item.species || '',
+    ligand: item.ligand || '',
+    chemblId: item.chemblId || '',
+    mutation: item.mutation || 'Wild-type',
+    class: item.class_field || item.class || '',  // Handle class_field from API
+    uniprotId: item.uniprotId || '',
+    ensembleId: item.ensembleId || ''
   });
   
   // Transform API response to match expected structure
-  // API returns: { count, next, previous, results: { data, statistics } }
-  // Transform to: { data, pagination, statistics, all_evolf_ids }
-  const transformedData = (apiResponse.results?.data || []).map(transformDataItem);
+  // API directly returns: { data, pagination, statistics, filterOptions, all_evolf_ids }
+  const transformedData = (apiResponse.data || []).map(transformDataItem);
   
   return {
     data: transformedData,
-    pagination: {
+    pagination: apiResponse.pagination || {
       currentPage: page,
       itemsPerPage: limit,
-      totalItems: apiResponse.count || 0,
-      totalPages: Math.ceil((apiResponse.count || 0) / limit)
+      totalItems: 0,
+      totalPages: 0
     },
-    statistics: apiResponse.results?.statistics || {
+    statistics: apiResponse.statistics || {
       totalRows: 0,
       uniqueClasses: [],
       uniqueSpecies: [],
       uniqueMutationTypes: []
     },
-    all_evolf_ids: transformedData.map(item => item.evolfId),
-    // Add filter arrays for dropdown menus
-    filterOptions: {
-      classes: apiResponse.results?.statistics?.uniqueClasses || [],
-      species: apiResponse.results?.statistics?.uniqueSpecies || [],
-      mutationTypes: apiResponse.results?.statistics?.uniqueMutationTypes || []
+    all_evolf_ids: apiResponse.all_evolf_ids || transformedData.map(item => item.evolfId),
+    // Filter options for dropdown menus
+    filterOptions: apiResponse.filterOptions || {
+      classes: [],
+      species: [],
+      mutationTypes: []
     }
   };
 }
