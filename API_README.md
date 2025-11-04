@@ -58,11 +58,11 @@ fetchDatasetPaginated(
 | `page` | number | No | 1 | Page number to retrieve (1-indexed) |
 | `limit` | number | No | 20 | Number of items per page (max: 100) |
 | `search` | string | No | - | Search query - searches across EvOlf ID, receptor, ligand, species, ChEMBL ID |
-| `sortBy` | string | No | 'evolfId' | Field to sort by ('evolfId', 'receptor', 'ligand', 'species', 'class') |
+| `sortBy` | string | No | 'EvOlf_ID' | Field to sort by (backend field names: 'EvOlf_ID', 'Receptor', 'Ligand', 'Species', 'Class') |
 | `sortOrder` | string | No | 'desc' | Sort direction ('asc' or 'desc') |
-| `species` | string | No | - | **Server-side filter** by species name (e.g., 'Homo sapiens') |
-| `class` | string | No | - | **Server-side filter** by GPCR class (e.g., 'Class A', 'Class B1') |
-| `mutationType` | string | No | - | **Server-side filter** by mutation type (e.g., 'Wild-type', 'Point Mutation') |
+| `species` | string | No | - | **Server-side filter** by species name (e.g., 'Human', 'Mouse', 'Rat') |
+| `class` | string | No | - | **Server-side filter** by GPCR class (e.g., '0', '1') |
+| `mutationType` | string | No | - | **Server-side filter** by mutation type (e.g., 'Wild type', 'Mutant') |
 
 **Note:** All filters are applied **server-side** for optimal performance. The API returns only the filtered results along with filter statistics.
 
@@ -80,21 +80,21 @@ const response = await fetchDatasetPaginated(
   2,                    // page 2
   50,                   // 50 items per page
   'receptor',           // search term
-  'evolfId',            // sort by evolf ID
+  'EvOlf_ID',           // sort by evolf ID (backend field name)
   'asc',                // ascending order
-  'Homo sapiens',       // filter by species
-  'Class A',            // filter by GPCR class
-  'Point Mutation'      // filter by mutation type
+  'Human',              // filter by species
+  '0',                  // filter by GPCR class
+  'Mutant'              // filter by mutation type
 );
 ```
 
 **cURL:**
 ```bash
 # Basic request
-curl "https://api.evolf.com/v1/dataset?page=1&limit=20&sortBy=evolfId&sortOrder=desc"
+curl "https://api.evolf.com/v1/dataset?page=1&limit=20&sortBy=EvOlf_ID&sortOrder=desc"
 
 # With filters
-curl "https://api.evolf.com/v1/dataset?page=2&limit=50&search=receptor&sortBy=evolfId&sortOrder=asc&species=Homo%20sapiens&class=Class%20A&mutationType=Point%20Mutation"
+curl "https://api.evolf.com/v1/dataset?page=2&limit=50&search=receptor&sortBy=EvOlf_ID&sortOrder=asc&species=Human&class=0&mutationType=Mutant"
 ```
 
 **Python:**
@@ -107,7 +107,7 @@ response = requests.get(
     params={
         'page': 1,
         'limit': 20,
-        'sortBy': 'evolfId',
+        'sortBy': 'EvOlf_ID',
         'sortOrder': 'desc'
     },
     headers={'Content-Type': 'application/json'}
@@ -121,11 +121,11 @@ response = requests.get(
         'page': 2,
         'limit': 50,
         'search': 'receptor',
-        'sortBy': 'evolfId',
+        'sortBy': 'EvOlf_ID',
         'sortOrder': 'asc',
-        'species': 'Homo sapiens',
-        'class': 'Class A',
-        'mutationType': 'Point Mutation'
+        'species': 'Human',
+        'class': '0',
+        'mutationType': 'Mutant'
     },
     headers={'Content-Type': 'application/json'}
 )
@@ -143,7 +143,7 @@ response <- GET(
   query = list(
     page = 1,
     limit = 20,
-    sortBy = "evolfId",
+    sortBy = "EvOlf_ID",
     sortOrder = "desc"
   ),
   add_headers("Content-Type" = "application/json")
@@ -157,11 +157,11 @@ response <- GET(
     page = 2,
     limit = 50,
     search = "receptor",
-    sortBy = "evolfId",
+    sortBy = "EvOlf_ID",
     sortOrder = "asc",
-    species = "Homo sapiens",
-    class = "Class A",
-    mutationType = "Point Mutation"
+    species = "Human",
+    class = "0",
+    mutationType = "Mutant"
   ),
   add_headers("Content-Type" = "application/json")
 )
@@ -175,44 +175,107 @@ data <- fromJSON(content(response, "text"))
 {
   "data": [
     {
-      "id": "uuid-string",
-      "evolfId": "EVOLF001234",
-      "receptor": "5-HT2A Receptor",
-      "species": "Homo sapiens",
-      "class": "Class A",
-      "ligand": "Serotonin",
-      "mutation": "F340A",
-      "chemblId": "CHEMBL12345",
-      "uniprotId": "P28223",
-      "ensembleId": "ENSG00000149295"
+      "id": 1,
+      "evolfId": "EvOlf0000001",
+      "receptor": "OR8B8",
+      "species": "Human",
+      "class_field": "0",
+      "ligand": "Musk xylol",
+      "mutation": "",
+      "chemblId": "ChEMBL19208",
+      "uniprotId": "",
+      "ensembleId": "ENSG00000197125"
+    },
+    {
+      "id": 2,
+      "evolfId": "EvOlf0000002",
+      "receptor": "OR8B12",
+      "species": "Human",
+      "class_field": "0",
+      "ligand": "Musk xylol",
+      "mutation": "",
+      "chemblId": "ChEMBL19208",
+      "uniprotId": "",
+      "ensembleId": "ENSG00000170953"
     }
-    // ... more items
+    // ... more items (18 more for total of 20 per page)
   ],
   "pagination": {
     "currentPage": 1,
-    "totalPages": 100,
-    "totalItems": 2000,
+    "totalPages": 13,
+    "totalItems": 250,
     "itemsPerPage": 20
   },
   "statistics": {
-    "totalRows": 2000,
-    "uniqueClasses": ["Class A", "Class B1", "Class B2", "Class C", "Class F"],
-    "uniqueSpecies": ["Homo sapiens", "Mus musculus", "Rattus norvegicus"],
-    "uniqueMutationTypes": ["Wild-type", "Point Mutation", "Deletion", "Insertion"]
+    "totalReceptors": 144,
+    "totalLigands": 58,
+    "totalMutations": 250,
+    "totalSpecies": 10,
+    "uniqueClasses": ["1", "0"],
+    "uniqueSpecies": [
+      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
+      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+    ],
+    "uniqueMutationTypes": ["Wild type", "Mutant"],
+    "totalRows": 250
   },
-  "all_evolf_ids": ["EVOLF001234", "EVOLF001235", "..."],
+  "filtered statiscs": {
+    "totalRows": 250,
+    "uniqueClasses": ["1", "0"],
+    "uniqueSpecies": [
+      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
+      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+    ],
+    "uniqueMutationTypes": {
+      "totalReceptors": 144,
+      "totalLigands": 58,
+      "totalMutations": 250,
+      "totalSpecies": 10,
+      "uniqueClasses": ["1", "0"],
+      "uniqueSpecies": [
+        "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
+        "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+      ],
+      "uniqueMutationTypes": ["Wild type", "Mutant"],
+      "totalRows": 250
+    }
+  },
   "filterOptions": {
-    "classes": ["Class A", "Class B1", "Class B2", "Class C", "Class F"],
-    "species": ["Homo sapiens", "Mus musculus", "Rattus norvegicus"],
-    "mutationTypes": ["Wild-type", "Point Mutation", "Deletion", "Insertion"]
-  }
+    "classes": ["1", "0"],
+    "species": [
+      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
+      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+    ],
+    "mutationTypes": ["Wild type", "Mutant"]
+  },
+  "all_evolf_ids": [
+    "EvOlf0000001", "EvOlf0000002", "EvOlf0000003", "EvOlf0000004",
+    "EvOlf0000005", "EvOlf0000006", "EvOlf0000007", "EvOlf0000008",
+    "EvOlf0000009", "EvOlf0000010"
+    // ... all 250 IDs matching current filters
+  ]
 }
 ```
 
+**Field Descriptions:**
+- `id`: Database primary key (integer)
+- `evolfId`: Unique EvoLF identifier (string, format: "EvOlf0000001")
+- `receptor`: Receptor name (string)
+- `species`: Species name (string, e.g., "Human", "Mouse", "Rat")
+- `class_field`: GPCR class (string, "0" or "1")
+- `ligand`: Ligand/compound name (string)
+- `mutation`: Mutation description (string, empty for wild-type)
+- `chemblId`: ChEMBL compound identifier (string)
+- `uniprotId`: UniProt protein identifier (string, may be empty)
+- `ensembleId`: Ensembl gene identifier (string)
+
 **Important Notes:**
 - `all_evolf_ids`: Contains all EvOlf IDs matching current filters (not just the current page) - useful for filtered downloads
-- `statistics`: Reflects the **filtered** dataset statistics when filters are applied
+- `statistics`: Reflects dataset-wide statistics including total receptors, ligands, mutations, and species
+- `filtered statiscs`: Contains statistics for the currently filtered/viewed dataset (note: typo in key name is from backend)
 - `filterOptions`: Available filter values for dropdown menus - updates based on current data
+- `class_field`: GPCR class field (note: backend uses `class_field` instead of `class` due to SQL reserved word)
+- Empty strings indicate missing data (e.g., empty `mutation` means wild-type, empty `uniprotId` means not available)
 - **Server-side filtering** ensures fast performance even with large datasets
 
 **Error Response (400/500):**
@@ -351,7 +414,7 @@ downloadDatasetByIds(evolfIds: string[]): Promise<Blob>
 import { downloadDatasetByIds } from '@/lib/api';
 
 // Download specific items
-const evolfIds = ['EVOLF001234', 'EVOLF001235', 'EVOLF001236'];
+const evolfIds = ['EvOlf0000001', 'EvOlf0000002', 'EvOlf0000003'];
 const blob = await downloadDatasetByIds(evolfIds);
 
 // Create download link
@@ -368,7 +431,7 @@ window.URL.revokeObjectURL(url);
 curl -X POST "https://api.evolf.com/v1/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{
-    "evolfIds": ["EVOLF001234", "EVOLF001235", "EVOLF001236"]
+    "evolfIds": ["EvOlf0000001", "EvOlf0000002", "EvOlf0000003"]
   }' \
   --output evolf_selected_data.zip
 ```
@@ -377,7 +440,7 @@ curl -X POST "https://api.evolf.com/v1/dataset/export" \
 ```python
 import requests
 
-evolf_ids = ['EVOLF001234', 'EVOLF001235', 'EVOLF001236']
+evolf_ids = ['EvOlf0000001', 'EvOlf0000002', 'EvOlf0000003']
 
 response = requests.post(
     'https://api.evolf.com/v1/dataset/export',
@@ -394,7 +457,7 @@ with open('evolf_selected_data.zip', 'wb') as f:
 ```r
 library(httr)
 
-evolf_ids <- c('EVOLF001234', 'EVOLF001235', 'EVOLF001236')
+evolf_ids <- c('EvOlf0000001', 'EvOlf0000002', 'EvOlf0000003')
 
 response <- POST(
   "https://api.evolf.com/v1/dataset/export",
@@ -420,8 +483,10 @@ writeBin(content(response, "raw"), "evolf_selected_data.zip")
 
 `data.csv`:
 ```csv
-evolfId,receptor,species,gpcrClass,ligand,mutationType,mutationDetails,wildtypeActivity,mutantActivity,foldChange,reference,pubmedId
-EVOLF001234,5-HT2A Receptor,Homo sapiens,Class A,Serotonin,Point Mutation,F340A,8.5,6.2,0.73,Smith et al. 2023,12345678
+id,evolfId,receptor,species,class_field,ligand,mutation,chemblId,uniprotId,ensembleId
+1,EvOlf0000001,OR8B8,Human,0,Musk xylol,,ChEMBL19208,,ENSG00000197125
+2,EvOlf0000002,OR8B12,Human,0,Musk xylol,,ChEMBL19208,,ENSG00000170953
+3,EvOlf0000003,OR5J2,Human,0,Musk xylol,,ChEMBL19208,,ENSG00000174957
 ...
 ```
 
@@ -430,7 +495,7 @@ EVOLF001234,5-HT2A Receptor,Homo sapiens,Class A,Serotonin,Point Mutation,F340A,
 {
   "exportDate": "2024-01-15T10:30:00Z",
   "totalRecords": 3,
-  "evolfIds": ["EVOLF001234", "EVOLF001235", "EVOLF001236"],
+  "evolfIds": ["EvOlf0000001", "EvOlf0000002", "EvOlf0000003"],
   "format": "csv",
   "version": "1.0"
 }
