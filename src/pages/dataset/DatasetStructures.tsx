@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { fetchDatasetDetail } from '@/lib/api';
+import { Molecular3DViewer } from '@/components/Molecular3DViewer';
 
 interface DatasetDetail {
   evolfId: string;
@@ -17,6 +18,10 @@ interface DatasetDetail {
   mutation?: string;
   structure3d?: string;
   method?: string;
+  receptorStructure?: string;
+  ligandStructure?: string;
+  receptorFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
+  ligandFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
 }
 
 export default function DatasetStructures() {
@@ -38,8 +43,25 @@ export default function DatasetStructures() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
-        setData(response);
+        // TODO: Replace with actual API call when ready
+        // const response = await fetchDatasetDetail(evolfId);
+        
+        // Placeholder data for demonstration
+        const mockData: DatasetDetail = {
+          evolfId: evolfId,
+          receptor: 'Dopamine Receptor D2',
+          ligand: 'Haloperidol',
+          class: 'Class A (Rhodopsin)',
+          mutation: 'T115I',
+          structure3d: 'https://files.rcsb.org/download/6CM4.pdb',
+          method: 'X-ray Diffraction',
+          receptorStructure: 'N/A', // Placeholder - will be populated by API
+          ligandStructure: 'N/A', // Placeholder - will be populated by API
+          receptorFormat: 'pdb',
+          ligandFormat: 'sdf',
+        };
+        
+        setData(mockData);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
@@ -221,16 +243,45 @@ export default function DatasetStructures() {
             </div>
           </Card>
 
+          {/* Receptor 3D Viewer */}
           <Card className="bg-card border-border">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">3D Viewer</h2>
-              <div className="bg-secondary/20 rounded-lg p-8 flex items-center justify-center min-h-[400px] border border-border">
-                {loading ? (
-                  <div className="animate-pulse bg-muted h-64 w-full rounded" />
-                ) : (
-                  <p className="text-muted-foreground">3D structure viewer will be integrated here</p>
-                )}
-              </div>
+              <h2 className="text-lg font-semibold mb-4">Receptor 3D Structure</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                {data?.receptor || 'Receptor Name'}
+              </p>
+              {loading ? (
+                <div className="animate-pulse bg-muted h-96 w-full rounded" />
+              ) : (
+                <Molecular3DViewer
+                  data={data?.receptorStructure || 'N/A'}
+                  format={data?.receptorFormat || 'pdb'}
+                  style="cartoon"
+                  backgroundColor="#0a0a0a"
+                  height={400}
+                />
+              )}
+            </div>
+          </Card>
+
+          {/* Ligand 3D Viewer */}
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Ligand 3D Structure</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                {data?.ligand || 'Ligand Name'}
+              </p>
+              {loading ? (
+                <div className="animate-pulse bg-muted h-96 w-full rounded" />
+              ) : (
+                <Molecular3DViewer
+                  data={data?.ligandStructure || 'N/A'}
+                  format={data?.ligandFormat || 'sdf'}
+                  style="stick"
+                  backgroundColor="#0a0a0a"
+                  height={400}
+                />
+              )}
             </div>
           </Card>
         </div>
