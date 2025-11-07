@@ -43,30 +43,29 @@ export default function DatasetStructures() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API call when ready
-        // const response = await fetchDatasetDetail(evolfId);
+        const response = await fetchDatasetDetail(evolfId);
         
-        // Placeholder data for demonstration
-        const mockData: DatasetDetail = {
-          evolfId: evolfId,
-          receptor: 'Dopamine Receptor D2',
-          ligand: 'Haloperidol',
-          class: 'Class A (Rhodopsin)',
-          mutation: 'T115I',
-          structure3d: 'https://files.rcsb.org/download/6CM4.pdb',
-          method: 'X-ray Diffraction',
-          receptorStructure: 'N/A', // Placeholder - will be populated by API
-          ligandStructure: 'N/A', // Placeholder - will be populated by API
+        // Map API response to component data structure
+        const structureData: DatasetDetail = {
+          evolfId: response.evolfId,
+          receptor: response.receptor,
+          ligand: response.ligand,
+          class: response.class,
+          mutation: response.mutation,
+          structure3d: response.structure3d,
+          method: 'X-ray Diffraction', // TODO: Add method field to API response if available
+          receptorStructure: response.pdbData, // PDB data from API
+          ligandStructure: response.sdfData,   // SDF data from API
           receptorFormat: 'pdb',
           ligandFormat: 'sdf',
         };
         
-        setData(mockData);
+        setData(structureData);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load entry details.',
+          description: 'Failed to load structure data. Please try again.',
           variant: 'destructive',
         });
       } finally {
