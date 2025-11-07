@@ -87,6 +87,76 @@ export default function DatasetStructures() {
     });
   };
 
+  const downloadReceptorStructure = () => {
+    if (!data?.receptorStructure || data.receptorStructure === 'N/A') return;
+
+    const blob = new Blob([data.receptorStructure], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${data.receptor || 'receptor'}_${data.evolfId}.pdb`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Download Started',
+      description: 'Receptor structure file downloaded',
+    });
+  };
+
+  const downloadLigandStructure = () => {
+    if (!data?.ligandStructure || data.ligandStructure === 'N/A') return;
+
+    const blob = new Blob([data.ligandStructure], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${data.ligand || 'ligand'}_${data.evolfId}.${data.ligandFormat || 'sdf'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Download Started',
+      description: 'Ligand structure file downloaded',
+    });
+  };
+
+  const exportAllStructures = () => {
+    if (!data) return;
+
+    const exportData = {
+      evolfId: data.evolfId,
+      receptor: data.receptor,
+      ligand: data.ligand,
+      class: data.class,
+      mutation: data.mutation,
+      method: data.method,
+      receptorStructure: data.receptorStructure,
+      ligandStructure: data.ligandStructure,
+      receptorFormat: data.receptorFormat,
+      ligandFormat: data.ligandFormat,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${data.evolfId}_structures_data.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export Successful',
+      description: 'Structure data exported successfully',
+    });
+  };
+
   const InfoField = ({ 
     label, 
     value, 
@@ -149,6 +219,18 @@ export default function DatasetStructures() {
             >
               Back to Overview
             </Button>
+            <div className="ml-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={exportAllStructures}
+                disabled={loading || !data}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export Data
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
@@ -217,74 +299,28 @@ export default function DatasetStructures() {
 
         {/* 3D Structures Content */}
         <div className="grid grid-cols-1 gap-6">
+          {/* Receptor Section */}
           <Card className="bg-card border-border">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Structure Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoField 
-                  label="3D Structure File" 
-                  value={data?.structure3d || 'N/A'} 
-                  copyable 
-                  fieldKey="structure3d" 
-                />
-                <InfoField label="Method" value={data?.method || 'N/A'} />
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">Receptor Structure</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={downloadReceptorStructure}
+                  disabled={loading || !data?.receptorStructure || data.receptorStructure === 'N/A'}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download PDB
+                </Button>
               </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                {data?.receptorStructure && data.receptorStructure !== 'N/A' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = data.receptorStructure!;
-                      link.download = `${data.receptor || 'receptor'}.pdb`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Receptor PDB
-                  </Button>
-                )}
-                {data?.ligandStructure && data.ligandStructure !== 'N/A' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = data.ligandStructure!;
-                      link.download = `${data.ligand || 'ligand'}.sdf`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Ligand SDF
-                  </Button>
-                )}
-                {data?.structure3d && data.structure3d !== 'N/A' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => window.open(data.structure3d, '_blank')}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Complex Structure
-                  </Button>
-                )}
+              
+              <div className="mb-6">
+                <p className="text-sm text-muted-foreground mb-2">Receptor Name</p>
+                <p className="font-medium">{data?.receptor || 'N/A'}</p>
               </div>
-            </div>
-          </Card>
 
-          {/* Receptor 3D Viewer */}
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Receptor 3D Structure</h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                {data?.receptor || 'Receptor Name'}
-              </p>
               {loading ? (
                 <div className="animate-pulse bg-muted h-96 w-full rounded" />
               ) : (
@@ -299,13 +335,28 @@ export default function DatasetStructures() {
             </div>
           </Card>
 
-          {/* Ligand 3D Viewer */}
+          {/* Ligand Section */}
           <Card className="bg-card border-border">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Ligand 3D Structure</h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                {data?.ligand || 'Ligand Name'}
-              </p>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">Ligand Structure</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={downloadLigandStructure}
+                  disabled={loading || !data?.ligandStructure || data.ligandStructure === 'N/A'}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download {data?.ligandFormat?.toUpperCase() || 'SDF'}
+                </Button>
+              </div>
+              
+              <div className="mb-6">
+                <p className="text-sm text-muted-foreground mb-2">Ligand Name</p>
+                <p className="font-medium">{data?.ligand || 'N/A'}</p>
+              </div>
+
               {loading ? (
                 <div className="animate-pulse bg-muted h-96 w-full rounded" />
               ) : (
@@ -317,6 +368,22 @@ export default function DatasetStructures() {
                   height={400}
                 />
               )}
+            </div>
+          </Card>
+
+          {/* Additional Structure Info */}
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-6">Additional Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoField 
+                  label="Complex Structure File" 
+                  value={data?.structure3d || 'N/A'} 
+                  copyable 
+                  fieldKey="structure3d" 
+                />
+                <InfoField label="Method" value={data?.method || 'N/A'} />
+              </div>
             </div>
           </Card>
         </div>

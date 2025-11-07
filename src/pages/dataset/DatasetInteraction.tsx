@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -60,6 +60,45 @@ export default function DatasetInteraction() {
     loadData();
   }, [evolfId, navigate, toast]);
 
+  const exportInteractionData = () => {
+    if (!data) return;
+
+    const exportData = {
+      evolfId: data.evolfId,
+      receptor: data.receptor,
+      ligand: data.ligand,
+      class: data.class,
+      mutation: data.mutation,
+      bindingAffinity: {
+        parameter: data.parameter,
+        value: data.value,
+        unit: data.unit,
+      },
+      experimentalDetails: {
+        method: data.method,
+        expressionSystem: data.expressionSystem,
+        source: data.source,
+        model: data.model,
+      },
+      comment: data.comment,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${data.evolfId}_interaction_data.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export Successful',
+      description: 'Interaction data exported successfully',
+    });
+  };
+
   const InfoField = ({ 
     label, 
     value, 
@@ -104,6 +143,18 @@ export default function DatasetInteraction() {
             >
               Back to Overview
             </Button>
+            <div className="ml-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={exportInteractionData}
+                disabled={loading || !data}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export Data
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
