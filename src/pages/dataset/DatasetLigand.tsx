@@ -2,26 +2,28 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { fetchDatasetDetail } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
-  receptorName?: string;
-  ligandName?: string;
+  receptor?: string;
+  ligand?: string;
   class?: string;
   mutation?: string;
   chemblId?: string;
-  pubchemCid?: string;
+  chemblLink?: string;
+  cid?: string;
+  pubchemLink?: string;
   smiles?: string;
-  molecularWeight?: number;
-  logP?: number;
-  hBondDonors?: number;
-  hBondAcceptors?: number;
-  rotableBonds?: number;
+  inchiKey?: string;
+  inchi?: string;
+  iupacName?: string;
+  image?: string;
 }
 
 export default function DatasetLigand() {
@@ -43,14 +45,8 @@ export default function DatasetLigand() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Implement API call to fetch ligand data by evolfId
-        // const response = await fetchLigandData(evolfId);
-        // setData(response);
-        
-        toast({
-          title: 'Feature Coming Soon',
-          description: 'Ligand details will be available when the API is connected.',
-        });
+        const response = await fetchDatasetDetail(evolfId);
+        setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
@@ -113,34 +109,6 @@ export default function DatasetLigand() {
     );
   };
 
-  if (loading) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!data) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <p className="text-muted-foreground mb-4">Entry not found</p>
-          <Button onClick={() => navigate('/dataset/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Database
-          </Button>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
@@ -148,26 +116,36 @@ export default function DatasetLigand() {
       {/* Header Section */}
       <div className="bg-card/30 border-b border-border">
         <div className="container mx-auto px-6 py-6">
-          <Button 
-            variant="link" 
-            size="sm" 
-            onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to results
-          </Button>
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/dataset/dashboard')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Database
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Back to Overview
+            </Button>
+          </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
-            <h1 className="text-2xl font-normal text-foreground">
-              {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
+            <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+              {!loading && `${data?.receptor || 'N/A'} - ${data?.ligand || 'N/A'}`}
             </h1>
-            {data?.class && (
+            {!loading && data?.class && (
               <Badge variant="outline" className="bg-secondary/50 border-border">
                 {data.class}
               </Badge>
             )}
-            {data?.mutation && (
+            {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
                 {data.mutation}
               </Badge>
@@ -228,19 +206,45 @@ export default function DatasetLigand() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Identifiers</h2>
               <div className="space-y-4">
-                <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
+                <InfoField label="Ligand Name" value={data?.ligand || 'N/A'} />
                 <InfoField 
                   label="ChEMBL ID" 
                   value={data?.chemblId || 'N/A'} 
                   copyable 
                   fieldKey="ligand-chembl"
                 />
+                {data?.chemblLink && data.chemblLink !== 'N/A' && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(data.chemblLink, '_blank')}
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View in ChEMBL
+                    </Button>
+                  </div>
+                )}
                 <InfoField 
                   label="PubChem CID" 
-                  value={data?.pubchemCid || 'N/A'} 
+                  value={data?.cid || 'N/A'} 
                   copyable 
                   fieldKey="ligand-pubchem"
                 />
+                {data?.pubchemLink && data.pubchemLink !== 'N/A' && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(data.pubchemLink, '_blank')}
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View in PubChem
+                    </Button>
+                  </div>
+                )}
                 <InfoField 
                   label="SMILES" 
                   value={data?.smiles || 'N/A'} 
@@ -253,13 +257,21 @@ export default function DatasetLigand() {
 
           <Card className="bg-card border-border">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Properties</h2>
+              <h2 className="text-lg font-semibold mb-6">Chemical Identifiers</h2>
               <div className="space-y-4">
-                <InfoField label="Molecular Weight" value={data?.molecularWeight ? `${data.molecularWeight} g/mol` : 'N/A'} />
-                <InfoField label="LogP" value={data?.logP || 'N/A'} />
-                <InfoField label="H-Bond Donors" value={data?.hBondDonors || 'N/A'} />
-                <InfoField label="H-Bond Acceptors" value={data?.hBondAcceptors || 'N/A'} />
-                <InfoField label="Rotatable Bonds" value={data?.rotableBonds || 'N/A'} />
+                <InfoField 
+                  label="InChI Key" 
+                  value={data?.inchiKey || 'N/A'} 
+                  copyable 
+                  fieldKey="inchi-key"
+                />
+                <InfoField 
+                  label="InChI" 
+                  value={data?.inchi || 'N/A'} 
+                  copyable 
+                  fieldKey="inchi"
+                />
+                <InfoField label="IUPAC Name" value={data?.iupacName || 'N/A'} />
               </div>
             </div>
           </Card>
@@ -268,7 +280,17 @@ export default function DatasetLigand() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-4">2D Structure</h2>
               <div className="bg-secondary/20 rounded-lg p-8 flex items-center justify-center min-h-[300px] border border-border">
-                <p className="text-muted-foreground">2D structure visualization will appear here</p>
+                {loading ? (
+                  <div className="animate-pulse bg-muted h-64 w-64 rounded" />
+                ) : data?.image && data.image !== 'N/A' ? (
+                  <img 
+                    src={data.image} 
+                    alt="Ligand 2D structure" 
+                    className="max-w-full max-h-[400px] object-contain"
+                  />
+                ) : (
+                  <p className="text-muted-foreground">N/A</p>
+                )}
               </div>
             </div>
           </Card>

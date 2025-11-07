@@ -2,24 +2,28 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { fetchDatasetDetail } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
-  receptorName?: string;
-  ligandName?: string;
+  receptor?: string;
+  ligand?: string;
   class?: string;
+  species?: string;
+  mutationStatus?: string;
   mutation?: string;
-  geneSymbol?: string;
-  uniprotId?: string;
-  receptorFamily?: string;
+  mutationImpact?: string;
+  sequence?: string;
   receptorSubtype?: string;
-  mutationInfo?: string;
-  receptorSequence?: string;
+  uniprotId?: string;
+  uniprotLink?: string;
+  ensemblId?: string;
+  ensemblLink?: string;
 }
 
 export default function DatasetReceptor() {
@@ -41,14 +45,8 @@ export default function DatasetReceptor() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Implement API call to fetch receptor data by evolfId
-        // const response = await fetchReceptorData(evolfId);
-        // setData(response);
-        
-        toast({
-          title: 'Feature Coming Soon',
-          description: 'Receptor details will be available when the API is connected.',
-        });
+        const response = await fetchDatasetDetail(evolfId);
+        setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
@@ -111,34 +109,6 @@ export default function DatasetReceptor() {
     );
   };
 
-  if (loading) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!data) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <p className="text-muted-foreground mb-4">Entry not found</p>
-          <Button onClick={() => navigate('/dataset/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Database
-          </Button>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
@@ -146,26 +116,36 @@ export default function DatasetReceptor() {
       {/* Header Section */}
       <div className="bg-card/30 border-b border-border">
         <div className="container mx-auto px-6 py-6">
-          <Button 
-            variant="link" 
-            size="sm" 
-            onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to results
-          </Button>
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/dataset/dashboard')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Database
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Back to Overview
+            </Button>
+          </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
-            <h1 className="text-2xl font-normal text-foreground">
-              {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
+            <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+              {!loading && `${data?.receptor || 'N/A'} - ${data?.ligand || 'N/A'}`}
             </h1>
-            {data?.class && (
+            {!loading && data?.class && (
               <Badge variant="outline" className="bg-secondary/50 border-border">
                 {data.class}
               </Badge>
             )}
-            {data?.mutation && (
+            {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
                 {data.mutation}
               </Badge>
@@ -226,16 +206,48 @@ export default function DatasetReceptor() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Basic Information</h2>
               <div className="space-y-4">
-                <InfoField label="Receptor Name" value={data?.receptorName || 'N/A'} />
-                <InfoField label="Gene Symbol" value={data?.geneSymbol || 'N/A'} />
+                <InfoField label="Receptor Name" value={data?.receptor || 'N/A'} />
+                <InfoField label="Class" value={data?.class || 'N/A'} />
+                <InfoField label="Species" value={data?.species || 'N/A'} />
+                <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
                 <InfoField 
                   label="UniProt ID" 
                   value={data?.uniprotId || 'N/A'} 
                   copyable 
                   fieldKey="receptor-uniprot"
                 />
-                <InfoField label="Receptor Family" value={data?.receptorFamily || 'N/A'} />
-                <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
+                {data?.uniprotLink && data.uniprotLink !== 'N/A' && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(data.uniprotLink, '_blank')}
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View in UniProt
+                    </Button>
+                  </div>
+                )}
+                <InfoField 
+                  label="Ensembl ID" 
+                  value={data?.ensemblId || 'N/A'} 
+                  copyable 
+                  fieldKey="receptor-ensembl"
+                />
+                {data?.ensemblLink && data.ensemblLink !== 'N/A' && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(data.ensemblLink, '_blank')}
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View in Ensembl
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -244,18 +256,19 @@ export default function DatasetReceptor() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Mutation Information</h2>
               <div className="space-y-4">
-                <InfoField label="Mutation" value={data?.mutation || 'Wild-type'} />
-                <InfoField label="Mutation Info" value={data?.mutationInfo || 'N/A'} />
+                <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
+                <InfoField label="Mutation" value={data?.mutation || 'N/A'} />
+                <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
               </div>
             </div>
           </Card>
 
           <Card className="bg-card border-border lg:col-span-2">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Sequence Information</h2>
-              <div className="bg-secondary/30 p-4 rounded-lg">
-                <p className="text-sm font-mono break-all text-muted-foreground">
-                  {data?.receptorSequence || 'Sequence data will be displayed here when available from API'}
+              <h2 className="text-lg font-semibold mb-6">Receptor Sequence</h2>
+              <div className="bg-secondary/30 p-4 rounded-lg max-h-[400px] overflow-y-auto">
+                <p className={`text-sm font-mono break-all ${loading ? 'animate-pulse bg-muted h-20 rounded' : 'text-foreground'}`}>
+                  {!loading && (data?.sequence || 'N/A')}
                 </p>
               </div>
             </div>

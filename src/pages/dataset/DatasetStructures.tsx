@@ -2,22 +2,21 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { fetchDatasetDetail } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
-  receptorName?: string;
-  ligandName?: string;
+  receptor?: string;
+  ligand?: string;
   class?: string;
   mutation?: string;
-  pdbId?: string;
-  resolution?: number;
+  structure3d?: string;
   method?: string;
-  rfactor?: number;
 }
 
 export default function DatasetStructures() {
@@ -39,14 +38,8 @@ export default function DatasetStructures() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Implement API call to fetch structure data by evolfId
-        // const response = await fetchStructureData(evolfId);
-        // setData(response);
-        
-        toast({
-          title: 'Feature Coming Soon',
-          description: '3D structure details will be available when the API is connected.',
-        });
+        const response = await fetchDatasetDetail(evolfId);
+        setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
@@ -109,34 +102,6 @@ export default function DatasetStructures() {
     );
   };
 
-  if (loading) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!data) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <p className="text-muted-foreground mb-4">Entry not found</p>
-          <Button onClick={() => navigate('/dataset/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Database
-          </Button>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
@@ -144,26 +109,36 @@ export default function DatasetStructures() {
       {/* Header Section */}
       <div className="bg-card/30 border-b border-border">
         <div className="container mx-auto px-6 py-6">
-          <Button 
-            variant="link" 
-            size="sm" 
-            onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to results
-          </Button>
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/dataset/dashboard')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Database
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Back to Overview
+            </Button>
+          </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
-            <h1 className="text-2xl font-normal text-foreground">
-              {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
+            <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+              {!loading && `${data?.receptor || 'N/A'} - ${data?.ligand || 'N/A'}`}
             </h1>
-            {data?.class && (
+            {!loading && data?.class && (
               <Badge variant="outline" className="bg-secondary/50 border-border">
                 {data.class}
               </Badge>
             )}
-            {data?.mutation && (
+            {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
                 {data.mutation}
               </Badge>
@@ -224,11 +199,25 @@ export default function DatasetStructures() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Structure Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoField label="PDB ID" value={data?.pdbId || 'N/A'} copyable fieldKey="pdb" />
-                <InfoField label="Resolution (Å)" value={data?.resolution || 'N/A'} />
+                <InfoField 
+                  label="3D Structure File" 
+                  value={data?.structure3d || 'N/A'} 
+                  copyable 
+                  fieldKey="structure3d" 
+                />
                 <InfoField label="Method" value={data?.method || 'N/A'} />
-                <InfoField label="R-factor" value={data?.rfactor || 'N/A'} />
               </div>
+              {data?.structure3d && data.structure3d !== 'N/A' && (
+                <div className="mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open(data.structure3d, '_blank')}
+                    className="gap-2"
+                  >
+                    Download 3D Structure
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
 
@@ -236,7 +225,11 @@ export default function DatasetStructures() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-4">3D Viewer</h2>
               <div className="bg-secondary/20 rounded-lg p-8 flex items-center justify-center min-h-[400px] border border-border">
-                <p className="text-muted-foreground">3D structure viewer will be integrated here</p>
+                {loading ? (
+                  <div className="animate-pulse bg-muted h-64 w-full rounded" />
+                ) : (
+                  <p className="text-muted-foreground">3D structure viewer will be integrated here</p>
+                )}
               </div>
             </div>
           </Card>
