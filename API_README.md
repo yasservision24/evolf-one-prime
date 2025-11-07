@@ -177,25 +177,25 @@ data <- fromJSON(content(response, "text"))
 {
   "data": [
     {
-      "id": 1,
+      "id": "1",
       "evolfId": "EvOlf0000001",
       "receptor": "OR8B8",
       "species": "Human",
-      "class_field": "0",
+      "class": "0",
       "ligand": "Musk xylol",
-      "mutation": "",
+      "mutation": "Wild-type",
       "chemblId": "ChEMBL19208",
       "uniprotId": "",
       "ensembleId": "ENSG00000197125"
     },
     {
-      "id": 2,
+      "id": "2",
       "evolfId": "EvOlf0000002",
       "receptor": "OR8B12",
       "species": "Human",
-      "class_field": "0",
+      "class": "0",
       "ligand": "Musk xylol",
-      "mutation": "",
+      "mutation": "Wild-type",
       "chemblId": "ChEMBL19208",
       "uniprotId": "",
       "ensembleId": "ENSG00000170953"
@@ -209,46 +209,21 @@ data <- fromJSON(content(response, "text"))
     "itemsPerPage": 20
   },
   "statistics": {
-    "totalReceptors": 144,
-    "totalLigands": 58,
-    "totalMutations": 250,
-    "totalSpecies": 10,
-    "uniqueClasses": ["1", "0"],
-    "uniqueSpecies": [
-      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
-      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
-    ],
-    "uniqueMutationTypes": ["Wild type", "Mutant"],
-    "totalRows": 250
-  },
-  "filtered statiscs": {
     "totalRows": 250,
-    "uniqueClasses": ["1", "0"],
+    "uniqueClasses": ["0", "1"],
     "uniqueSpecies": [
-      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
-      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+      "Human", "Mouse", "Rat", "Chimpanzee", "Bonobo",
+      "Gorilla", "Orangutan", "Rhesus macaque", "Pig", "Guinea pig"
     ],
-    "uniqueMutationTypes": {
-      "totalReceptors": 144,
-      "totalLigands": 58,
-      "totalMutations": 250,
-      "totalSpecies": 10,
-      "uniqueClasses": ["1", "0"],
-      "uniqueSpecies": [
-        "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
-        "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
-      ],
-      "uniqueMutationTypes": ["Wild type", "Mutant"],
-      "totalRows": 250
-    }
+    "uniqueMutationTypes": ["Wild-type", "Mutant"]
   },
   "filterOptions": {
-    "classes": ["1", "0"],
-    "species": [
-      "Gorilla", "Rhesus macaque", "Orangutan", "Pig", "Guinea pig",
-      "Rat", "Human", "Mouse", "Chimpanzee", "Bonobo"
+    "uniqueClasses": ["0", "1"],
+    "uniqueSpecies": [
+      "Human", "Mouse", "Rat", "Chimpanzee", "Bonobo",
+      "Gorilla", "Orangutan", "Rhesus macaque", "Pig", "Guinea pig"
     ],
-    "mutationTypes": ["Wild type", "Mutant"]
+    "uniqueMutationTypes": ["Wild-type", "Mutant"]
   },
   "all_evolf_ids": [
     "EvOlf0000001", "EvOlf0000002", "EvOlf0000003", "EvOlf0000004",
@@ -260,25 +235,31 @@ data <- fromJSON(content(response, "text"))
 ```
 
 **Field Descriptions:**
-- `id`: Database primary key (integer)
+- `id`: Database primary key (string)
 - `evolfId`: Unique EvoLF identifier (string, format: "EvOlf0000001")
 - `receptor`: Receptor name (string)
 - `species`: Species name (string, e.g., "Human", "Mouse", "Rat")
-- `class_field`: GPCR class (string, "0" or "1")
+- `class`: GPCR class (string, "0" or "1") - Note: API returns `class_field` but frontend transforms to `class`
 - `ligand`: Ligand/compound name (string)
-- `mutation`: Mutation description (string, empty for wild-type)
+- `mutation`: Mutation description (string, "Wild-type" for wild-type)
 - `chemblId`: ChEMBL compound identifier (string)
 - `uniprotId`: UniProt protein identifier (string, may be empty)
 - `ensembleId`: Ensembl gene identifier (string)
 
 **Important Notes:**
 - `all_evolf_ids`: Contains all EvOlf IDs matching current filters (not just the current page) - useful for filtered downloads
-- `statistics`: Reflects dataset-wide statistics including total receptors, ligands, mutations, and species
-- `filtered statiscs`: Contains statistics for the currently filtered/viewed dataset (note: typo in key name is from backend)
-- `filterOptions`: Available filter values for dropdown menus - updates based on current data
-- `class_field`: GPCR class field (note: backend uses `class_field` instead of `class` due to SQL reserved word)
-- Empty strings indicate missing data (e.g., empty `mutation` means wild-type, empty `uniprotId` means not available)
+- `statistics`: Contains statistics for the filtered dataset including:
+  - `totalRows`: Total number of rows matching current filters
+  - `uniqueClasses`: Array of unique GPCR classes in the filtered dataset
+  - `uniqueSpecies`: Array of unique species in the filtered dataset
+  - `uniqueMutationTypes`: Array of unique mutation types in the filtered dataset
+- `filterOptions`: Available filter values for dropdown menus - these match the statistics fields:
+  - `uniqueClasses`: Array of available GPCR classes for filtering
+  - `uniqueSpecies`: Array of available species for filtering
+  - `uniqueMutationTypes`: Array of available mutation types for filtering
+- **Backend Field Mapping**: API returns `class_field` but frontend transforms to `class` for easier usage
 - **Server-side filtering** ensures fast performance even with large datasets
+- All filters (`species`, `class`, `mutationType`) are applied server-side before returning results
 
 **Error Response (400/500):**
 ```json
