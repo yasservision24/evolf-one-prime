@@ -299,12 +299,6 @@ export default function DatasetLigand() {
                     </Button>
                   </div>
                 )}
-                <InfoField 
-                  label="PubChem CID" 
-                  value={data?.cid || 'N/A'} 
-                  copyable 
-                  fieldKey="ligand-pubchem"
-                />
               </div>
             </div>
           </Card>
