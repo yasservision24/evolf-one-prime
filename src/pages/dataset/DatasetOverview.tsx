@@ -78,47 +78,23 @@ export default function DatasetOverview() {
     value, 
   }: { 
     label: string; 
-    value: string | number; 
+    value: string | number | null | undefined; 
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
     return (
-      <div className="py-3">
+      <div className="py-3 border-b border-border/50 last:border-0">
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
-          <div className="text-foreground font-medium">{displayValue}</div>
+          <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''}`}>
+            {!loading && displayValue}
+          </div>
         </div>
       </div>
     );
   };
 
-  if (loading) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!data) {
-    return (
-      <>
-        <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <p className="text-muted-foreground mb-4">Entry not found</p>
-          <Button onClick={() => navigate('/dataset/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Database
-          </Button>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+  // Always show the full page structure
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -141,53 +117,35 @@ export default function DatasetOverview() {
           {/* Title Row */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-3 flex-1 flex-wrap">
-              <h1 className="text-2xl font-normal text-foreground">
-                {data?.receptorName || 'Receptor'} - {data?.ligandName || 'Ligand'}
+              <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+                {!loading && (data?.receptorName || 'N/A')} {!loading && '-'} {!loading && (data?.ligandName || 'N/A')}
               </h1>
-              {data?.class && (
-                <Badge variant="outline" className="bg-secondary/50 border-border">
-                  {data.class}
-                </Badge>
-              )}
-              {data?.mutation && (
-                <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                  {data.mutation}
-                </Badge>
+              {!loading && (
+                <>
+                  <Badge variant="outline" className="bg-secondary/50 border-border">
+                    {data?.class || 'N/A'}
+                  </Badge>
+                  <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
+                    {data?.mutation || 'N/A'}
+                  </Badge>
+                </>
               )}
             </div>
             
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2" disabled={loading}>
                 <Download className="h-4 w-4" />
                 Export
               </Button>
-              {data?.uniprotId && (
-                <Button variant="ghost" size="sm" asChild>
-                  <a 
-                    href={`https://www.uniprot.org/uniprot/${data.uniprotId}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    UniProt
-                  </a>
-                </Button>
-              )}
-              {data?.chemblId && (
-                <Button variant="ghost" size="sm" asChild>
-                  <a 
-                    href={`https://www.ebi.ac.uk/chembl/compound_report_card/${data.chemblId}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    ChEMBL
-                  </a>
-                </Button>
-              )}
+              <Button variant="ghost" size="sm" className="gap-2" disabled={loading || !data?.uniprotId}>
+                <ExternalLink className="h-4 w-4" />
+                UniProt
+              </Button>
+              <Button variant="ghost" size="sm" className="gap-2" disabled={loading || !data?.chemblId}>
+                <ExternalLink className="h-4 w-4" />
+                ChEMBL
+              </Button>
             </div>
           </div>
           
@@ -195,38 +153,36 @@ export default function DatasetOverview() {
           <div className="flex items-center flex-wrap gap-x-8 gap-y-2 text-sm mb-6">
             <div>
               <span className="text-muted-foreground">EvOlf ID: </span>
-              <span className="text-cyan-400 font-mono font-medium">{data?.evolfId || 'N/A'}</span>
+              <span className={`text-cyan-400 font-mono font-medium ${loading ? 'animate-pulse' : ''}`}>
+                {loading ? 'Loading...' : (data?.evolfId || evolfId || 'N/A')}
+              </span>
             </div>
-            {data?.species && (
-              <div>
-                <span className="text-muted-foreground">Species: </span>
-                <span className="text-foreground italic">{data.species}</span>
-              </div>
-            )}
-            {data?.interactionType && data?.interactionValue && (
-              <div>
-                <span className="text-muted-foreground">Interaction: </span>
-                <span className="text-foreground font-normal">
-                  {data.interactionType} = {data.interactionValue} {data.interactionUnit}
+            <div>
+              <span className="text-muted-foreground">Species: </span>
+              <span className={`text-foreground italic ${loading ? 'animate-pulse' : ''}`}>
+                {loading ? 'Loading...' : (data?.species || 'N/A')}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Interaction: </span>
+              <span className={`text-foreground font-normal ${loading ? 'animate-pulse' : ''}`}>
+                {loading ? 'Loading...' : (data?.interactionType || 'N/A')} = {loading ? '...' : (data?.interactionValue || 'N/A')} {data?.interactionUnit || ''}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full bg-green-500 ring-2 ring-green-500/30 ${loading ? 'animate-pulse' : ''}`}></div>
+                <span className={`text-green-500 text-sm ${loading ? 'animate-pulse' : ''}`}>
+                  Quality: {loading ? 'Loading...' : (data?.quality || 'N/A')}
                 </span>
               </div>
-            )}
-            {data?.quality && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 ring-2 ring-green-500/30"></div>
-                  <span className="text-green-500 text-sm">Quality: {data.quality}</span>
-                </div>
-                {data.qualityScore && (
-                  <div className="w-28 h-2 bg-secondary/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500 transition-all"
-                      style={{ width: `${data.qualityScore}%` }}
-                    />
-                  </div>
-                )}
+              <div className="w-28 h-2 bg-secondary/50 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-green-500 transition-all"
+                  style={{ width: loading ? '0%' : `${data?.qualityScore || 0}%` }}
+                />
               </div>
-            )}
+            </div>
           </div>
 
           {/* Navigation Tabs */}
@@ -318,21 +274,28 @@ export default function DatasetOverview() {
                 <InfoField label="PubChem ID" value={data?.pubchemId || 'N/A'} />
                 
                 {/* 2D Structure Image */}
-                {data?.structure2d && (
-                  <div className="py-3">
-                    <div className="text-sm text-muted-foreground mb-2">2D Structure</div>
-                    <div className="border border-border rounded-lg p-4 bg-background">
+                <div className="py-3 border-b border-border/50">
+                  <div className="text-sm text-muted-foreground mb-2">2D Structure</div>
+                  <div className="border border-border rounded-lg p-4 bg-background">
+                    {loading ? (
+                      <div className="w-full h-40 bg-muted animate-pulse rounded" />
+                    ) : data?.structure2d ? (
                       <img 
                         src={data.structure2d} 
                         alt="Ligand 2D Structure" 
                         className="w-full h-auto"
                         onError={(e) => {
-                          e.currentTarget.src = 'https://via.placeholder.com/200x150?text=Structure+Not+Available';
+                          e.currentTarget.alt = 'Structure not available';
+                          e.currentTarget.className = 'w-full h-40 flex items-center justify-center text-muted-foreground';
                         }}
                       />
-                    </div>
+                    ) : (
+                      <div className="w-full h-40 flex items-center justify-center text-muted-foreground">
+                        N/A
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
               <Button 
                 variant="outline" 
@@ -386,14 +349,21 @@ export default function DatasetOverview() {
         </Card>
 
         {/* Comments */}
-        {data?.comments && (
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Comments</h2>
-              <p className="text-foreground/80 whitespace-pre-wrap">{data.comments}</p>
-            </div>
-          </Card>
-        )}
+        <Card className="bg-card border-border">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Comments</h2>
+            {loading ? (
+              <div className="space-y-2">
+                <div className="animate-pulse bg-muted h-4 w-full rounded" />
+                <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
+              </div>
+            ) : (
+              <p className="text-foreground/80 whitespace-pre-wrap">
+                {data?.comments || 'N/A'}
+              </p>
+            )}
+          </div>
+        </Card>
       </div>
 
       <Footer />
