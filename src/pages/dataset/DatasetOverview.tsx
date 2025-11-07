@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetOverview } from '@/lib/api';
+import { fetchDatasetDetail } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -55,7 +55,7 @@ export default function DatasetOverview() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetOverview(evolfId);
+        const response = await fetchDatasetDetail(evolfId);
         setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);

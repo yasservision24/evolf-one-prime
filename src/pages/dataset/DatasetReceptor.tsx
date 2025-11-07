@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetReceptor, downloadDatasetByEvolfId } from '@/lib/api';
+import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -49,13 +49,13 @@ export default function DatasetReceptor() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetReceptor(evolfId);
+        const response = await fetchDatasetDetail(evolfId);
         setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load receptor details.',
+          description: 'Failed to load entry details.',
           variant: 'destructive',
         });
       } finally {
