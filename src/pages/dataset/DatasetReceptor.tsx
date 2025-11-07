@@ -24,6 +24,8 @@ interface DatasetDetail {
   uniprotLink?: string;
   ensemblId?: string;
   ensemblLink?: string;
+  receptorName?: string;
+  ligandName?: string;
 }
 
 export default function DatasetReceptor() {
@@ -138,7 +140,7 @@ export default function DatasetReceptor() {
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
             <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
-              {!loading && `${data?.receptor || 'N/A'} - ${data?.ligand || 'N/A'}`}
+              {!loading && `${data?.receptorName || data?.receptor || 'N/A'} - ${data?.ligandName || data?.ligand || 'N/A'}`}
             </h1>
             {!loading && data?.class && (
               <Badge variant="outline" className="bg-secondary/50 border-border">
@@ -206,7 +208,7 @@ export default function DatasetReceptor() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Basic Information</h2>
               <div className="space-y-4">
-                <InfoField label="Receptor Name" value={data?.receptor || 'N/A'} />
+                <InfoField label="Receptor Name" value={data?.receptorName || data?.receptor || 'N/A'} />
                 <InfoField label="Class" value={data?.class || 'N/A'} />
                 <InfoField label="Species" value={data?.species || 'N/A'} />
                 <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
