@@ -572,41 +572,6 @@ export async function downloadPredictionResults(jobId: string) {
 }
 
 
-/**
- * Fetch GPCR receptors list
- * Endpoint: GET /receptors
- * @returns List of available receptors
- */
-export async function fetchReceptors() {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/receptors`, {
-    method: 'GET',
-    headers: API_CONFIG.HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new ApiError(`Failed to fetch receptors: ${response.statusText}`, response.status);
-  }
-
-  return await response.json();
-}
-
-/**
- * Fetch interactions data
- * Endpoint: GET /interactions
- * @returns Interaction data
- */
-export async function fetchInteractions() {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/interactions`, {
-    method: 'GET',
-    headers: API_CONFIG.HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new ApiError(`Failed to fetch interactions: ${response.statusText}`, response.status);
-  }
-
-  return await response.json();
-}
 
 /**
  * Search dataset with autocomplete suggestions
@@ -645,35 +610,5 @@ export async function searchDataset(query: string) {
   return await response.json();
 }
 
-/**
- * Fetch single dataset entry by EvOlf ID
- * Endpoint: GET /dataset/:evolfId
- * 
- * Response Format:
- * {
- *   entry: {
- *     evolfId: string,
- *     receptorName: string,
- *     geneSymbol: string,
- *     uniprotId: string,
- *     // ... all detailed fields
- *   }
- * }
- * 
- * @param evolfId - EvOlf ID of the entry
- * @returns Detailed entry data
- */
-export async function fetchDatasetEntry(evolfId: string) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/${evolfId}`, {
-    method: 'GET',
-    headers: API_CONFIG.HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new ApiError(`Failed to fetch dataset entry: ${response.statusText}`, response.status);
-  }
-
-  return await response.json();
-}
 
 
