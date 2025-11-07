@@ -332,7 +332,59 @@ export default function DatasetLigand() {
 
           <Card className="bg-card border-border lg:col-span-2">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">2D Structure</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">SMILES Structure</h2>
+                {data?.smiles && data.smiles !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(data.smiles!, 'smiles-structure')}
+                    className="gap-2"
+                  >
+                    {copiedField === 'smiles-structure' ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    Copy SMILES
+                  </Button>
+                )}
+              </div>
+              <div className="bg-secondary/30 p-4 rounded-lg">
+                <p className="text-sm font-mono break-all text-foreground">
+                  {data?.smiles || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-card border-border lg:col-span-2">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">2D Structure</h2>
+                {data?.image && data.image !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = data.image!;
+                      link.download = `${data.ligandName || data.ligand || 'ligand'}_2D.png`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      toast({
+                        title: 'Success!',
+                        description: 'Image download started',
+                      });
+                    }}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Image
+                  </Button>
+                )}
+              </div>
               <div className="bg-secondary/20 rounded-lg p-8 flex items-center justify-center min-h-[300px] border border-border">
                 {loading ? (
                   <div className="animate-pulse bg-muted h-64 w-64 rounded" />

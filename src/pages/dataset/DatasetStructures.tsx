@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -229,17 +229,52 @@ export default function DatasetStructures() {
                 />
                 <InfoField label="Method" value={data?.method || 'N/A'} />
               </div>
-              {data?.structure3d && data.structure3d !== 'N/A' && (
-                <div className="mt-6">
+              <div className="mt-6 flex flex-wrap gap-3">
+                {data?.receptorStructure && data.receptorStructure !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = data.receptorStructure!;
+                      link.download = `${data.receptor || 'receptor'}.pdb`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Receptor PDB
+                  </Button>
+                )}
+                {data?.ligandStructure && data.ligandStructure !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = data.ligandStructure!;
+                      link.download = `${data.ligand || 'ligand'}.sdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Ligand SDF
+                  </Button>
+                )}
+                {data?.structure3d && data.structure3d !== 'N/A' && (
                   <Button
                     variant="outline"
                     onClick={() => window.open(data.structure3d, '_blank')}
                     className="gap-2"
                   >
-                    Download 3D Structure
+                    <Download className="h-4 w-4" />
+                    Download Complex Structure
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </Card>
 
