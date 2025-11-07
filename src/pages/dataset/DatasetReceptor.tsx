@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
-import { Molecular3DViewer } from '@/components/Molecular3DViewer';
 
 interface DatasetDetail {
   evolfId: string;
@@ -323,20 +322,6 @@ export default function DatasetReceptor() {
             </div>
           </Card>
 
-          <Card className="bg-card border-border lg:col-span-2">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">3D Structure Viewer (PDB)</h2>
-              <Molecular3DViewer 
-                data={data?.pdbData || ''}
-                format="pdb"
-                style="cartoon"
-                height={500}
-              />
-              <p className="text-xs text-muted-foreground mt-3">
-                Interactive 3D viewer - Click and drag to rotate, scroll to zoom
-              </p>
-            </div>
-          </Card>
         </div>
       </div>
 
