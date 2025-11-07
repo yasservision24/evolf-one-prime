@@ -444,24 +444,6 @@ export async function downloadCompleteDataset() {
 }
 
 /**
- * Fetch dataset statistics
- * Endpoint: GET /dataset/stats
- * @returns Statistics object with total receptors, ligands, mutations, etc.
- */
-export async function fetchDatasetStats() {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/stats`, {
-    method: 'GET',
-    headers: API_CONFIG.HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new ApiError(`Failed to fetch dataset stats: ${response.statusText}`, response.status);
-  }
-
-  return await response.json();
-}
-
-/**
  * Submit prediction request with receptor and ligands
  * Endpoint: POST /predict
  * 
