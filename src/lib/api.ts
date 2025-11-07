@@ -318,6 +318,57 @@ export async function fetchDatasetPaginated(
 }
 
 /**
+ * Fetch detailed data for a specific EvOlf ID
+ * Endpoint: GET /dataset/details/:evolfId
+ * @param evolfId - The EvOlf ID to fetch details for
+ * @returns Detailed dataset entry information
+ */
+export async function fetchDatasetDetail(evolfId: string) {
+  const url = `${API_CONFIG.BASE_URL}/dataset/details/${evolfId}`;
+  console.log('API Request URL:', url);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to fetch dataset detail: ${response.statusText}`, response.status);
+  }
+
+  const apiResponse = await response.json();
+  
+  // Transform API response to match frontend structure
+  return {
+    evolfId: apiResponse.evolfId || '',
+    receptorName: apiResponse.receptor || '',
+    ligandName: apiResponse.ligand || '',
+    species: apiResponse.species || '',
+    mutation: apiResponse.mutation || 'Wild-type',
+    mutationType: apiResponse.mutationType || '',
+    mutationImpact: apiResponse.mutationImpact || '',
+    class: apiResponse.class_field || apiResponse.class || '',
+    receptorSubtype: apiResponse.receptorSubtype || '',
+    uniprotId: apiResponse.uniprotId || '',
+    chemblId: apiResponse.chemblId || '',
+    pubchemId: apiResponse.pubchemId || '',
+    ensembleId: apiResponse.ensembleId || '',
+    expressionSystem: apiResponse.expressionSystem || '',
+    parameter: apiResponse.parameter || '',
+    value: apiResponse.value || '',
+    unit: apiResponse.unit || '',
+    structure2d: apiResponse.structure2d || '', // URL to 2D structure image
+    comments: apiResponse.comments || '',
+    geneSymbol: apiResponse.geneSymbol || '',
+    interactionType: apiResponse.interactionType || '',
+    interactionValue: apiResponse.interactionValue || null,
+    interactionUnit: apiResponse.interactionUnit || '',
+    quality: apiResponse.quality || '',
+    qualityScore: apiResponse.qualityScore || null,
+  };
+}
+
+/**
  * Download dataset by evolf IDs (returns ZIP)
  * Endpoint: POST /dataset/export
  * @param evolfIds - Array of evolf IDs to export

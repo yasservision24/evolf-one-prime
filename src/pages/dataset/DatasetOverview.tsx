@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2, FlaskConical, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { fetchDatasetDetail } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -14,7 +15,14 @@ interface DatasetDetail {
   ligandName?: string;
   class?: string;
   mutation?: string;
+  mutationType?: string;
+  mutationImpact?: string;
   species?: string;
+  receptorSubtype?: string;
+  expressionSystem?: string;
+  parameter?: string;
+  value?: string;
+  unit?: string;
   interactionType?: string;
   interactionValue?: number;
   interactionUnit?: string;
@@ -23,7 +31,10 @@ interface DatasetDetail {
   geneSymbol?: string;
   uniprotId?: string;
   chemblId?: string;
-  pubchemCid?: string;
+  pubchemId?: string;
+  ensembleId?: string;
+  structure2d?: string; // URL to 2D structure image
+  comments?: string;
 }
 
 export default function DatasetOverview() {
@@ -44,14 +55,8 @@ export default function DatasetOverview() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Implement API call to fetch dataset detail by evolfId
-        // const response = await fetchDatasetDetail(evolfId);
-        // setData(response);
-        
-        toast({
-          title: 'Feature Coming Soon',
-          description: 'Dataset details will be available when the API is connected.',
-        });
+        const response = await fetchDatasetDetail(evolfId);
+        setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
@@ -59,6 +64,7 @@ export default function DatasetOverview() {
           description: 'Failed to load entry details. Please try again.',
           variant: 'destructive',
         });
+        setData(null);
       } finally {
         setLoading(false);
       }
@@ -272,21 +278,21 @@ export default function DatasetOverview() {
       <div className="container mx-auto px-6 py-8">
 
         {/* Overview Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Receptor Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Receptor Information */}
           <Card className="bg-card border-border">
             <div className="p-6">
               <div className="flex items-center gap-2 mb-6">
                 <Database className="h-5 w-5 text-blue-500" />
-                <h2 className="text-lg font-semibold">Receptor Summary</h2>
+                <h2 className="text-lg font-semibold">Receptor Information</h2>
               </div>
-              <div className="space-y-4">
-                <InfoField label="Receptor Name" value={data?.receptorName || 'Adenosine A2A receptor'} />
-                <InfoField label="Gene Symbol" value={data?.geneSymbol || 'ADORA2A'} />
-                <InfoField 
-                  label="UniProt ID" 
-                  value={data?.uniprotId || 'P29274'} 
-                />
+              <div className="space-y-3">
+                <InfoField label="Receptor Name" value={data?.receptorName || 'N/A'} />
+                <InfoField label="Gene Symbol" value={data?.geneSymbol || 'N/A'} />
+                <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
+                <InfoField label="Species" value={data?.species || 'N/A'} />
+                <InfoField label="UniProt ID" value={data?.uniprotId || 'N/A'} />
+                <InfoField label="Ensemble ID" value={data?.ensembleId || 'N/A'} />
               </div>
               <Button 
                 variant="outline" 
@@ -294,28 +300,39 @@ export default function DatasetOverview() {
                 className="w-full mt-6"
                 onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
               >
-                View Full Details
+                View Full Receptor Details
               </Button>
             </div>
           </Card>
 
-          {/* Ligand Summary */}
+          {/* Ligand Information */}
           <Card className="bg-card border-border">
             <div className="p-6">
               <div className="flex items-center gap-2 mb-6">
                 <TestTube className="h-5 w-5 text-green-500" />
-                <h2 className="text-lg font-semibold">Ligand Summary</h2>
+                <h2 className="text-lg font-semibold">Ligand Information</h2>
               </div>
-              <div className="space-y-4">
-                <InfoField label="Ligand Name" value={data?.ligandName || 'ZM 241385'} />
-                <InfoField 
-                  label="ChEMBL ID" 
-                  value={data?.chemblId || 'CHEMBL191'} 
-                />
-                <InfoField 
-                  label="PubChem CID" 
-                  value={data?.pubchemCid || '3035979'} 
-                />
+              <div className="space-y-3">
+                <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
+                <InfoField label="ChEMBL ID" value={data?.chemblId || 'N/A'} />
+                <InfoField label="PubChem ID" value={data?.pubchemId || 'N/A'} />
+                
+                {/* 2D Structure Image */}
+                {data?.structure2d && (
+                  <div className="py-3">
+                    <div className="text-sm text-muted-foreground mb-2">2D Structure</div>
+                    <div className="border border-border rounded-lg p-4 bg-background">
+                      <img 
+                        src={data.structure2d} 
+                        alt="Ligand 2D Structure" 
+                        className="w-full h-auto"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/200x150?text=Structure+Not+Available';
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <Button 
                 variant="outline" 
@@ -323,11 +340,60 @@ export default function DatasetOverview() {
                 className="w-full mt-6"
                 onClick={() => navigate(`/dataset/ligand?evolfid=${evolfId}`)}
               >
-                View Full Details
+                View Full Ligand Details
               </Button>
             </div>
           </Card>
+
+          {/* Mutation Information */}
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <FlaskConical className="h-5 w-5 text-purple-500" />
+                <h2 className="text-lg font-semibold">Mutation Information</h2>
+              </div>
+              <div className="space-y-3">
+                <InfoField label="Mutation" value={data?.mutation || 'Wild-type'} />
+                <InfoField label="Mutation Type" value={data?.mutationType || 'N/A'} />
+                <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
+                <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
+              </div>
+            </div>
+          </Card>
         </div>
+
+        {/* Interaction Data */}
+        <Card className="bg-card border-border mb-6">
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Info className="h-5 w-5 text-cyan-500" />
+              <h2 className="text-lg font-semibold">Interaction Data</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
+              <InfoField label="Value" value={data?.value || 'N/A'} />
+              <InfoField label="Unit" value={data?.unit || 'N/A'} />
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full mt-6"
+              onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
+            >
+              View Full Interaction Data
+            </Button>
+          </div>
+        </Card>
+
+        {/* Comments */}
+        {data?.comments && (
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Comments</h2>
+              <p className="text-foreground/80 whitespace-pre-wrap">{data.comments}</p>
+            </div>
+          </Card>
+        )}
       </div>
 
       <Footer />
