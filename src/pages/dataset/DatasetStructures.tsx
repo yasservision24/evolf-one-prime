@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail } from '@/lib/api';
+import { fetchDatasetStructures } from '@/lib/api';
 import { Molecular3DViewer } from '@/components/Molecular3DViewer';
 
 interface DatasetDetail {
@@ -43,7 +43,7 @@ export default function DatasetStructures() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
+        const response = await fetchDatasetStructures(evolfId);
         
         // Map API response to component data structure
         const structureData: DatasetDetail = {

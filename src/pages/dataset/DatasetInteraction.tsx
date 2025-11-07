@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail } from '@/lib/api';
+import { fetchDatasetInteraction } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -43,13 +43,13 @@ export default function DatasetInteraction() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
+        const response = await fetchDatasetInteraction(evolfId);
         setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load entry details.',
+          description: 'Failed to load interaction details.',
           variant: 'destructive',
         });
       } finally {

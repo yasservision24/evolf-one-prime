@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
+import { fetchDatasetLigand, downloadDatasetByEvolfId } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -49,13 +49,13 @@ export default function DatasetLigand() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
+        const response = await fetchDatasetLigand(evolfId);
         setData(response);
       } catch (error) {
         console.error('Failed to fetch entry:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load entry details.',
+          description: 'Failed to load ligand details.',
           variant: 'destructive',
         });
       } finally {
