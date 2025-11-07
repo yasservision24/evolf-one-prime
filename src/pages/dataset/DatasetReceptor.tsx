@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail } from '@/lib/api';
+import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
+import { Molecular3DViewer } from '@/components/Molecular3DViewer';
 
 interface DatasetDetail {
   evolfId: string;
@@ -26,6 +27,7 @@ interface DatasetDetail {
   ensemblLink?: string;
   receptorName?: string;
   ligandName?: string;
+  pdbData?: string;
 }
 
 export default function DatasetReceptor() {
@@ -37,6 +39,7 @@ export default function DatasetReceptor() {
   const [data, setData] = useState<DatasetDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!evolfId) {
@@ -72,6 +75,38 @@ export default function DatasetReceptor() {
       title: 'Copied!',
       description: 'Copied to clipboard',
     });
+  };
+
+  const handleExport = async () => {
+    if (!evolfId) return;
+    
+    try {
+      setExporting(true);
+      const blob = await downloadDatasetByEvolfId(evolfId);
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${evolfId}_data.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Success!',
+        description: 'Dataset exported successfully',
+      });
+    } catch (error) {
+      console.error('Failed to export:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to export dataset.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExporting(false);
+    }
   };
 
   const InfoField = ({ 
@@ -136,6 +171,18 @@ export default function DatasetReceptor() {
             >
               Back to Overview
             </Button>
+            <div className="ml-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExport}
+                disabled={exporting}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? 'Exporting...' : 'Export Data'}
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mb-6 flex-wrap">
@@ -267,12 +314,27 @@ export default function DatasetReceptor() {
 
           <Card className="bg-card border-border lg:col-span-2">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Receptor Sequence</h2>
+              <h2 className="text-lg font-semibold mb-6">Receptor Sequence (FASTA)</h2>
               <div className="bg-secondary/30 p-4 rounded-lg max-h-[400px] overflow-y-auto">
                 <p className={`text-sm font-mono break-all ${loading ? 'animate-pulse bg-muted h-20 rounded' : 'text-foreground'}`}>
                   {!loading && (data?.sequence || 'N/A')}
                 </p>
               </div>
+            </div>
+          </Card>
+
+          <Card className="bg-card border-border lg:col-span-2">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">3D Structure Viewer (PDB)</h2>
+              <Molecular3DViewer 
+                data={data?.pdbData || ''}
+                format="pdb"
+                style="cartoon"
+                height={500}
+              />
+              <p className="text-xs text-muted-foreground mt-3">
+                Interactive 3D viewer - Click and drag to rotate, scroll to zoom
+              </p>
             </div>
           </Card>
         </div>

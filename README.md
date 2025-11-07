@@ -1,8 +1,46 @@
-# Welcome to your Lovable project
+# EvoLF - GPCR Dataset & Prediction Platform
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/95c100a9-7c19-4503-ab16-4fb4d9b4282f
+
+## About EvoLF
+
+EvoLF is a comprehensive web platform for exploring GPCR (G Protein-Coupled Receptor) datasets and making binding affinity predictions. The platform provides:
+
+- **Dataset Browser**: Explore and filter comprehensive GPCR interaction data
+- **Detail Pages**: View detailed receptor, ligand, and interaction information
+- **3D Molecular Visualization**: Interactive PDB and SDF structure viewers
+- **Prediction Model**: Submit receptor-ligand pairs for affinity predictions
+- **Data Export**: Download dataset entries individually or in bulk
+
+## Key Features
+
+### Dataset Pages
+- `/dataset/dashboard` - Browse paginated dataset with advanced filters
+- `/dataset/detail?evolfid=X` - Overview of a specific entry
+- `/dataset/receptor?evolfid=X` - Receptor details with FASTA sequence and 3D PDB viewer
+- `/dataset/ligand?evolfid=X` - Ligand details with SMILES and 3D SDF viewer
+- `/dataset/interaction?evolfid=X` - Interaction data and experimental parameters
+- `/dataset/structures?evolfid=X` - 3D structure visualization
+
+### API Integration
+All dataset pages fetch data from the backend API:
+- `GET /api/dataset/details/:evolfId` - Get complete entry details
+- `GET /api/dataset/export/:evolfId` - Export single entry as ZIP
+- `POST /api/dataset/export` - Export multiple entries as ZIP
+
+See [API_README.md](./API_README.md) for complete API documentation.
+
+## Technologies
+
+This project is built with:
+
+- **Frontend**: React, TypeScript, Vite
+- **UI Components**: shadcn-ui, Tailwind CSS
+- **3D Visualization**: 3Dmol.js for molecular structures
+- **Routing**: React Router
+- **API Integration**: REST API with fetch
 
 ## How can I edit this code?
 
@@ -49,16 +87,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
 ## How can I deploy this project?
 

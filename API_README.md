@@ -6,10 +6,12 @@ Complete API reference for EvoLF dataset endpoints and prediction model with exa
 
 ## Table of Contents
 1. [Get Paginated Dataset](#1-get-paginated-dataset)
-2. [Search Dataset (Autocomplete)](#2-search-dataset-autocomplete)
-3. [Download Selected Dataset Items](#3-download-selected-dataset-items)
-4. [Download Complete Dataset](#4-download-complete-dataset)
-5. [Prediction Model API](#5-prediction-model-api)
+2. [Get Dataset Entry Details](#2-get-dataset-entry-details)
+3. [Search Dataset (Autocomplete)](#3-search-dataset-autocomplete)
+4. [Download Single Dataset Entry](#4-download-single-dataset-entry)
+5. [Download Selected Dataset Items](#5-download-selected-dataset-items)
+6. [Download Complete Dataset](#6-download-complete-dataset)
+7. [Prediction Model API](#7-prediction-model-api)
 
 ---
 
@@ -289,7 +291,146 @@ data <- fromJSON(content(response, "text"))
 
 ---
 
-## 2. Search Dataset (Autocomplete)
+## 2. Get Dataset Entry Details
+
+Fetch complete details for a specific EvOlf ID including receptor information, ligand data, sequences, 3D structures, and experimental parameters. This endpoint is used by all detail pages (`/dataset/detail`, `/dataset/receptor`, `/dataset/ligand`, etc.).
+
+### Endpoint
+```
+GET /dataset/details/:evolfId
+```
+
+### Function Signature
+```typescript
+fetchDatasetDetail(evolfId: string): Promise<DatasetDetail>
+```
+
+### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `evolfId` | string | Yes | EvOlf ID (e.g., 'EvOlf0000001') |
+
+### Example Request
+
+**JavaScript/TypeScript:**
+```javascript
+import { fetchDatasetDetail } from '@/lib/api';
+
+// Fetch details for a specific entry
+const details = await fetchDatasetDetail('EvOlf0000001');
+console.log(details);
+```
+
+**cURL:**
+```bash
+curl "https://api.evolf.com/v1/dataset/details/EvOlf0000001"
+```
+
+**Python:**
+```python
+import requests
+
+response = requests.get(
+    'https://api.evolf.com/v1/dataset/details/EvOlf0000001',
+    headers={'Content-Type': 'application/json'}
+)
+details = response.json()
+```
+
+**R:**
+```r
+library(httr)
+library(jsonlite)
+
+response <- GET(
+  "https://api.evolf.com/v1/dataset/details/EvOlf0000001",
+  add_headers("Content-Type" = "application/json")
+)
+data <- fromJSON(content(response, "text"))
+```
+
+### Response Format
+
+**Success Response (200 OK):**
+```json
+{
+  "evolfId": "EvOlf0000001",
+  "receptor": "OR8B8",
+  "receptorName": "OR8B8",
+  "ligand": "Musk xylol",
+  "ligandName": "Musk xylol",
+  "species": "Human",
+  "class": "0",
+  "mutation": "",
+  "mutationStatus": "Wild-type",
+  "mutationType": "",
+  "mutationImpact": "",
+  "receptorSubtype": "Olfactory",
+  "uniprotId": "Q8NGI8",
+  "uniprotLink": "https://www.uniprot.org/uniprot/Q8NGI8",
+  "ensemblId": "ENSG00000197125",
+  "ensemblLink": "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000197125",
+  "chemblId": "CHEMBL19208",
+  "chemblLink": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL19208",
+  "cid": "10947",
+  "pubchemId": "10947",
+  "pubchemLink": "https://pubchem.ncbi.nlm.nih.gov/compound/10947",
+  "smiles": "CC1=CC(=C(C=C1)C)C(C)(C)C",
+  "inchi": "InChI=1S/C12H18/c1-9-6-7-10(2)11(8-9)12(3,4)5/h6-8H,1-5H3",
+  "inchiKey": "GQJKHUZIILBKJI-UHFFFAOYSA-N",
+  "iupacName": "1,3-dimethyl-5-tert-butylbenzene",
+  "sequence": "MSEFLILGLPSNLSAVLGNLLVLFAVRDSHLHTPMYFFLSNLSFADLCYSTVTSPKLVNLLGKWSFGDAMC...",
+  "pdbData": "HEADER    RECEPTOR...\nATOM      1  N   MET A   1...",
+  "sdfData": "\n  Mrv0541...\n 16 17  0  0...",
+  "structure2d": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=10947&width=300&height=300",
+  "image": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=10947&width=300&height=300",
+  "structure3d": "https://api.evolf.com/structures/EvOlf0000001.pdb",
+  "expressionSystem": "HEK293",
+  "parameter": "Ki",
+  "value": "15.2",
+  "unit": "nM",
+  "comments": "Binding affinity measured at 25°C",
+  "geneSymbol": "OR8B8",
+  "interactionType": "Antagonist",
+  "interactionValue": 15.2,
+  "interactionUnit": "nM",
+  "quality": "High",
+  "qualityScore": 95
+}
+```
+
+**Field Descriptions:**
+- **Identifiers**: `evolfId`, `uniprotId`, `ensemblId`, `chemblId`, `cid`
+- **Receptor Info**: `receptor`, `receptorName`, `species`, `class`, `receptorSubtype`, `geneSymbol`
+- **Ligand Info**: `ligand`, `ligandName`, `smiles`, `inchi`, `inchiKey`, `iupacName`
+- **Sequences & Structures**: `sequence` (FASTA), `pdbData` (PDB format), `sdfData` (SDF format)
+- **Images**: `structure2d`, `image`, `structure3d`
+- **External Links**: `uniprotLink`, `ensemblLink`, `chemblLink`, `pubchemLink`
+- **Mutation Data**: `mutation`, `mutationStatus`, `mutationType`, `mutationImpact`
+- **Interaction Data**: `parameter`, `value`, `unit`, `interactionType`, `interactionValue`, `interactionUnit`
+- **Experimental**: `expressionSystem`, `comments`
+- **Quality Metrics**: `quality`, `qualityScore`
+
+**Important Notes:**
+- All fields are optional and may return empty strings or null if not available
+- `pdbData` contains complete PDB file content for 3D visualization
+- `sdfData` contains complete SDF file content for ligand 3D visualization
+- `sequence` is in FASTA format
+- Links are direct URLs to external databases
+
+**Error Response (404 Not Found):**
+```json
+{
+  "error": "Entry not found",
+  "status": 404,
+  "message": "No entry found with EvOlf ID: EvOlf0000001"
+}
+```
+
+---
+
+## 3. Search Dataset (Autocomplete)
 
 Search the dataset with autocomplete suggestions for quick lookup of receptors, ligands, species, and EvOlf IDs.
 
@@ -387,7 +528,59 @@ data <- fromJSON(content(response, "text"))
 
 ---
 
-## 3. Download Selected Dataset Items
+## 4. Download Single Dataset Entry
+
+Export a single dataset entry by its EvOlf ID as a ZIP file containing all data, sequences, and structures.
+
+### Endpoint
+```
+GET /dataset/export/:evolfId
+```
+
+### Function Signature
+```typescript
+downloadDatasetByEvolfId(evolfId: string): Promise<Blob>
+```
+
+### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `evolfId` | string | Yes | Single EvoLF ID to export |
+
+### Example Request
+
+**JavaScript/TypeScript:**
+```javascript
+import { downloadDatasetByEvolfId } from '@/lib/api';
+
+// Download single entry
+const blob = await downloadDatasetByEvolfId('EvOlf0000001');
+
+// Create download link
+const url = window.URL.createObjectURL(blob);
+const link = document.createElement('a');
+link.href = url;
+link.download = 'EvOlf0000001_data.zip';
+link.click();
+window.URL.revokeObjectURL(url);
+```
+
+**cURL:**
+```bash
+curl "https://api.evolf.com/v1/dataset/export/EvOlf0000001" \
+  --output EvOlf0000001_data.zip
+```
+
+### Response Format
+
+**Success Response (200 OK):**
+- **Content-Type:** `application/zip`
+- **Body:** Binary ZIP file containing complete entry data
+
+---
+
+## 5. Download Selected Dataset Items
 
 Export specific dataset items by their EvoLF IDs as a ZIP file.
 
@@ -512,7 +705,7 @@ id,evolfId,receptor,species,class_field,ligand,mutation,chemblId,uniprotId,ensem
 
 ---
 
-## 4. Download Complete Dataset
+## 6. Download Complete Dataset
 
 Download the entire EvoLF dataset as a pre-generated ZIP file.
 
@@ -702,7 +895,7 @@ try {
 
 ---
 
-## 5. Prediction Model API
+## 7. Prediction Model API
 
 Submit GPCR-ligand binding affinity predictions using the evolf deep learning model. Predictions are processed asynchronously and results are available via job ID.
 

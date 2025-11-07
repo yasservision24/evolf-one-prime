@@ -341,18 +341,22 @@ export async function fetchDatasetDetail(evolfId: string) {
   // Transform API response to match frontend structure
   return {
     evolfId: apiResponse.evolfId || '',
+    receptor: apiResponse.receptor || '',
     receptorName: apiResponse.receptor || '',
+    ligand: apiResponse.ligand || '',
     ligandName: apiResponse.ligand || '',
     species: apiResponse.species || '',
     mutation: apiResponse.mutation || 'Wild-type',
     mutationType: apiResponse.mutationType || '',
     mutationImpact: apiResponse.mutationImpact || '',
+    mutationStatus: apiResponse.mutationStatus || '',
     class: apiResponse.class_field || apiResponse.class || '',
     receptorSubtype: apiResponse.receptorSubtype || '',
     uniprotId: apiResponse.uniprotId || '',
     uniprotLink: apiResponse.uniprotLink || '',
     chemblId: apiResponse.chemblId || '',
     chemblLink: apiResponse.chemblLink || '',
+    cid: apiResponse.cid || '',
     pubchemId: apiResponse.pubchemId || '',
     pubchemLink: apiResponse.pubchemLink || '',
     ensemblId: apiResponse.ensemblId || '',
@@ -361,7 +365,8 @@ export async function fetchDatasetDetail(evolfId: string) {
     parameter: apiResponse.parameter || '',
     value: apiResponse.value || '',
     unit: apiResponse.unit || '',
-    structure2d: apiResponse.structure2d || '', // URL to 2D structure image
+    structure2d: apiResponse.structure2d || '',
+    image: apiResponse.image || '',
     comments: apiResponse.comments || '',
     geneSymbol: apiResponse.geneSymbol || '',
     interactionType: apiResponse.interactionType || '',
@@ -369,6 +374,15 @@ export async function fetchDatasetDetail(evolfId: string) {
     interactionUnit: apiResponse.interactionUnit || '',
     quality: apiResponse.quality || '',
     qualityScore: apiResponse.qualityScore || null,
+    // New fields for 3D structures and sequences
+    sequence: apiResponse.sequence || '',
+    smiles: apiResponse.smiles || '',
+    inchi: apiResponse.inchi || '',
+    inchiKey: apiResponse.inchiKey || '',
+    iupacName: apiResponse.iupacName || '',
+    pdbData: apiResponse.pdbData || '',
+    sdfData: apiResponse.sdfData || '',
+    structure3d: apiResponse.structure3d || '',
   };
 }
 
@@ -387,6 +401,25 @@ export async function downloadDatasetByIds(evolfIds: string[]) {
 
   if (!response.ok) {
     throw new ApiError(`Failed to export dataset: ${response.statusText}`, response.status);
+  }
+
+  return await response.blob();
+}
+
+/**
+ * Download single dataset entry by evolf ID (returns ZIP)
+ * Endpoint: GET /dataset/export/:evolfId
+ * @param evolfId - Single evolf ID to export
+ * @returns Blob (ZIP file) for download
+ */
+export async function downloadDatasetByEvolfId(evolfId: string) {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/export/${evolfId}`, {
+    method: 'GET',
+    headers: API_CONFIG.HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to export dataset entry: ${response.statusText}`, response.status);
   }
 
   return await response.blob();
