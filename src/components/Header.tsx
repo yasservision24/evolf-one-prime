@@ -57,7 +57,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => onNavigate('model')}
+                onClick={() => navigate('/prediction')}
                 className={`hover:text-foreground ${
                   currentPage === 'model'
                     ? 'text-foreground font-extrabold'

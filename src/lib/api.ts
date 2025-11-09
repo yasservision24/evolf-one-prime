@@ -62,7 +62,7 @@
  * 3. All API responses should return JSON format
  */
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL ||  "http://192.168.24.13:3000/api",
   TIMEOUT: 30000, // 30 second timeout for all requests
   HEADERS: {
     'Content-Type': 'application/json',
