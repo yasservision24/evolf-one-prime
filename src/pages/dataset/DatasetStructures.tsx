@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail } from '@/lib/api';
+import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
 import { Molecular3DViewer } from '@/components/Molecular3DViewer';
 
 interface DatasetDetail {
@@ -33,6 +33,7 @@ export default function DatasetStructures() {
   const [data, setData] = useState<DatasetDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!evolfId) {
@@ -124,36 +125,36 @@ export default function DatasetStructures() {
     });
   };
 
-  const exportAllStructures = () => {
-    if (!data) return;
-
-    const exportData = {
-      evolfId: data.evolfId,
-      receptor: data.receptor,
-      ligand: data.ligand,
-      class: data.class,
-      mutation: data.mutation,
-      method: data.method,
-      receptorStructure: data.receptorStructure,
-      ligandStructure: data.ligandStructure,
-      receptorFormat: data.receptorFormat,
-      ligandFormat: data.ligandFormat,
-    };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${data.evolfId}_structures_data.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: 'Export Successful',
-      description: 'Structure data exported successfully',
-    });
+  const handleExport = async () => {
+    if (!evolfId) return;
+    
+    try {
+      setExporting(true);
+      const blob = await downloadDatasetByEvolfId(evolfId);
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${evolfId}_data.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Success!',
+        description: 'Dataset exported successfully',
+      });
+    } catch (error) {
+      console.error('Failed to export:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to export dataset.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExporting(false);
+    }
   };
 
   const InfoField = ({ 
@@ -222,12 +223,12 @@ export default function DatasetStructures() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={exportAllStructures}
-                disabled={loading || !data}
+                onClick={handleExport}
+                disabled={exporting}
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
-                Export Data
+                {exporting ? 'Exporting...' : 'Export Data'}
               </Button>
             </div>
           </div>

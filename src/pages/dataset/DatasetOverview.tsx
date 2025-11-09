@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail } from '@/lib/api';
+import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
 
 interface DatasetDetail {
   evolfId: string;
@@ -45,6 +45,7 @@ export default function DatasetOverview() {
   
   const [data, setData] = useState<DatasetDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!evolfId) {
@@ -73,7 +74,39 @@ export default function DatasetOverview() {
     loadData();
   }, [evolfId, navigate, toast]);
 
-  const InfoField = ({ 
+  const handleExport = async () => {
+    if (!evolfId) return;
+    
+    try {
+      setExporting(true);
+      const blob = await downloadDatasetByEvolfId(evolfId);
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${evolfId}_data.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Success!',
+        description: 'Dataset exported successfully',
+      });
+    } catch (error) {
+      console.error('Failed to export:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to export dataset.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const InfoField = ({
     label, 
     value, 
   }: { 
@@ -104,15 +137,17 @@ export default function DatasetOverview() {
       <div className="bg-card/30 border-b border-border">
         <div className="container mx-auto px-6 py-6">
           {/* Back Button */}
-          <Button 
-            variant="link" 
-            size="sm" 
-            onClick={() => navigate('/dataset/dashboard')}
-            className="mb-6 -ml-2 text-primary hover:text-primary/80 p-0"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to results
-          </Button>
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/dataset/dashboard')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Database
+            </Button>
+          </div>
 
           {/* Title Row */}
           <div className="flex items-start justify-between mb-6">
@@ -134,15 +169,33 @@ export default function DatasetOverview() {
             
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="gap-2" disabled={loading}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExport}
+                disabled={exporting}
+                className="gap-2"
+              >
                 <Download className="h-4 w-4" />
-                Export
+                {exporting ? 'Exporting...' : 'Export Data'}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-2" disabled={loading || !data?.uniprotId}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2" 
+                disabled={loading || !data?.uniprotId}
+                onClick={() => data?.uniprotId && window.open(`https://www.uniprot.org/uniprotkb/${data.uniprotId}`, '_blank')}
+              >
                 <ExternalLink className="h-4 w-4" />
                 UniProt
               </Button>
-              <Button variant="ghost" size="sm" className="gap-2" disabled={loading || !data?.chemblId}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2" 
+                disabled={loading || !data?.chemblId}
+                onClick={() => data?.chemblId && window.open(`https://www.ebi.ac.uk/chembl/compound_report_card/${data.chemblId}`, '_blank')}
+              >
                 <ExternalLink className="h-4 w-4" />
                 ChEMBL
               </Button>
