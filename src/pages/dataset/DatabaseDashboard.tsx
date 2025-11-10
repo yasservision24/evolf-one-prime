@@ -724,11 +724,11 @@ const DatabaseDashboard = () => {
 
               {/* Export Button */}
               <Button 
-                className="w-full sm:w-auto bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+                className="w-full sm:w-auto bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 hover:scale-105 hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] transition-all duration-300 group"
                 onClick={downloadDataset}
                 disabled={allEvolfIds.length === 0}
               >
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
                 Export
               </Button>
             </div>
@@ -765,7 +765,7 @@ const DatabaseDashboard = () => {
                   variant="ghost"
                   size="sm"
                   onClick={clearAllFilters}
-                  className="h-6 text-xs text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80"
+                  className="h-6 text-xs text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80 hover:bg-[hsl(var(--brand-teal))]/10 transition-all duration-300"
                 >
                   Clear all
                 </Button>
@@ -850,14 +850,14 @@ const DatabaseDashboard = () => {
                   </div>
                   <Button 
                     size="lg"
-                    className="h-14 px-4 sm:px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 min-w-[100px] sm:min-w-[120px] relative z-10"
+                    className="h-14 px-4 sm:px-6 bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 hover:scale-105 hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] transition-all duration-300 group min-w-[100px] sm:min-w-[120px] relative z-10"
                     onClick={handleSearchSubmit}
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin group-hover:scale-110 transition-transform duration-300" />
                     ) : (
-                      <Search className="w-5 h-5 sm:mr-2" />
+                      <Search className="w-5 h-5 sm:mr-2 group-hover:scale-110 transition-transform duration-300" />
                     )}
                     <span className="hidden sm:inline">{isLoading ? 'Searching...' : 'Search'}</span>
                   </Button>
@@ -880,7 +880,7 @@ const DatabaseDashboard = () => {
                         setShowSuggestions(false);
                         setFocusedSuggestionIndex(-1);
                       }}
-                      className="text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80"
+                      className="text-[hsl(var(--brand-teal))] hover:text-[hsl(var(--brand-teal))]/80 hover:bg-[hsl(var(--brand-teal))]/10 transition-all duration-300"
                     >
                       Clear search
                     </Button>
@@ -1137,7 +1137,7 @@ const DatabaseDashboard = () => {
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 mt-8">
             <Button 
-              className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+              className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 hover:scale-105 hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] transition-all duration-300 group"
               onClick={() => {
                 setCurrentPage(1);
                 setSearchQuery('');
@@ -1145,15 +1145,15 @@ const DatabaseDashboard = () => {
                 fetchDatasetItems();
               }}
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-300" />
               Refresh Data
             </Button>
             <Button 
-              className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90"
+              className="bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 hover:scale-105 hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] transition-all duration-300 group"
               onClick={handleDownloadAll}
               disabled={isDownloading}
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
               {isDownloading ? 'Downloading...' : 'Download All Data'}
             </Button>
           </div>

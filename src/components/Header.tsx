@@ -23,13 +23,12 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             {/* Logo */}
-            <button
-              onClick={() => onNavigate('home')}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <h1 className="text-xl font-semibold gradient-logo">EvOlf</h1>
-            </button>
-
+<button
+  onClick={() => onNavigate('home')}
+  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+>
+  <h1 className="text-xl font-semibold gradient-evolf">EvOlf</h1>
+</button>
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               <Button
