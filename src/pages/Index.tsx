@@ -32,7 +32,7 @@ const Index = () => {
             </Badge>
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 md:mb-6 px-4">
-              Welcome to <span className="gradient-logo">{system.app.name}</span>
+              Welcome to <span className="gradient-evolf font-bold">{system.app.name}</span>
             </h1>
             
             <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
@@ -42,7 +42,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-10 md:mb-16 px-4">
               <Button
                 size="lg"
-                className="bg-muted text-foreground hover:bg-[hsl(var(--brand-teal))] hover:text-white shadow-lg transition-all duration-300"
+                className="bg-brand-teal text-white hover:bg-brand-teal/90 shadow-lg transition-all duration-300"
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 <Database className="mr-2 h-5 w-5" />
@@ -52,8 +52,7 @@ const Index = () => {
 
               <Button
                 size="lg"
-                variant="outline"
-                className="border border-border/40 bg-muted text-foreground hover:border-[hsl(var(--brand-purple))] hover:bg-[hsl(var(--brand-purple)/0.1)] hover:text-[hsl(var(--brand-purple))] transition-all duration-300"
+                className="bg-brand-purple text-white hover:bg-brand-purple/90 shadow-lg transition-all duration-300"
                 onClick={() => handleNavigate('model')}
               >
                 <Brain className="mr-2 h-5 w-5" />
@@ -90,13 +89,13 @@ const Index = () => {
 
           <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto mt-12 px-4 md:px-0">
             {/* Dataset Explorer */}
-            <Card className="group flex flex-col flex-1 p-6 md:p-8 rounded-3xl border border-border bg-gradient-to-br from-[hsl(var(--background))] to-[hsl(var(--background)/0.85)] hover:from-[hsl(var(--brand-teal)/0.08)] hover:to-[hsl(var(--brand-teal)/0.12)] hover:border-[hsl(var(--brand-teal))] hover:shadow-[0_0_35px_-5px_hsl(var(--brand-teal)/0.5)] transition-all duration-500 ease-out">
+            <Card className="group flex flex-col flex-1 p-6 md:p-8 rounded-3xl border border-border bg-gradient-to-br from-card to-card/85 hover:from-brand-teal/5 hover:to-brand-teal/10 hover:border-brand-teal hover:shadow-[0_0_35px_-5px_hsl(var(--brand-teal)/0.5)] transition-all duration-500 ease-out">
               {/* Icon */}
-              <div className="w-14 h-14 md:w-16 md:h-16 border-2 border-[hsl(var(--brand-teal))] rounded-2xl flex items-center justify-center mb-5 shadow-sm group-hover:bg-[hsl(var(--brand-teal))] transition-all duration-300">
-                <Database className="h-7 w-7 md:h-8 md:w-8 text-[hsl(var(--brand-teal))] group-hover:text-white transition-colors duration-300" />
+              <div className="w-14 h-14 md:w-16 md:h-16 border-2 border-brand-teal rounded-2xl flex items-center justify-center mb-5 shadow-sm group-hover:bg-brand-teal transition-all duration-300">
+                <Database className="h-7 w-7 md:h-8 md:w-8 text-brand-teal group-hover:text-white transition-colors duration-300" />
               </div>
 
-              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 md:mb-4 tracking-tight group-hover:text-[hsl(var(--brand-teal))] transition-colors duration-300">
+              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 md:mb-4 tracking-tight group-hover:text-brand-teal transition-colors duration-300">
                 Dataset Explorer
               </h3>
 
@@ -112,15 +111,15 @@ const Index = () => {
                   'Data export for machine learning integration',
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-[hsl(var(--brand-teal))] flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="h-5 w-5 text-brand-teal flex-shrink-0 mt-0.5" />
                     <span className="text-xs md:text-sm text-muted-foreground">{item}</span>
                   </li>
                 ))}
               </ul>
 
               <Button
-                className="w-full border border-[hsl(var(--brand-teal))] bg-transparent text-[hsl(var(--brand-teal))] font-medium text-sm md:text-base py-2.5 md:py-3 rounded-xl 
-                shadow-md transition-all duration-300 hover:bg-[hsl(var(--brand-teal))] hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal)/0.6)]"
+                className="w-full border border-brand-teal bg-transparent text-brand-teal font-medium text-sm md:text-base py-2.5 md:py-3 rounded-xl 
+                shadow-md transition-all duration-300 hover:bg-brand-teal hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal)/0.6)]"
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 Explore Database
@@ -129,13 +128,13 @@ const Index = () => {
             </Card>
 
             {/* EvOlf Prediction Model */}
-            <Card className="group flex flex-col flex-1 p-6 md:p-8 rounded-3xl border border-border bg-gradient-to-br from-[hsl(var(--background))] to-[hsl(var(--background)/0.85)] hover:from-[hsl(var(--brand-purple)/0.08)] hover:to-[hsl(var(--brand-purple)/0.12)] hover:border-[hsl(var(--brand-purple))] hover:shadow-[0_0_35px_-5px_hsl(var(--brand-purple)/0.5)] transition-all duration-500 ease-out">
+            <Card className="group flex flex-col flex-1 p-6 md:p-8 rounded-3xl border border-border bg-gradient-to-br from-card to-card/85 hover:from-brand-purple/5 hover:to-brand-purple/10 hover:border-brand-purple hover:shadow-[0_0_35px_-5px_hsl(var(--brand-purple)/0.5)] transition-all duration-500 ease-out">
               {/* Brain Icon (outline style) */}
-              <div className="w-14 h-14 md:w-16 md:h-16 border-2 border-[hsl(var(--brand-purple))] rounded-2xl flex items-center justify-center mb-5 shadow-sm group-hover:bg-[hsl(var(--brand-purple))] transition-all duration-300">
-                <Brain className="h-7 w-7 md:h-8 md:w-8 text-[hsl(var(--brand-purple))] group-hover:text-white transition-colors duration-300" />
+              <div className="w-14 h-14 md:w-16 md:h-16 border-2 border-brand-purple rounded-2xl flex items-center justify-center mb-5 shadow-sm group-hover:bg-brand-purple transition-all duration-300">
+                <Brain className="h-7 w-7 md:h-8 md:w-8 text-brand-purple group-hover:text-white transition-colors duration-300" />
               </div>
 
-              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 md:mb-4 tracking-tight group-hover:text-[hsl(var(--brand-purple))] transition-colors duration-300">
+              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 md:mb-4 tracking-tight group-hover:text-brand-purple transition-colors duration-300">
                 EvOlf Prediction Model
               </h3>
 
@@ -151,19 +150,19 @@ const Index = () => {
                   'Supports custom receptor variants and mutations',
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-[hsl(var(--brand-purple))] flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="h-5 w-5 text-brand-purple flex-shrink-0 mt-0.5" />
                     <span className="text-xs md:text-sm text-muted-foreground">{item}</span>
                   </li>
                 ))}
               </ul>
 
               <Button
-                className="w-full border border-[hsl(var(--brand-purple))] bg-transparent text-[hsl(var(--brand-purple))] font-medium text-sm md:text-base py-2.5 md:py-3 rounded-xl 
-                shadow-md transition-all duration-300 hover:bg-[hsl(var(--brand-purple))] hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-purple)/0.6)] flex items-center justify-center gap-2"
+                className="w-full border border-brand-purple bg-transparent text-brand-purple font-medium text-sm md:text-base py-2.5 md:py-3 rounded-xl 
+                shadow-md transition-all duration-300 hover:bg-brand-purple hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-purple)/0.6)] flex items-center justify-center gap-2"
                 onClick={() => handleNavigate('model')}
               >
                 Try Prediction Model
-                <Brain className="h-4 w-4 md:h-5 md:w-5 text-[hsl(var(--brand-purple))] group-hover:text-white transition-colors duration-300" />
+                <Brain className="h-4 w-4 md:h-5 md:w-5" />
               </Button>
 
             </Card>
@@ -175,8 +174,8 @@ const Index = () => {
       {/* How It Works Section */}
       <section className="py-20 bg-[hsl(var(--background))] text-foreground">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4 bg-gradient-to-r from-[hsl(var(--brand-teal))] via-[hsl(var(--brand-purple))] to-[hsl(var(--brand-purple-alt))] bg-clip-text text-transparent">
-            How EvOlf Works
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4">
+            How <span className="gradient-evolf">EvOlf</span> Works
           </h2>
           <p className="text-muted-foreground text-sm md:text-base max-w-3xl mx-auto mb-12 leading-relaxed">
             EvOlf integrates data curation, model training, and prediction into a unified pipeline for GPCR–ligand interaction analysis.
@@ -186,11 +185,11 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 text-left">
             
             {/* Step 1: Data Curation */}
-            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-[hsl(var(--brand-teal))] hover:shadow-[0_0_30px_-5px_hsl(var(--brand-teal)/0.5)] transition-all duration-500">
-              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[hsl(var(--brand-teal))] to-[hsl(var(--brand-teal)/0.8)] rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
-                <Database className="h-7 w-7 text-primary-foreground" />
+            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-brand-teal hover:shadow-[0_0_30px_-5px_hsl(var(--brand-teal)/0.5)] transition-all duration-500">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-brand-teal to-brand-teal/80 rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Database className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-foreground group-hover:text-[hsl(var(--brand-teal))] transition-colors duration-300">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-brand-teal transition-colors duration-300">
                 Data Curation
               </h3>
               <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
@@ -199,11 +198,11 @@ const Index = () => {
             </div>
 
             {/* Step 2: Model Training */}
-            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-[hsl(var(--primary))] hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.5)] transition-all duration-500">
-              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.8)] rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
-                <Cpu className="h-7 w-7 text-primary-foreground" />
+            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-brand-gold hover:shadow-[0_0_30px_-5px_hsl(var(--brand-gold)/0.5)] transition-all duration-500">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-brand-gold to-brand-gold/80 rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Cpu className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-foreground group-hover:text-[hsl(var(--primary))] transition-colors duration-300">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-brand-gold transition-colors duration-300">
                 Model Training
               </h3>
               <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
@@ -212,11 +211,11 @@ const Index = () => {
             </div>
 
             {/* Step 3: Prediction */}
-            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-[hsl(var(--brand-purple))] hover:shadow-[0_0_30px_-5px_hsl(var(--brand-purple)/0.5)] transition-all duration-500">
-              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[hsl(var(--brand-purple))] to-[hsl(var(--brand-purple)/0.8)] rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
-                <Brain className="h-7 w-7 text-primary-foreground" />
+            <div className="group bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl border border-border p-6 md:p-8 hover:border-brand-purple hover:shadow-[0_0_30px_-5px_hsl(var(--brand-purple)/0.5)] transition-all duration-500">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-brand-purple to-brand-purple/80 rounded-2xl flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Brain className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-foreground group-hover:text-[hsl(var(--brand-purple))] transition-colors duration-300">
+              <h3 className="text-xl md:text-2xl font-semibold mb-3 text-brand-purple transition-colors duration-300">
                 Prediction
               </h3>
               <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
@@ -323,7 +322,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
             <Button
                 size="lg"
-                className="bg-muted text-foreground hover:bg-[hsl(var(--brand-teal))] hover:text-white shadow-lg transition-all duration-300"
+                className="bg-brand-teal text-white hover:bg-brand-teal/90 shadow-lg transition-all duration-300"
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 <Database className="mr-2 h-5 w-5" />
@@ -333,8 +332,7 @@ const Index = () => {
 
               <Button
                 size="lg"
-                variant="outline"
-                className="border border-border/40 bg-muted text-foreground hover:border-[hsl(var(--brand-purple))] hover:bg-[hsl(var(--brand-purple)/0.1)] hover:text-[hsl(var(--brand-purple))] transition-all duration-300"
+                className="bg-brand-purple text-white hover:bg-brand-purple/90 shadow-lg transition-all duration-300"
                 onClick={() => handleNavigate('model')}
               >
                 <Brain className="mr-2 h-5 w-5" />

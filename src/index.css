@@ -44,9 +44,13 @@ All colors MUST be HSL.
     --brand-gold-light: 39 52% 65%; /* Lighter gold variant */
     --brand-gray-dark: 0 0% 20%; /* Dark charcoal */
     --brand-gray-medium: 0 0% 60%; /* Medium gray */
+    --brand-teal: 168 76% 42%; /* #00C9A7 - Green for dataset */
+    --brand-purple: 261 51% 60%; /* #8B5CF6 - Purple for prediction */
+    --brand-purple-alt: 261 55% 70%; /* Lighter purple variant */
 
     /* Gradients */
     --gradient-logo: linear-gradient(90deg, #C79640 0%, #D4A574 100%);
+    --gradient-evolf: linear-gradient(90deg, #00C9A7 0%, #8B5CF6 100%);
     --gradient-button-hover: linear-gradient(90deg, #D4A574 0%, #C79640 100%);
 
     /* Sidebar */
@@ -118,6 +122,13 @@ All colors MUST be HSL.
 @layer utilities {
   .gradient-logo {
     background: var(--gradient-logo);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-evolf {
+    background: var(--gradient-evolf);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
