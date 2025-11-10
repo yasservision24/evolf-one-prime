@@ -19,9 +19,10 @@ export const system = {
     cardForeground: 'hsl(var(--card-foreground))',
     
     // Brand colors
-    brandTeal: 'hsl(var(--brand-teal))',
-    brandPurple: 'hsl(var(--brand-purple))',
-    brandPurpleAlt: 'hsl(var(--brand-purple-alt))',
+    brandGold: 'hsl(var(--brand-gold))',
+    brandGoldLight: 'hsl(var(--brand-gold-light))',
+    brandGrayDark: 'hsl(var(--brand-gray-dark))',
+    brandGrayMedium: 'hsl(var(--brand-gray-medium))',
     
     // Chart colors
     chart1: 'hsl(var(--chart-1))',
@@ -33,8 +34,8 @@ export const system = {
   
   // Gradients
   gradients: {
-    logo: 'linear-gradient(90deg, #00C9A7 0%, #9D4EDD 100%)',
-    buttonHover: 'linear-gradient(90deg, #00C9A7 0%, #8B5CF6 100%)',
+    logo: 'linear-gradient(90deg, #C79640 0%, #D4A574 100%)',
+    buttonHover: 'linear-gradient(90deg, #D4A574 0%, #C79640 100%)',
     heroBackground: 'linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--background)))',
   },
   
