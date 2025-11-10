@@ -42,7 +42,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-10 md:mb-16 px-4">
               <Button
                 size="lg"
-                className="bg-brand-teal text-white hover:bg-brand-teal/90 shadow-lg transition-all duration-300"
+                className="bg-brand-teal text-white hover:bg-brand-teal/90 hover:scale-105 hover:shadow-[0_0_25px_-5px_hsl(var(--brand-teal)/0.6)] shadow-lg transition-all duration-300"
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 <Database className="mr-2 h-5 w-5" />
@@ -52,7 +52,7 @@ const Index = () => {
 
               <Button
                 size="lg"
-                className="bg-brand-purple text-white hover:bg-brand-purple/90 shadow-lg transition-all duration-300"
+                className="bg-brand-purple text-white hover:bg-brand-purple/90 hover:scale-105 hover:shadow-[0_0_25px_-5px_hsl(var(--brand-purple)/0.6)] shadow-lg transition-all duration-300"
                 onClick={() => handleNavigate('model')}
               >
                 <Brain className="mr-2 h-5 w-5" />
@@ -322,7 +322,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
             <Button
                 size="lg"
-                className="bg-brand-teal text-white hover:bg-brand-teal/90 shadow-lg transition-all duration-300"
+                className="bg-brand-teal text-white hover:bg-brand-teal/90 hover:scale-105 hover:shadow-[0_0_25px_-5px_hsl(var(--brand-teal)/0.6)] shadow-lg transition-all duration-300"
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 <Database className="mr-2 h-5 w-5" />
@@ -332,7 +332,7 @@ const Index = () => {
 
               <Button
                 size="lg"
-                className="bg-brand-purple text-white hover:bg-brand-purple/90 shadow-lg transition-all duration-300"
+                className="bg-brand-purple text-white hover:bg-brand-purple/90 hover:scale-105 hover:shadow-[0_0_25px_-5px_hsl(var(--brand-purple)/0.6)] shadow-lg transition-all duration-300"
                 onClick={() => handleNavigate('model')}
               >
                 <Brain className="mr-2 h-5 w-5" />

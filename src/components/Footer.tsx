@@ -8,7 +8,7 @@ export const Footer = () => {
           
           {/* About EvOlf */}
           <div>
-            <h3 className="text-white font-semibold mb-4 transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]">
+            <h3 className="text-foreground font-semibold mb-4 transition-colors duration-300 hover:text-brand-purple">
               About EvOlf
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -18,7 +18,7 @@ export const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="text-white font-semibold mb-4 transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]">
+            <h3 className="text-foreground font-semibold mb-4 transition-colors duration-300 hover:text-brand-teal">
               Resources
             </h3>
             <ul className="space-y-2">
@@ -31,7 +31,7 @@ export const Footer = () => {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-white text-sm transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]"
+                    className="text-muted-foreground text-sm transition-colors duration-300 hover:text-brand-teal hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -42,7 +42,7 @@ export const Footer = () => {
 
           {/* Help */}
           <div>
-            <h3 className="text-white font-semibold mb-4 transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]">
+            <h3 className="text-foreground font-semibold mb-4 transition-colors duration-300 hover:text-brand-gold">
               Help
             </h3>
             <ul className="space-y-2">
@@ -55,7 +55,7 @@ export const Footer = () => {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-white text-sm transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]"
+                    className="text-muted-foreground text-sm transition-colors duration-300 hover:text-brand-gold hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -66,7 +66,7 @@ export const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-4 transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]">
+            <h3 className="text-foreground font-semibold mb-4 transition-colors duration-300 hover:text-brand-purple">
               Legal
             </h3>
             <ul className="space-y-2">
@@ -78,7 +78,7 @@ export const Footer = () => {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-white text-sm transition-colors duration-300 hover:text-[hsl(var(--brand-purple))]"
+                    className="text-muted-foreground text-sm transition-colors duration-300 hover:text-brand-purple hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -92,7 +92,7 @@ export const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border text-center">
           <p className="text-muted-foreground text-sm">
             © 2025{" "}
-            <span className="text-white font-medium hover:text-[hsl(var(--brand-purple))] transition-colors duration-300 cursor-pointer">
+            <span className="gradient-evolf font-semibold cursor-pointer">
               EvOlf
             </span>
             . All rights reserved.
