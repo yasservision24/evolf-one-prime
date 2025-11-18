@@ -16,7 +16,6 @@ interface DatasetDetail {
   class?: string;
   mutation?: string;
   chemblId?: string;
-  chemblLink?: string;
   cid?: string;
   pubchemLink?: string;
   smiles?: string;
@@ -27,6 +26,8 @@ interface DatasetDetail {
   ligandName?: string;
   receptorName?: string;
   sdfData?: string;
+  mutationStatus?: string;
+  wildTypeEvolfId?: string;
 }
 
 export default function DatasetLigand() {
@@ -195,7 +196,7 @@ export default function DatasetLigand() {
             )}
             {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                {data.mutation}
+                {data.mutation}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
               </Badge>
             )}
           </div>
@@ -267,20 +268,7 @@ export default function DatasetLigand() {
                   copyable 
                   fieldKey="ligand-chembl"
                 />
-                {data?.chemblLink && data.chemblLink !== 'N/A' && (
-                  <div className="pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(data.chemblLink, '_blank')}
-                      className="gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View in ChEMBL
-                    </Button>
-                  </div>
-                )}
-                <InfoField 
+                <InfoField
                   label="PubChem CID" 
                   value={data?.cid || 'N/A'} 
                   copyable 
@@ -397,6 +385,28 @@ export default function DatasetLigand() {
 
         </div>
       </div>
+
+      {/* Wild Type Link for Mutants */}
+      {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+        <div className="container mx-auto px-6 pb-8">
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <span>* This is a mutant variant.</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/dataset/ligand?evolfid=${data.wildTypeEvolfId}`)}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Wild Type Ligand
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -23,6 +23,8 @@ interface DatasetDetail {
   source?: string;
   model?: string;
   comment?: string;
+  mutationStatus?: string;
+  wildTypeEvolfId?: string;
 }
 
 export default function DatasetInteraction() {
@@ -162,7 +164,7 @@ export default function DatasetInteraction() {
             )}
             {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                {data.mutation}
+                {data.mutation}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
               </Badge>
             )}
           </div>
@@ -252,6 +254,28 @@ export default function DatasetInteraction() {
           </Card>
         </div>
       </div>
+
+      {/* Wild Type Link for Mutants */}
+      {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+        <div className="container mx-auto px-6 pb-8">
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <span>* This is a mutant variant.</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/dataset/interaction?evolfid=${data.wildTypeEvolfId}`)}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Wild Type Interaction Data
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <Footer />
     </div>

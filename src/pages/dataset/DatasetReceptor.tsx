@@ -22,11 +22,12 @@ interface DatasetDetail {
   receptorSubtype?: string;
   uniprotId?: string;
   uniprotLink?: string;
-  ensemblId?: string;
-  ensemblLink?: string;
+  source?: string;
+  sourceLinks?: string;
   receptorName?: string;
   ligandName?: string;
   pdbData?: string;
+  wildTypeEvolfId?: string;
 }
 
 export default function DatasetReceptor() {
@@ -195,7 +196,7 @@ export default function DatasetReceptor() {
             )}
             {!loading && data?.mutation && data.mutation !== 'None' && (
               <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                {data.mutation}
+                {data.mutation}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
               </Badge>
             )}
           </div>
@@ -278,22 +279,31 @@ export default function DatasetReceptor() {
                   </div>
                 )}
                 <InfoField 
-                  label="Ensembl ID" 
-                  value={data?.ensemblId || 'N/A'} 
+                  label="Source" 
+                  value={data?.source || 'N/A'} 
                   copyable 
-                  fieldKey="receptor-ensembl"
+                  fieldKey="receptor-source"
                 />
-                {data?.ensemblLink && data.ensemblLink !== 'N/A' && (
+                {data?.sourceLinks && data.sourceLinks !== 'N/A' && (
                   <div className="pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(data.ensemblLink, '_blank')}
-                      className="gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View in Ensembl
-                    </Button>
+                    <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {data.sourceLinks.split('|').map((link, index) => {
+                        const trimmedLink = link.trim();
+                        return trimmedLink && (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(trimmedLink, '_blank')}
+                            className="gap-2"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Source {index + 1}
+                          </Button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -323,6 +333,26 @@ export default function DatasetReceptor() {
           </Card>
 
         </div>
+
+        {/* Wild Type Link for Mutants */}
+        {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+          <Card className="bg-card border-border mt-6">
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <span>* This is a mutant variant.</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/dataset/receptor?evolfid=${data.wildTypeEvolfId}`)}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Wild Type Receptor
+              </Button>
+            </div>
+          </Card>
+        )}
       </div>
 
       <Footer />

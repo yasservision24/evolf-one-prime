@@ -26,15 +26,14 @@ interface DatasetDetail {
   interactionType?: string;
   interactionValue?: number;
   interactionUnit?: string;
-  quality?: string;
-  qualityScore?: number;
   geneSymbol?: string;
   uniprotId?: string;
   chemblId?: string;
   pubchemId?: string;
-  ensembleId?: string;
   structure2d?: string; // URL to 2D structure image
   comments?: string;
+  mutationStatus?: string;
+  wildTypeEvolfId?: string;
 }
 
 export default function DatasetOverview() {
@@ -161,7 +160,7 @@ export default function DatasetOverview() {
                     {data?.class || 'N/A'}
                   </Badge>
                   <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                    {data?.mutation || 'N/A'}
+                    {data?.mutation || 'N/A'}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
                   </Badge>
                 </>
               )}
@@ -221,20 +220,6 @@ export default function DatasetOverview() {
               <span className={`text-foreground font-normal ${loading ? 'animate-pulse' : ''}`}>
                 {loading ? 'Loading...' : (data?.interactionType || 'N/A')} = {loading ? '...' : (data?.interactionValue || 'N/A')} {data?.interactionUnit || ''}
               </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full bg-green-500 ring-2 ring-green-500/30 ${loading ? 'animate-pulse' : ''}`}></div>
-                <span className={`text-green-500 text-sm ${loading ? 'animate-pulse' : ''}`}>
-                  Quality: {loading ? 'Loading...' : (data?.quality || 'N/A')}
-                </span>
-              </div>
-              <div className="w-28 h-2 bg-secondary/50 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-green-500 transition-all"
-                  style={{ width: loading ? '0%' : `${data?.qualityScore || 0}%` }}
-                />
-              </div>
             </div>
           </div>
 
@@ -301,7 +286,6 @@ export default function DatasetOverview() {
                 <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
                 <InfoField label="Species" value={data?.species || 'N/A'} />
                 <InfoField label="UniProt ID" value={data?.uniprotId || 'N/A'} />
-                <InfoField label="Ensemble ID" value={data?.ensembleId || 'N/A'} />
               </div>
               <Button 
                 variant="outline" 
@@ -418,6 +402,28 @@ export default function DatasetOverview() {
           </div>
         </Card>
       </div>
+
+      {/* Wild Type Link for Mutants */}
+      {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+        <div className="container mx-auto px-6 pb-8">
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <span>* This is a mutant variant.</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/dataset/detail?evolfid=${data.wildTypeEvolfId}`)}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Wild Type Entry
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <Footer />
     </div>
