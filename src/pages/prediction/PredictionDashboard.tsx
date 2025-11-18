@@ -32,15 +32,11 @@ const PredictionDashboard = () => {
   );
   const [receptorFile, setReceptorFile] = useState<File | null>(null);
   
-  // Ligand state
-  const [ligandInput, setLigandInput] = useState<'manual' | 'csv'>('manual');
-  const [ligandFields, setLigandFields] = useState<LigandField[]>([
-    { id: '1', smiles: 'CCN1C=NC2=C1C(=O)N(C(=O)N2C)C', name: 'Caffeine' }
-  ]);
-  const [ligandFile, setLigandFile] = useState<File | null>(null);
+  // Ligand state (single ligand only)
+  const [ligandSmiles, setLigandSmiles] = useState('CCN1C=NC2=C1C(=O)N(C(=O)N2C)C');
+  const [ligandName, setLigandName] = useState('Caffeine');
   
   const receptorFileRef = useRef<HTMLInputElement>(null);
-  const ligandFileRef = useRef<HTMLInputElement>(null);
 
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
