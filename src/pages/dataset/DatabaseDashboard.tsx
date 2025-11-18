@@ -42,7 +42,7 @@ export interface DatasetItem {
   mutation: string;           // Mutation information (e.g., "L249A", "Wild-type")
   class: string;              // GPCR class (e.g., "Class A", "Class B", "Class C")
   uniprotId?: string;         // Optional: UniProt identifier
-  ensembleId?: string;        // Optional: Ensemble identifier
+  cid?: string;               // Optional: Compound ID
 }
 
 /**
@@ -1050,31 +1050,19 @@ const DatabaseDashboard = () => {
                         )}
                       </div>
 
-                      {/* UniProt/Ensemble */}
+                      {/* UniProt/CID */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[140px]">
                         <p className="text-xs text-muted-foreground font-medium md:block">Database IDs</p>
                         <div className="flex flex-col gap-1">
                           {item.uniprotId && (
-                            <a
-                              href={`https://www.uniprot.org/uniprot/${item.uniprotId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[hsl(var(--brand-teal))] hover:underline text-xs"
-                              onClick={(e) => e.stopPropagation()}
-                            >
+                            <span className="text-xs text-foreground/80">
                               UniProt: {item.uniprotId}
-                            </a>
+                            </span>
                           )}
-                          {item.ensembleId && (
-                            <a
-                              href={`https://www.ensembl.org/id/${item.ensembleId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[hsl(var(--brand-teal))] hover:underline text-xs"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Ensembl: {item.ensembleId}
-                            </a>
+                          {item.cid && (
+                            <span className="text-xs text-foreground/80">
+                              CID: {item.cid}
+                            </span>
                           )}
                         </div>
                       </div>
