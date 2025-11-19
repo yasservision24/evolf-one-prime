@@ -103,6 +103,7 @@ export default function DatasetOverview() {
 
   const isMutant = data?.mutationStatus === 'Mutant';
   const isWildType = data?.mutationStatus === 'Wild type';
+  const hasUniProtLink = !!data?.uniprotLink;
 
   const InfoField = ({
     label, 
@@ -133,6 +134,17 @@ export default function DatasetOverview() {
               </>
             )}
           </div>
+          {!loading && isUniprot && hasUniProtLink && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 hover:bg-accent"
+              onClick={() => window.open(data.uniprotLink, '_blank')}
+              title="Open UniProt"
+            >
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -200,7 +212,7 @@ export default function DatasetOverview() {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2" 
-                disabled={loading || !data?.uniprotLink}
+                disabled={loading || !hasUniProtLink}
                 onClick={() => data?.uniprotLink && window.open(data.uniprotLink, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
