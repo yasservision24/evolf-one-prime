@@ -155,9 +155,7 @@ export default function DatasetOverview() {
                   <Badge variant="outline" className="bg-secondary/50 border-border">
                     {data?.class || 'N/A'}
                   </Badge>
-                  <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                    {data?.mutation || 'N/A'}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
-                  </Badge>
+                 
                 </>
               )}
             </div>
