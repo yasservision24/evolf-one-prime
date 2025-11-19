@@ -27,11 +27,9 @@ interface DatasetDetail {
   uniprotLink?: string;
   chemblId?: string;
   pubchemId?: string;
-  structure2d?: string; // URL to 2D structure image
+  structure2d?: string;
   comments?: string;
   mutationStatus?: string;
-  wildTypeEvolfId?: string;
-  isMutant?: boolean;
 }
 
 export default function DatasetOverview() {
@@ -103,26 +101,8 @@ export default function DatasetOverview() {
     }
   };
 
-  // Function to handle UniProt navigation
-  const handleUniProtNavigation = () => {
-    if (!data) return;
-    
-    if (data.mutationStatus === 'Mutant' && data.wildTypeEvolfId) {
-      // Navigate to wild type entry
-      navigate(`/dataset/overview?evolfid=${data.wildTypeEvolfId}`);
-    } else if (data.uniprotLink) {
-      // Open UniProt in new tab
-      window.open(data.uniprotLink, '_blank');
-    }
-  };
-
-  // Function to get UniProt button text
-  const getUniProtButtonText = () => {
-    if (!data) return 'UniProt';
-    
-    
-    return 'UniProt';
-  };
+  const isMutant = data?.mutationStatus === 'Mutant';
+  const isWildType = data?.mutationStatus === 'Wild type';
 
   const InfoField = ({
     label, 
@@ -142,7 +122,7 @@ export default function DatasetOverview() {
           <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''}`}>
             {!loading && (
               <>
-                {isUniprot && data?.mutationStatus === 'Mutant' ? (
+                {isUniprot && isMutant ? (
                   <span className="flex items-center gap-1">
                     {displayValue}
                     <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
@@ -157,8 +137,6 @@ export default function DatasetOverview() {
       </div>
     );
   };
-
-  // Always show the full page structure
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -191,10 +169,15 @@ export default function DatasetOverview() {
                   <Badge variant="outline" className="bg-secondary/50 border-border">
                     {data?.class || 'N/A'}
                   </Badge>
-                  {data?.mutationStatus === 'Mutant' && (
+                  {isMutant && (
                     <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
                       <Star className="h-3 w-3 fill-yellow-600 mr-1" />
                       Mutant
+                    </Badge>
+                  )}
+                  {isWildType && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                      Wild Type
                     </Badge>
                   )}
                 </>
@@ -217,19 +200,19 @@ export default function DatasetOverview() {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2" 
-                disabled={loading || (!data?.uniprotId && !data?.wildTypeEvolfId)}
-                onClick={handleUniProtNavigation}
+                disabled={loading || !data?.uniprotLink}
+                onClick={() => data?.uniprotLink && window.open(data.uniprotLink, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
-                {getUniProtButtonText()}
-                {data?.mutationStatus === 'Mutant' && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
+                UniProt
+                {isMutant && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="gap-2" 
                 disabled={loading || !data?.pubchemId}
-                onClick={() => data?.pubchemId && window.open(`https://pubmed.ncbi.nlm.nih.gov/?term=${data.pubchemId}`, '_blank')}
+                onClick={() => data?.pubchemId && window.open(`https://pubchem.ncbi.nlm.nih.gov/compound/${data.pubchemId}`, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
                 PubChem
@@ -251,10 +234,10 @@ export default function DatasetOverview() {
                 {loading ? 'Loading...' : (data?.species || 'N/A')}
               </span>
             </div>
-            {!loading && data?.mutationStatus === 'Mutant' && (
+            {!loading && isMutant && (
               <div className="flex items-center gap-1 text-amber-600">
                 <Star className="h-3 w-3 fill-amber-500" />
-                <span>Mutant variant - {data.wildTypeEvolfId ? 'Click star button to view wild-type' : 'Wild type not available'}</span>
+                <span>Mutant variant - UniProt links to wild-type protein</span>
               </div>
             )}
           </div>
@@ -325,12 +308,7 @@ export default function DatasetOverview() {
                   value={data?.uniprotDisplay || data?.uniprotId || 'N/A'} 
                   isUniprot={true}
                 />
-                {data?.mutationStatus === 'Mutant' && data?.wildTypeEvolfId && (
-                  <InfoField 
-                    label="Wild Type EvOlf ID" 
-                    value={data.wildTypeEvolfId} 
-                  />
-                )}
+                <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
               </div>
               <Button 
                 variant="outline" 
@@ -448,7 +426,7 @@ export default function DatasetOverview() {
       </div>
 
       {/* UniProt Link Footnote for Mutants */}
-      {!loading && data?.mutationStatus === 'Mutant' && (
+      {!loading && isMutant && (
         <div className="container mx-auto px-6 pb-8">
           <Card className="bg-card border-yellow-200 bg-yellow-50">
             <div className="p-4">
@@ -457,10 +435,8 @@ export default function DatasetOverview() {
                 <div>
                   <p className="font-medium mb-1">Note about UniProt links:</p>
                   <p>
-                    {data.wildTypeEvolfId 
-                      ? `This is a mutant protein. The UniProt button will navigate you to the wild-type protein entry (EvOlf ID: ${data.wildTypeEvolfId}).`
-                      : 'TThis is a mutant protein. The UniProt button will navigate you to the wild-type protein entry'
-                    }
+                    This is a mutant protein variant. The UniProt link points to the wild-type protein entry 
+                    for reference. The star icon indicates this is a mutant version of the linked protein.
                   </p>
                 </div>
               </div>
