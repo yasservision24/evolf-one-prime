@@ -15,7 +15,6 @@ interface DatasetDetail {
   ligandName?: string;
   class?: string;
   mutation?: string;
-  mutationType?: string;
   mutationImpact?: string;
   species?: string;
   receptorSubtype?: string;
@@ -352,10 +351,10 @@ export default function DatasetOverview() {
                 <h2 className="text-lg font-semibold">Mutation Information</h2>
               </div>
               <div className="space-y-3">
-                <InfoField label="Mutation" value={data?.mutation || 'Wild-type'} />
-                <InfoField label="Mutation Type" value={data?.mutationType || 'N/A'} />
+                <InfoField label="Mutation" value={data?.mutation || 'N/A'} />
+                <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
                 <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
-                <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
+                
               </div>
             </div>
           </Card>
