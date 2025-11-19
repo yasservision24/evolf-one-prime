@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2, FlaskConical, Info } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2, FlaskConical, Info, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -22,16 +22,16 @@ interface DatasetDetail {
   parameter?: string;
   value?: string;
   unit?: string;
- 
-
-  
   uniprotId?: string;
+  uniprotDisplay?: string;
+  uniprotLink?: string;
   chemblId?: string;
   pubchemId?: string;
   structure2d?: string; // URL to 2D structure image
   comments?: string;
   mutationStatus?: string;
   wildTypeEvolfId?: string;
+  isMutant?: boolean;
 }
 
 export default function DatasetOverview() {
@@ -106,9 +106,11 @@ export default function DatasetOverview() {
   const InfoField = ({
     label, 
     value, 
+    isUniprot = false,
   }: { 
     label: string; 
-    value: string | number | null | undefined; 
+    value: string | number | null | undefined;
+    isUniprot?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
@@ -117,7 +119,18 @@ export default function DatasetOverview() {
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
           <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''}`}>
-            {!loading && displayValue}
+            {!loading && (
+              <>
+                {isUniprot && data?.isMutant ? (
+                  <span className="flex items-center gap-1">
+                    {displayValue}
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                  </span>
+                ) : (
+                  displayValue
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -157,7 +170,12 @@ export default function DatasetOverview() {
                   <Badge variant="outline" className="bg-secondary/50 border-border">
                     {data?.class || 'N/A'}
                   </Badge>
-                 
+                  {data?.isMutant && (
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                      <Star className="h-3 w-3 fill-yellow-600 mr-1" />
+                      Mutant
+                    </Badge>
+                  )}
                 </>
               )}
             </div>
@@ -179,10 +197,11 @@ export default function DatasetOverview() {
                 size="sm" 
                 className="gap-2" 
                 disabled={loading || !data?.uniprotId}
-                onClick={() => data?.uniprotId && window.open(`https://www.uniprot.org/uniprotkb/${data.uniprotId}`, '_blank')}
+                onClick={() => data?.uniprotLink && window.open(data.uniprotLink, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
                 UniProt
+                {data?.isMutant && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
               </Button>
               <Button 
                 variant="ghost" 
@@ -211,7 +230,12 @@ export default function DatasetOverview() {
                 {loading ? 'Loading...' : (data?.species || 'N/A')}
               </span>
             </div>
-            
+            {!loading && data?.isMutant && (
+              <div className="flex items-center gap-1 text-amber-600">
+                <Star className="h-3 w-3 fill-amber-500" />
+                <span>Mutant variant - UniProt links to wild-type</span>
+              </div>
+            )}
           </div>
 
           {/* Navigation Tabs */}
@@ -273,10 +297,13 @@ export default function DatasetOverview() {
               </div>
               <div className="space-y-3">
                 <InfoField label="Receptor Name" value={data?.receptorName || 'N/A'} />
-                
                 <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
                 <InfoField label="Species" value={data?.species || 'N/A'} />
-                <InfoField label="UniProt ID" value={data?.uniprotId || 'N/A'} />
+                <InfoField 
+                  label="UniProt ID" 
+                  value={data?.uniprotDisplay || data?.uniprotId || 'N/A'} 
+                  isUniprot={true}
+                />
               </div>
               <Button 
                 variant="outline" 
@@ -299,7 +326,7 @@ export default function DatasetOverview() {
               <div className="space-y-3">
                 <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
                 <InfoField label="ChEMBL ID" value={data?.chemblId || 'N/A'} />
-                <InfoField label="PubChem ID" value={data?.pubchemId|| 'N/A'} />
+                <InfoField label="PubChem ID" value={data?.pubchemId || 'N/A'} />
                 
                 {/* 2D Structure Image */}
                 <div className="py-3 border-b border-border/50">
@@ -347,7 +374,6 @@ export default function DatasetOverview() {
                 <InfoField label="Mutation" value={data?.mutation || 'N/A'} />
                 <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
                 <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
-                
               </div>
             </div>
           </Card>
@@ -358,7 +384,7 @@ export default function DatasetOverview() {
           <div className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <Info className="h-5 w-5 text-cyan-500" />
-              
+              <h2 className="text-lg font-semibold">Interaction Data</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
@@ -394,23 +420,21 @@ export default function DatasetOverview() {
         </Card>
       </div>
 
-      {/* Wild Type Link for Mutants */}
-      {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+      {/* UniProt Link Footnote for Mutants */}
+      {!loading && data?.isMutant && (
         <div className="container mx-auto px-6 pb-8">
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <span>* This is a mutant variant.</span>
+          <Card className="bg-card border-yellow-200 bg-yellow-50">
+            <div className="p-4">
+              <div className="flex items-start gap-2 text-sm text-yellow-800">
+                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium mb-1">Note about UniProt links:</p>
+                  <p>
+                    For mutant proteins, the UniProt link points to the wild-type protein entry. 
+                    The star (*) indicates this is a mutant variant of the linked protein.
+                  </p>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/dataset/detail?evolfid=${data.wildTypeEvolfId}`)}
-                className="gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Wild Type Entry
-              </Button>
             </div>
           </Card>
         </div>

@@ -1061,7 +1061,7 @@ const DatabaseDashboard = () => {
                           )}
                           {item.cid && (
                             <span className="text-xs text-foreground/80">
-                              CID: {item.cid}
+                              Pubchem: {item.cid}
                             </span>
                           )}
                         </div>
