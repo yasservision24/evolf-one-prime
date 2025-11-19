@@ -242,11 +242,7 @@ export default function DatasetStructures() {
                 {data.class}
               </Badge>
             )}
-            {!loading && data?.mutation && data.mutation !== 'None' && (
-              <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                {data.mutation}
-              </Badge>
-            )}
+            
           </div>
 
           {/* Navigation Tabs */}
@@ -376,12 +372,7 @@ export default function DatasetStructures() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Additional Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoField 
-                  label="Complex Structure File" 
-                  value={data?.structure3d || 'N/A'} 
-                  copyable 
-                  fieldKey="structure3d" 
-                />
+                
                 <InfoField label="Method" value={data?.method || 'N/A'} />
               </div>
             </div>

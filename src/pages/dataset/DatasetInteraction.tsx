@@ -162,11 +162,7 @@ export default function DatasetInteraction() {
                 {data.class}
               </Badge>
             )}
-            {!loading && data?.mutation && data.mutation !== 'None' && (
-              <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/40">
-                {data.mutation}{data?.mutationStatus?.toLowerCase() === 'mutant' && ' *'}
-              </Badge>
-            )}
+            
           </div>
 
           {/* Navigation Tabs */}
