@@ -688,7 +688,7 @@ const DatabaseDashboard = () => {
                 <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
                   <SelectValue placeholder="Species" />
                 </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
+                <SelectContent className="bg-background border-border z-[10001]">
                   <SelectItem value=" ">All Species</SelectItem>
                   {filterOptions.species.map((species) => (
                     <SelectItem key={species} value={species}>{species}</SelectItem>
@@ -701,7 +701,7 @@ const DatabaseDashboard = () => {
                 <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
                   <SelectValue placeholder="GPCR Class" />
                 </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
+                <SelectContent className="bg-background border-border z-[10001]">
                   <SelectItem value=" ">All Classes</SelectItem>
                   {filterOptions.classes.map((cls) => (
                     <SelectItem key={cls} value={cls}>{cls}</SelectItem>
@@ -714,7 +714,7 @@ const DatabaseDashboard = () => {
                 <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
                   <SelectValue placeholder="Mutation Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-background border-border z-50">
+                <SelectContent className="bg-background border-border z-[10001]">
                   <SelectItem value=" ">All Types</SelectItem>
                   {filterOptions.mutationTypes.map((mutation) => (
                     <SelectItem key={mutation} value={mutation}>{mutation}</SelectItem>
