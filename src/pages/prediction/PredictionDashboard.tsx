@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Brain, Sparkles, Info } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -26,9 +26,21 @@ MPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFI
   const [ligandSmiles, setLigandSmiles] = useState<string>('CCN1C=NC2=C1C(=O)N(C(=O)N2C)C');
   const [ligandName, setLigandName] = useState<string>('Caffeine');
 
+  // optional fields (user may edit or leave blank)
+  const [tempRecId, setTempRecId] = useState<string>('');
+  const [rowId, setRowId] = useState<string>(''); // if left blank backend will default to "1"
+
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
     else if (page === 'model') navigate('/prediction');
+  };
+
+  // helper: convert pasted FASTA to raw sequence (remove header lines beginning with ">")
+  const fastaToSequence = (fasta: string) => {
+    if (!fasta) return '';
+    const lines = fasta.split(/\r?\n/);
+    const seqLines = lines.filter((l) => l && !l.startsWith('>'));
+    return seqLines.join('').trim();
   };
 
   const handlePredict = async () => {
@@ -44,21 +56,19 @@ MPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFI
     setPredicting(true);
 
     try {
-      // Keep using the existing submitPrediction signature (receptor + ligands)
+      // Convert FASTA -> raw sequence (backend expects plain sequence string)
+      const seq = fastaToSequence(receptorSequence);
+
+      // Build single-row payload (no arrays)
       const requestData = {
-        receptor: {
-          sequence: receptorSequence?.trim() || '',
-          name: 'Uploaded Receptor',
-        },
-        ligands: [
-          {
-            smiles: ligandSmiles.trim(),
-            name: ligandName?.trim() || undefined,
-          },
-        ],
+        smiles: ligandSmiles.trim(),
+        mutated_sequence: seq || '',
+        temp_ligand_id: ligandName?.trim() || '', // backend will default to lig_1 if empty
+        temp_rec_id: tempRecId?.trim() || '',
+        id: rowId?.trim() || '', // backend will default to "1" if empty
       };
 
-      const result = await submitPrediction(requestData as any);
+      const result = await submitPrediction(requestData);
 
       // backend returns job_id (or jobId)
       const jobId = result?.job_id ?? result?.jobId;
@@ -139,6 +149,18 @@ MPIMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFI
                         className="text-xs md:text-sm"
                         value={ligandName}
                         onChange={(e) => setLigandName(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Receptor ID (optional)"
+                        className="text-xs md:text-sm"
+                        value={tempRecId}
+                        onChange={(e) => setTempRecId(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Row ID (optional, default = 1)"
+                        className="text-xs md:text-sm"
+                        value={rowId}
+                        onChange={(e) => setRowId(e.target.value)}
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">Enter a single ligand SMILES. One ligand per request.</p>

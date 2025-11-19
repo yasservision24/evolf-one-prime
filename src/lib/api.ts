@@ -466,19 +466,23 @@ export async function downloadCompleteDataset() {
  * @param data - Prediction request data with receptor and ligands
  * @returns Prediction response with job ID
  */
-export async function submitPrediction(data: {
-  receptor: {
-    sequence: string;
-    name?: string;
-  };
-  ligands: Array<{
-    smiles: string;
-    name?: string;
-  }>;
-}) {
+// lib/api.ts
+
+export type PredictionRequestBody = {
+  smiles: string;
+  mutated_sequence?: string;
+  temp_ligand_id?: string;
+  temp_rec_id?: string;
+  id?: string;
+};
+
+export async function submitPrediction(data: PredictionRequestBody) {
   const response = await fetch(`${API_CONFIG.BASE_URL}/predict/smiles/`, {
     method: 'POST',
-    headers: API_CONFIG.HEADERS,
+    headers: {
+      ...API_CONFIG.HEADERS,
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
 
@@ -493,6 +497,7 @@ export async function submitPrediction(data: {
 
   return await response.json();
 }
+
 
 /**
  * Get prediction job status and results
