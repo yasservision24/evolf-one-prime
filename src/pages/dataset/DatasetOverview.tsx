@@ -22,9 +22,7 @@ interface DatasetDetail {
   parameter?: string;
   value?: string;
   unit?: string;
-  interactionType?: string;
-  interactionValue?: number;
-  interactionUnit?: string;
+  
   uniprotId?: string;
   chemblId?: string;
   pubchemId?: string;
@@ -213,12 +211,7 @@ export default function DatasetOverview() {
                 {loading ? 'Loading...' : (data?.species || 'N/A')}
               </span>
             </div>
-            <div>
-              <span className="text-muted-foreground">Interaction: </span>
-              <span className={`text-foreground font-normal ${loading ? 'animate-pulse' : ''}`}>
-                {loading ? 'Loading...' : (data?.interactionType || 'N/A')} = {loading ? '...' : (data?.interactionValue || 'N/A')} {data?.interactionUnit || ''}
-              </span>
-            </div>
+            
           </div>
 
           {/* Navigation Tabs */}
@@ -365,7 +358,7 @@ export default function DatasetOverview() {
           <div className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <Info className="h-5 w-5 text-cyan-500" />
-              <h2 className="text-lg font-semibold">Interaction Data</h2>
+              
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
