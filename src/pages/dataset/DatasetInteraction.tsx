@@ -115,6 +115,60 @@ export default function DatasetInteraction() {
     );
   };
 
+  // Function to parse and display source links as clickable hyperlinks
+  const renderSourceLinks = () => {
+    if (!data?.sourceLinks || data.sourceLinks === 'N/A') return null;
+
+    const links = data.sourceLinks.split('|').map(link => link.trim()).filter(link => link);
+    
+    return (
+      <div className="pt-2">
+        <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
+        <div className="flex flex-wrap gap-2">
+          {links.map((link, index) => (
+            <a
+              key={index}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Source {index + 1}
+            </a>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Function to parse and display source IDs as clickable PubMed links
+  const renderSourceIds = () => {
+    if (!data?.source || data.source === 'N/A') return null;
+
+    const sourceIds = data.source.split('|').map(id => id.trim()).filter(id => id);
+    
+    return (
+      <div className="pt-2">
+        <div className="text-sm text-muted-foreground mb-2">PubMed IDs:</div>
+        <div className="flex flex-wrap gap-2">
+          {sourceIds.map((id, index) => (
+            <a
+              key={index}
+              href={`https://pubmed.ncbi.nlm.nih.gov/${id}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              PubMed: {id}
+            </a>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header currentPage="dataset" onNavigate={(page) => navigate(page === 'home' ? '/' : `/${page}`)} />
@@ -163,7 +217,6 @@ export default function DatasetInteraction() {
                 {data.class}
               </Badge>
             )}
-            
           </div>
 
           {/* Navigation Tabs */}
@@ -216,8 +269,6 @@ export default function DatasetInteraction() {
 
         {/* Interaction Data Content */}
         <div className="grid grid-cols-1 gap-6">
-          
-
           <Card className="bg-card border-border">
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Experimental Details</h2>
@@ -226,30 +277,13 @@ export default function DatasetInteraction() {
                 <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
                 <div className="md:col-span-2">
                   <InfoField label="Source" value={data?.source || 'N/A'} />
-                  {data?.sourceLinks && data.sourceLinks !== 'N/A' && (
-                    <div className="pt-2">
-                      <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
-                      <div className="flex flex-wrap gap-2">
-                        {data.sourceLinks.split('|').map((link, index) => {
-                          const trimmedLink = link.trim();
-                          return trimmedLink && (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(trimmedLink, '_blank')}
-                              className="gap-2"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              Source {index + 1}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  {renderSourceIds()}
+                  {renderSourceLinks()}
                 </div>
                 <InfoField label="Model" value={data?.model || 'N/A'} />
+                <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
+                <InfoField label="Value" value={data?.value || 'N/A'} />
+                <InfoField label="Unit" value={data?.unit || 'N/A'} />
               </div>
             </div>
           </Card>
