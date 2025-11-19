@@ -11,16 +11,19 @@ import { Label } from '@/components/ui/label';
 import { submitPrediction } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
+// --- EXAMPLE DATA ---
+const EXAMPLE_SMILES = "CN1C[C@H](C[C@H]2[C@H]1Cc1cn(c3c1c2ccc3)C)NS(=O)(=O)N(C)C";
+const EXAMPLE_RECEPTOR = "MVNLRNAVHSFLVHLIGLLVWQSDISVSPVAAIVTDIFNTSDGGRFKFPDGVQNWPALSIVIIIIMTIGGNILVIMAVSMEKKLHNATNYFLMSLAIADMLVGLLVMPLSLLAILYDYVWPLPRYLCPVWISLDVLFSTASIMHLCAISLDRYVAIRNPIEHSRFNSRTKAIMKIAIVWAISIGVSVPIPVIGLRDEEKVFVNNTTCVLNDPNFVLIGSFVAFFIPLTIMVITYCLTIYVLRRQALMLLHGHTEEPPGLSLDFLKCCKRNTAEEENSANPNQDQNARRRKKKERRPRGTMQAINNERKASKVLGIVFFVLLIMWCPFFITNILSVLCEKSCNQKLMEKLLNVFVWIGYVCSGINPLVYTLFNKIYRRAFSNYLRCNYKVEKKPPVRQIPRVAATALSGRELNVNIYRHTNEPVIEKASDNEPGIEMQVENLELPVNPSSVVSERISSV";
+// --------------------
+
 const PredictionDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [predicting, setPredicting] = useState(false);
 
-  // Only plain sequence (NOT FASTA)
-  const [receptorSequence, setReceptorSequence] = useState<string>('');
-
-  // Only SMILES
-  const [ligandSmiles, setLigandSmiles] = useState<string>('');
+  // Set initial state to the example data
+  const [receptorSequence, setReceptorSequence] = useState<string>(EXAMPLE_RECEPTOR);
+  const [ligandSmiles, setLigandSmiles] = useState<string>(EXAMPLE_SMILES);
 
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
