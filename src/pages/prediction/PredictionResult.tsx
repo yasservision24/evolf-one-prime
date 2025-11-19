@@ -12,17 +12,20 @@ import { useToast } from '@/hooks/use-toast';
 
 type JobStatus = 'running' | 'completed' | 'expired';
 
+const POLL_INTERVAL_MS = 5000;
+
 const PredictionResult = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const jobId = searchParams.get('job-id');
-  
+  const jobId = searchParams.get('job-id') || searchParams.get('jobId'); // support both
+
   const [status, setStatus] = useState<JobStatus>('running');
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [jobData, setJobData] = useState<any>(null);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [pollHandle, setPollHandle] = useState<number | null>(null);
 
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
@@ -31,21 +34,44 @@ const PredictionResult = () => {
 
   const fetchJobStatus = async () => {
     if (!jobId) return;
-    
     try {
       const data = await getPredictionJobStatus(jobId);
       setJobData(data);
-      setStatus(data.status);
-      setLoading(false);
-      
-      // Poll every 5 seconds if still running
-      if (data.status === 'running') {
-        setTimeout(fetchJobStatus, 5000);
+      // backend "finished" normalized by api -> "completed"
+      const s = (data.status || 'running') as JobStatus | string;
+      if (s === 'completed' || s === 'running' || s === 'expired') {
+        setStatus(s as JobStatus);
+      } else if (s === 'finished') {
+        setStatus('completed');
+      } else {
+        // unknown status -> treat as running
+        setStatus('running');
       }
-    } catch (error: any) {
+      setLoading(false);
+
+      // only poll again if still running
+      if (data.status === 'running') {
+        const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
+        setPollHandle(h);
+      } else {
+        // stop any pending poll
+        if (pollHandle) {
+          clearTimeout(pollHandle);
+          setPollHandle(null);
+        }
+      }
+    } catch (err: any) {
+      // treat 404 / not found as 'expired' (removed)
+      if (err && err.code === 404) {
+        setStatus('expired');
+        setLoading(false);
+        setJobData(null);
+        return;
+      }
+
       toast({
         title: 'Error',
-        description: error.message || 'Failed to fetch job status',
+        description: err?.message || 'Failed to fetch job status',
         variant: 'destructive'
       });
       setLoading(false);
@@ -62,13 +88,21 @@ const PredictionResult = () => {
       navigate('/prediction');
       return;
     }
-    
+
     fetchJobStatus();
+
+    // cleanup on unmount
+    return () => {
+      if (pollHandle) {
+        clearTimeout(pollHandle);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
 
   const handleDownload = async () => {
     if (!jobId) return;
-    
+
     setDownloading(true);
     try {
       const blob = await downloadPredictionResults(jobId);
@@ -80,17 +114,27 @@ const PredictionResult = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast({
         title: 'Download started',
         description: 'Your prediction results are downloading'
       });
     } catch (error: any) {
-      toast({
-        title: 'Download failed',
-        description: error.message || 'Failed to download results',
-        variant: 'destructive'
-      });
+      // if 404 -> output missing (maybe expired)
+      if (error && error.code === 404) {
+        toast({
+          title: 'Download failed',
+          description: 'Results not found or have expired',
+          variant: 'destructive'
+        });
+        setStatus('expired');
+      } else {
+        toast({
+          title: 'Download failed',
+          description: error.message || 'Failed to download results',
+          variant: 'destructive'
+        });
+      }
     } finally {
       setDownloading(false);
     }
@@ -205,7 +249,7 @@ const PredictionResult = () => {
                         Your prediction has completed successfully! Download the results below.
                       </AlertDescription>
                     </Alert>
-                    
+
                     <Button 
                       onClick={handleDownload} 
                       disabled={downloading}
@@ -225,21 +269,17 @@ const PredictionResult = () => {
                       )}
                     </Button>
 
-                    {jobData?.results && (
+                    {jobData?.output_files && (
                       <div className="mt-6 p-4 bg-muted rounded-lg">
-                        <h3 className="font-semibold mb-3">Prediction Summary</h3>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Ligands analyzed:</span>
-                            <span className="font-medium">{jobData.results.ligands?.length || 0}</span>
-                          </div>
-                          {jobData.createdAt && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Submitted:</span>
-                              <span className="font-medium">{new Date(jobData.createdAt).toLocaleString()}</span>
-                            </div>
-                          )}
-                        </div>
+                        <h3 className="font-semibold mb-3">Output files</h3>
+                        <ul className="text-sm space-y-1">
+                          {jobData.output_files.map((f: string) => (
+                            <li key={f} className="flex justify-between">
+                              <span className="truncate max-w-lg">{f}</span>
+                              <span className="text-muted-foreground text-xs">file</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
@@ -250,8 +290,7 @@ const PredictionResult = () => {
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      This prediction job has expired. Results are only available for 15 days after submission.
-                      Please submit a new prediction request.
+                      This prediction job has expired or was not found. Please submit a new prediction request.
                     </AlertDescription>
                   </Alert>
                 )}

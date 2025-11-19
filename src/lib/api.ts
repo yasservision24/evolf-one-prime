@@ -521,39 +521,84 @@ export async function submitPrediction(data: PredictionRequestBody) {
  *   createdAt?: string          // ISO timestamp when job was created
  * }
  * 
- * @param jobId - Job ID from prediction submission
- * @returns Job status and results
+ 
+
+/**
+ * Get prediction job status and metadata.
+ * Maps backend "finished" -> frontend "completed".
  */
 export async function getPredictionJobStatus(jobId: string) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/predict/job/${jobId}`, {
+  if (!jobId) throw new ApiError("Missing jobId", 400);
+
+  const url = `${API_CONFIG.BASE_URL}/job/${encodeURIComponent(jobId)}/`; // note trailing slash
+  const resp = await fetch(url, {
     method: 'GET',
-    headers: API_CONFIG.HEADERS,
+    headers: {
+      ...API_CONFIG.HEADERS, // but don't include Content-Type for GET
+      Accept: 'application/json',
+    },
+    credentials: 'include', // remove if you're not using cookie auth
   });
 
-  if (!response.ok) {
-    throw new ApiError(`Failed to fetch prediction job: ${response.statusText}`, response.status);
+  // treat 404 specially (job removed / expired)
+  if (resp.status === 404) {
+    const body = await safeJson(resp);
+    const err = new ApiError('Job not found', 404);
+    (err as any).body = body;
+    throw err;
   }
 
-  return await response.json();
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => '');
+    throw new ApiError(text || `HTTP ${resp.status}`, resp.status);
+  }
+
+  const data = await resp.json().catch(() => ({}));
+
+  // normalize backend status -> frontend
+  const normalized = { ...data };
+  if (data.status === 'finished') normalized.status = 'completed';
+
+  return normalized;
 }
 
 /**
- * Download prediction results as ZIP
- * Endpoint: GET /predict/download/:jobId
- * @param jobId - Job ID from prediction submission
- * @returns Blob (ZIP file) for download
+ * Download prediction results as ZIP.
+ * Uses the job endpoint with ?download=output so it matches backend implementation.
  */
 export async function downloadPredictionResults(jobId: string) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/predict/download/${jobId}`, {
+  if (!jobId) throw new ApiError("Missing jobId", 400);
+
+  const url = `${API_CONFIG.BASE_URL}/job/${encodeURIComponent(jobId)}/?download=output`;
+  const resp = await fetch(url, {
     method: 'GET',
-    headers: API_CONFIG.HEADERS,
+    credentials: 'include', // include cookies if required
+    // no Content-Type header
   });
 
-  if (!response.ok) {
-    throw new ApiError(`Failed to download results: ${response.statusText}`, response.status);
+  if (resp.status === 404) {
+    const body = await safeJson(resp);
+    const err = new ApiError('Output not found', 404);
+    (err as any).body = body;
+    throw err;
   }
 
-  return await response.blob();
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => '');
+    throw new ApiError(text || `HTTP ${resp.status}`, resp.status);
+  }
+
+  const blob = await resp.blob();
+  return blob;
+}
+
+/** helper to safely parse json (returns null on parse failure) */
+async function safeJson(resp: Response) {
+  try {
+    return await resp.json();
+  } catch {
+    return null;
+  }
 }
 
 
