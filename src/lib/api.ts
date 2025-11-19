@@ -536,8 +536,7 @@ export async function getPredictionJobStatus(jobId: string) {
     headers: {
       ...API_CONFIG.HEADERS, // but don't include Content-Type for GET
       Accept: 'application/json',
-    },
-    credentials: 'include', // remove if you're not using cookie auth
+    }
   });
 
   // treat 404 specially (job removed / expired)
@@ -571,8 +570,7 @@ export async function downloadPredictionResults(jobId: string) {
 
   const url = `${API_CONFIG.BASE_URL}/predict/job/${encodeURIComponent(jobId)}/?download=output`;
   const resp = await fetch(url, {
-    method: 'GET',
-    credentials: 'include', // include cookies if required
+    method: 'GET'
     // no Content-Type header
   });
 
