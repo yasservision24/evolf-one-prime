@@ -378,7 +378,7 @@ export async function fetchDatasetDetail(evolfId: string) {
     iupacName: apiResponse.iupacName || '',
     pdbData: apiResponse.pdbData || '',
     sdfData: apiResponse.sdfData || '',
-    structure3d: apiResponse.structure3d || '',
+    structure3d: apiResponse.structure3d || '', 
     surce: apiResponse.source || "",
     sourceLinks: apiResponse.sourceLinks || "",
   };
