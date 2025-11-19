@@ -379,7 +379,7 @@ export async function fetchDatasetDetail(evolfId: string) {
     pdbData: apiResponse.pdbData || '',
     sdfData: apiResponse.sdfData || '',
     structure3d: apiResponse.structure3d || '', 
-    surce: apiResponse.source || "",
+    source:apiResponse.source || "",
     sourceLinks: apiResponse.sourceLinks || "",
   };
 }
