@@ -115,49 +115,47 @@ export default function DatasetInteraction() {
     );
   };
 
-  // Function to parse and display source links as clickable hyperlinks in a separate section
-  const SourceLinksSection = () => {
-    if (!data?.sourceLinks || data.sourceLinks === 'nan' || data.sourceLinks === 'N/A') return null;
+  // Function to render source links in a scrollable section
+  const renderSourceLinks = () => {
+    if (!data?.sourceLinks || data.sourceLinks === 'nan' || data.sourceLinks === 'N/A' || data.sourceLinks === '') return null;
 
     // Split by pipe and filter out empty strings
-    const links = data.sourceLinks.split('|').map(link => link.trim()).filter(link => link && link !== 'nan');
+    const links = data.sourceLinks.split('|').map(link => link.trim()).filter(link => link && link !== 'nan' && link !== 'N/A');
     
     if (links.length === 0) return null;
 
     return (
-      <Card className="bg-card border-border">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Source Links</h2>
-          <div className="bg-secondary/30 rounded-lg p-4">
-            <div className="max-h-48 overflow-y-auto space-y-2 pr-2">
-              {links.map((link, index) => {
-                // Extract PubMed ID from URL for display
-                const pubmedId = link.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/)?.[1] || `Source ${index + 1}`;
-                
-                return (
-                  <a
-                    key={index}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors group"
-                  >
-                    <ExternalLink className="h-4 w-4 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">
-                        PubMed: {pubmedId}
-                      </div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {link}
-                      </div>
+      <div className="py-3">
+        <div className="text-sm text-muted-foreground mb-2">Source Links</div>
+        <div className="bg-secondary/30 rounded-lg p-3">
+          <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
+            {links.map((link, index) => {
+              // Extract PubMed ID from URL for display
+              const pubmedId = link.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/)?.[1] || `Source ${index + 1}`;
+              
+              return (
+                <a
+                  key={index}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-2.5 border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors group"
+                >
+                  <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm">
+                      PubMed: {pubmedId}
                     </div>
-                  </a>
-                );
-              })}
-            </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {link}
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </div>
-      </Card>
+      </div>
     );
   };
 
@@ -270,12 +268,13 @@ export default function DatasetInteraction() {
                 <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
                 <InfoField label="Value" value={data?.value || 'N/A'} />
                 <InfoField label="Unit" value={data?.unit || 'N/A'} />
+                <InfoField label="Source" value={data?.source || 'N/A'} />
               </div>
+              
+              {/* Source Links - Scrollable Section */}
+              {renderSourceLinks()}
             </div>
           </Card>
-
-          {/* Source Links Section - Separate Card */}
-          <SourceLinksSection />
 
           {/* Comments Card */}
           <Card className="bg-card border-border">
