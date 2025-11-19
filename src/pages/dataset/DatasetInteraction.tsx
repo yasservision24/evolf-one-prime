@@ -115,57 +115,49 @@ export default function DatasetInteraction() {
     );
   };
 
-  // Function to parse and display source links as clickable hyperlinks
-  const renderSourceLinks = () => {
-    if (!data?.sourceLinks || data.sourceLinks === 'N/A') return null;
+  // Function to parse and display source links as clickable hyperlinks in a separate section
+  const SourceLinksSection = () => {
+    if (!data?.sourceLinks || data.sourceLinks === 'nan' || data.sourceLinks === 'N/A') return null;
 
-    const links = data.sourceLinks.split('|').map(link => link.trim()).filter(link => link);
+    // Split by pipe and filter out empty strings
+    const links = data.sourceLinks.split('|').map(link => link.trim()).filter(link => link && link !== 'nan');
     
-    return (
-      <div className="pt-2">
-        <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
-        <div className="flex flex-wrap gap-2">
-          {links.map((link, index) => (
-            <a
-              key={index}
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Source {index + 1}
-            </a>
-          ))}
-        </div>
-      </div>
-    );
-  };
+    if (links.length === 0) return null;
 
-  // Function to parse and display source IDs as clickable PubMed links
-  const renderSourceIds = () => {
-    if (!data?.source || data.source === 'N/A') return null;
-
-    const sourceIds = data.source.split('|').map(id => id.trim()).filter(id => id);
-    
     return (
-      <div className="pt-2">
-        <div className="text-sm text-muted-foreground mb-2">PubMed IDs:</div>
-        <div className="flex flex-wrap gap-2">
-          {sourceIds.map((id, index) => (
-            <a
-              key={index}
-              href={`https://pubmed.ncbi.nlm.nih.gov/${id}/`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-              PubMed: {id}
-            </a>
-          ))}
+      <Card className="bg-card border-border">
+        <div className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Source Links</h2>
+          <div className="bg-secondary/30 rounded-lg p-4">
+            <div className="max-h-48 overflow-y-auto space-y-2 pr-2">
+              {links.map((link, index) => {
+                // Extract PubMed ID from URL for display
+                const pubmedId = link.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/)?.[1] || `Source ${index + 1}`;
+                
+                return (
+                  <a
+                    key={index}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors group"
+                  >
+                    <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">
+                        PubMed: {pubmedId}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {link}
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      </Card>
     );
   };
 
@@ -266,20 +258,14 @@ export default function DatasetInteraction() {
 
       {/* Content */}
       <div className="container mx-auto px-6 py-8">
-
-        {/* Interaction Data Content */}
         <div className="grid grid-cols-1 gap-6">
+          {/* Experimental Details Card */}
           <Card className="bg-card border-border">
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Experimental Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InfoField label="Method" value={data?.method || 'N/A'} />
                 <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
-                <div className="md:col-span-2">
-                  <InfoField label="Source" value={data?.source || 'N/A'} />
-                  {renderSourceIds()}
-                  {renderSourceLinks()}
-                </div>
                 <InfoField label="Model" value={data?.model || 'N/A'} />
                 <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
                 <InfoField label="Value" value={data?.value || 'N/A'} />
@@ -288,6 +274,10 @@ export default function DatasetInteraction() {
             </div>
           </Card>
 
+          {/* Source Links Section - Separate Card */}
+          <SourceLinksSection />
+
+          {/* Comments Card */}
           <Card className="bg-card border-border">
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Comments</h2>
