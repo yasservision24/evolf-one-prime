@@ -25,7 +25,7 @@ interface DatasetDetail {
   model?: string;
   comment?: string;
   mutationStatus?: string;
-  wildTypeEvolfId?: string;
+ 
 }
 
 export default function DatasetInteraction() {
@@ -291,27 +291,7 @@ export default function DatasetInteraction() {
         </div>
       </div>
 
-      {/* Wild Type Link for Mutants */}
-      {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
-        <div className="container mx-auto px-6 pb-8">
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <span>* This is a mutant variant.</span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/dataset/interaction?evolfid=${data.wildTypeEvolfId}`)}
-                className="gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Wild Type Interaction Data
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )}
+      
 
       <Footer />
     </div>
