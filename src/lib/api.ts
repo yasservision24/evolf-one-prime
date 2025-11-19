@@ -476,7 +476,7 @@ export async function submitPrediction(data: {
     name?: string;
   }>;
 }) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/predict`, {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/predict/smiles/`, {
     method: 'POST',
     headers: API_CONFIG.HEADERS,
     body: JSON.stringify(data),
