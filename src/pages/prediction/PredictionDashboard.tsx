@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Brain, Sparkles, Info, TrendingUp, AlertCircle, Upload, Plus, X, FileText } from 'lucide-react';
+import { Brain, Sparkles, Info, FileText, Upload } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -8,17 +8,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { submitPrediction } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-
-interface LigandField {
-  id: string;
-  smiles: string;
-  name: string;
-}
 
 const PredictionDashboard = () => {
   const navigate = useNavigate();
@@ -61,105 +53,6 @@ const PredictionDashboard = () => {
     setReceptorSequence(text);
   };
 
-  const handleLigandFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    if (!file.name.endsWith('.csv')) {
-      toast({
-        title: 'Invalid file type',
-        description: 'Please upload a CSV file',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    setLigandFile(file);
-    const text = await file.text();
-    parseCsvLigands(text);
-  };
-
-  const parseCsvLigands = (csv: string) => {
-    const lines = csv.split('\n').filter(line => line.trim());
-    const headers = lines[0].toLowerCase().split(',');
-    
-    const smilesIdx = headers.findIndex(h => h.includes('smiles'));
-    const nameIdx = headers.findIndex(h => h.includes('name'));
-    
-    if (smilesIdx === -1) {
-      toast({
-        title: 'Invalid CSV format',
-        description: 'CSV must contain a "smiles" column',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    const newLigands: LigandField[] = [];
-    for (let i = 1; i < Math.min(lines.length, 11); i++) {
-      const values = lines[i].split(',');
-      if (values[smilesIdx]?.trim()) {
-        newLigands.push({
-          id: String(i),
-          smiles: values[smilesIdx].trim(),
-          name: nameIdx >= 0 ? values[nameIdx]?.trim() || `Ligand ${i}` : `Ligand ${i}`
-        });
-      }
-    }
-    
-    if (newLigands.length === 0) {
-      toast({
-        title: 'No ligands found',
-        description: 'CSV file does not contain valid SMILES data',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    if (lines.length > 11) {
-      toast({
-        title: 'Maximum ligands exceeded',
-        description: 'Only the first 10 ligands will be used',
-      });
-    }
-    
-    setLigandFields(newLigands.slice(0, 10));
-  };
-
-  const addLigandField = () => {
-    if (ligandFields.length >= 10) {
-      toast({
-        title: 'Maximum ligands reached',
-        description: 'You can add up to 10 ligands per prediction',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    setLigandFields([
-      ...ligandFields,
-      { id: String(Date.now()), smiles: '', name: '' }
-    ]);
-  };
-
-  const removeLigandField = (id: string) => {
-    if (ligandFields.length <= 1) {
-      toast({
-        title: 'Cannot remove',
-        description: 'At least one ligand is required',
-        variant: 'destructive'
-      });
-      return;
-    }
-    setLigandFields(ligandFields.filter(field => field.id !== id));
-  };
-
-  const updateLigandField = (id: string, field: 'smiles' | 'name', value: string) => {
-    setLigandFields(ligandFields.map(ligand => 
-      ligand.id === id ? { ...ligand, [field]: value } : ligand
-    ));
-  };
-
   const handlePredict = async () => {
     if (!receptorSequence.trim()) {
       toast({
@@ -170,11 +63,10 @@ const PredictionDashboard = () => {
       return;
     }
 
-    const validLigands = ligandFields.filter(l => l.smiles.trim());
-    if (validLigands.length === 0) {
+    if (!ligandSmiles.trim()) {
       toast({
-        title: 'Missing ligands',
-        description: 'Please provide at least one ligand',
+        title: 'Missing ligand',
+        description: 'Please provide a ligand SMILES string',
         variant: 'destructive'
       });
       return;
@@ -188,10 +80,10 @@ const PredictionDashboard = () => {
           sequence: receptorSequence,
           name: 'Uploaded Receptor'
         },
-        ligands: validLigands.map(l => ({
-          smiles: l.smiles,
-          name: l.name || undefined
-        }))
+        ligands: [{
+          smiles: ligandSmiles,
+          name: ligandName || undefined
+        }]
       };
 
       const result = await submitPrediction(requestData);
@@ -306,106 +198,23 @@ const PredictionDashboard = () => {
 
                   {/* Ligand Input */}
                   <div>
-                    <Label className="text-sm md:text-base mb-2 block">Ligand Structures (Max 10)</Label>
-                    <Tabs value={ligandInput} onValueChange={(v) => setLigandInput(v as 'manual' | 'csv')}>
-                      <TabsList className="grid w-full grid-cols-2 mb-3">
-                        <TabsTrigger value="manual">Manual Entry</TabsTrigger>
-                        <TabsTrigger value="csv">Upload CSV</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="manual" className="space-y-3">
-                        {ligandFields.map((ligand, index) => (
-                          <div key={ligand.id} className="flex gap-2">
-                            <div className="flex-1 grid grid-cols-2 gap-2">
-                              <Input
-                                placeholder="SMILES notation"
-                                className="font-mono text-xs"
-                                value={ligand.smiles}
-                                onChange={(e) => updateLigandField(ligand.id, 'smiles', e.target.value)}
-                              />
-                              <Input
-                                placeholder="Ligand name (optional)"
-                                className="text-xs"
-                                value={ligand.name}
-                                onChange={(e) => updateLigandField(ligand.id, 'name', e.target.value)}
-                              />
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => removeLigandField(ligand.id)}
-                              disabled={ligandFields.length <= 1}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={addLigandField}
-                          disabled={ligandFields.length >= 10}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Ligand ({ligandFields.length}/10)
-                        </Button>
-                      </TabsContent>
-                      
-                      <TabsContent value="csv">
-                        <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                          <input
-                            ref={ligandFileRef}
-                            type="file"
-                            accept=".csv"
-                            className="hidden"
-                            onChange={handleLigandFileChange}
-                          />
-                          <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                          {ligandFile ? (
-                            <div>
-                              <p className="text-sm font-medium">{ligandFile.name}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {ligandFields.length} ligands loaded
-                              </p>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-2"
-                                onClick={() => ligandFileRef.current?.click()}
-                              >
-                                Change File
-                              </Button>
-                            </div>
-                          ) : (
-                            <>
-                              <p className="text-sm text-muted-foreground mb-2">
-                                Upload CSV file with SMILES (max 10 rows)
-                              </p>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => ligandFileRef.current?.click()}
-                              >
-                                <Upload className="h-4 w-4 mr-2" />
-                                Select CSV
-                              </Button>
-                              <div className="mt-3 pt-3 border-t">
-                                <a
-                                  href="/samples/smiles_sample.csv"
-                                  download
-                                  className="text-xs text-purple-600 dark:text-purple-400 hover:underline"
-                                >
-                                  Download sample CSV
-                                </a>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </TabsContent>
-                    </Tabs>
+                    <Label className="text-sm md:text-base mb-2 block">Ligand Structure</Label>
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="SMILES notation (e.g., CCN1C=NC2=C1C(=O)N(C(=O)N2C)C)"
+                        className="font-mono text-xs md:text-sm"
+                        value={ligandSmiles}
+                        onChange={(e) => setLigandSmiles(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Ligand name (optional)"
+                        className="text-xs md:text-sm"
+                        value={ligandName}
+                        onChange={(e) => setLigandName(e.target.value)}
+                      />
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Enter ligands as SMILES notation
+                      Enter ligand as SMILES notation
                     </p>
                   </div>
                 </div>
@@ -470,7 +279,7 @@ const PredictionDashboard = () => {
                   </li>
                   <li className="flex gap-2">
                     <span className="text-purple-600 dark:text-purple-400 flex-shrink-0">•</span>
-                    <span>Upload CSV with max 10 SMILES</span>
+                    <span>One ligand per prediction</span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-purple-600 dark:text-purple-400 flex-shrink-0">•</span>
@@ -482,16 +291,6 @@ const PredictionDashboard = () => {
               <Card className="p-4 md:p-6 bg-gradient-to-br from-secondary to-background border-border">
                 <h3 className="text-base md:text-lg text-foreground mb-3">Resources</h3>
                 <div className="space-y-2 md:space-y-3">
-                  <a
-                    href="/samples/smiles_sample.csv"
-                    download
-                    className="block"
-                  >
-                    <Button variant="outline" size="sm" className="w-full justify-start text-left text-xs md:text-sm">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Download Sample CSV
-                    </Button>
-                  </a>
                   <Button
                     variant="outline"
                     size="sm"
