@@ -219,16 +219,7 @@ export default function DatasetInteraction() {
 
         {/* Interaction Data Content */}
         <div className="grid grid-cols-1 gap-6">
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Binding Affinity</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
-                <InfoField label="Value" value={data?.value !== undefined ? `${data.value} ${data.unit || ''}` : 'N/A'} />
-                <InfoField label="Unit" value={data?.unit || 'N/A'} />
-              </div>
-            </div>
-          </Card>
+          
 
           <Card className="bg-card border-border">
             <div className="p-6">
