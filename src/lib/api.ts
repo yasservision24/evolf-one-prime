@@ -569,7 +569,7 @@ export async function getPredictionJobStatus(jobId: string) {
 export async function downloadPredictionResults(jobId: string) {
   if (!jobId) throw new ApiError("Missing jobId", 400);
 
-  const url = `${API_CONFIG.BASE_URL}/prediction/job/${encodeURIComponent(jobId)}/?download=output`;
+  const url = `${API_CONFIG.BASE_URL}/predict/job/${encodeURIComponent(jobId)}/?download=output`;
   const resp = await fetch(url, {
     method: 'GET',
     credentials: 'include', // include cookies if required
