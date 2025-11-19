@@ -21,6 +21,7 @@ interface DatasetDetail {
   value?: number;
   unit?: string;
   source?: string;
+  sourceLinks?: string;
   model?: string;
   comment?: string;
   mutationStatus?: string;
@@ -223,7 +224,31 @@ export default function DatasetInteraction() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InfoField label="Method" value={data?.method || 'N/A'} />
                 <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
-                <InfoField label="Source" value={data?.source || 'N/A'} />
+                <div className="md:col-span-2">
+                  <InfoField label="Source" value={data?.source || 'N/A'} />
+                  {data?.sourceLinks && data.sourceLinks !== 'N/A' && (
+                    <div className="pt-2">
+                      <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {data.sourceLinks.split('|').map((link, index) => {
+                          const trimmedLink = link.trim();
+                          return trimmedLink && (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(trimmedLink, '_blank')}
+                              className="gap-2"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Source {index + 1}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <InfoField label="Model" value={data?.model || 'N/A'} />
               </div>
             </div>
