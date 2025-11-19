@@ -355,12 +355,11 @@ export async function fetchDatasetDetail(evolfId: string) {
     uniprotId: apiResponse.uniprotId || '',
     uniprotLink: apiResponse.uniprotLink || '',
     chemblId: apiResponse.chemblId || '',
-    chemblLink: apiResponse.chemblLink || '',
+   
     cid: apiResponse.cid || '',
     pubchemId: apiResponse.pubchemId || '',
     pubchemLink: apiResponse.pubchemLink || '',
-    ensemblId: apiResponse.ensemblId || '',
-    ensemblLink: apiResponse.ensemblLink || '',
+    
     expressionSystem: apiResponse.expressionSystem || '',
     parameter: apiResponse.parameter || '',
     value: apiResponse.value || '',
@@ -369,11 +368,8 @@ export async function fetchDatasetDetail(evolfId: string) {
     image: apiResponse.image || '',
     comments: apiResponse.comments || '',
     geneSymbol: apiResponse.geneSymbol || '',
-    interactionType: apiResponse.interactionType || '',
-    interactionValue: apiResponse.interactionValue || null,
-    interactionUnit: apiResponse.interactionUnit || '',
-    quality: apiResponse.quality || '',
-    qualityScore: apiResponse.qualityScore || null,
+    
+ 
     // New fields for 3D structures and sequences
     sequence: apiResponse.sequence || '',
     smiles: apiResponse.smiles || '',
@@ -383,6 +379,8 @@ export async function fetchDatasetDetail(evolfId: string) {
     pdbData: apiResponse.pdbData || '',
     sdfData: apiResponse.sdfData || '',
     structure3d: apiResponse.structure3d || '',
+    surce: apiResponse.source || "",
+    sourceLinks: apiResponse.sourceLinks || "",
   };
 }
 
