@@ -120,9 +120,7 @@ export default function DatasetOverview() {
   const getUniProtButtonText = () => {
     if (!data) return 'UniProt';
     
-    if (data.mutationStatus === 'Mutant') {
-      return data.wildTypeEvolfId ? 'View Wild Type' : 'Wild Type N/A';
-    }
+    
     return 'UniProt';
   };
 
