@@ -22,6 +22,8 @@ interface DatasetDetail {
   parameter?: string;
   value?: string;
   unit?: string;
+  cId?: string;
+
   
   uniprotId?: string;
   chemblId?: string;
@@ -186,11 +188,11 @@ export default function DatasetOverview() {
                 variant="ghost" 
                 size="sm" 
                 className="gap-2" 
-                disabled={loading || !data?.chemblId}
-                onClick={() => data?.chemblId && window.open(`https://www.ebi.ac.uk/chembl/compound_report_card/${data.chemblId}`, '_blank')}
+                disabled={loading || !data?.cId}
+                onClick={() => data?.cId && window.open(`https://pubmed.ncbi.nlm.nih.gov/?term=${data.cId}`, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
-                ChEMBL
+                PubChem
               </Button>
             </div>
           </div>
@@ -297,7 +299,7 @@ export default function DatasetOverview() {
               <div className="space-y-3">
                 <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
                 <InfoField label="ChEMBL ID" value={data?.chemblId || 'N/A'} />
-                <InfoField label="PubChem ID" value={data?.pubchemId || 'N/A'} />
+                <InfoField label="PubChem ID" value={data?.cId || 'N/A'} />
                 
                 {/* 2D Structure Image */}
                 <div className="py-3 border-b border-border/50">
