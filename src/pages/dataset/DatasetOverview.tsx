@@ -26,7 +26,6 @@ interface DatasetDetail {
   interactionType?: string;
   interactionValue?: number;
   interactionUnit?: string;
-  geneSymbol?: string;
   uniprotId?: string;
   chemblId?: string;
   pubchemId?: string;
@@ -282,7 +281,7 @@ export default function DatasetOverview() {
               </div>
               <div className="space-y-3">
                 <InfoField label="Receptor Name" value={data?.receptorName || 'N/A'} />
-                <InfoField label="Gene Symbol" value={data?.geneSymbol || 'N/A'} />
+                
                 <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
                 <InfoField label="Species" value={data?.species || 'N/A'} />
                 <InfoField label="UniProt ID" value={data?.uniprotId || 'N/A'} />
