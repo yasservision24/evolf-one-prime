@@ -459,7 +459,7 @@ export default function DatasetOverview() {
                   <p>
                     {data.wildTypeEvolfId 
                       ? `This is a mutant protein. The UniProt button will navigate you to the wild-type protein entry (EvOlf ID: ${data.wildTypeEvolfId}).`
-                      : 'This is a mutant protein, but the wild-type entry is not available in the database.'
+                      : 'TThis is a mutant protein. The UniProt button will navigate you to the wild-type protein entry'
                     }
                   </p>
                 </div>
