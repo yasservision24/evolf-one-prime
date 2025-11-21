@@ -16,7 +16,7 @@ Complete API reference for EvoLF dataset endpoints and prediction model with exa
 ---
 
 ## Base Configuration
-
+ 
 **Base URL:** `https://api.evolf.com/v1` (or configured via `VITE_API_BASE_URL`)
 
 **Headers Required:**
