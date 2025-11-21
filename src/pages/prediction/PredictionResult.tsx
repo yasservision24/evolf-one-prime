@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 
 type JobStatus = 'running' | 'completed' | 'expired';
 
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 10000; // 🔥 increased to 10 sec
 
 const PredictionResult = () => {
   const navigate = useNavigate();
@@ -37,6 +37,7 @@ const PredictionResult = () => {
     try {
       const data = await getPredictionJobStatus(jobId);
       setJobData(data);
+
       // backend "finished" normalized by api -> "completed"
       const s = (data.status || 'running') as JobStatus | string;
       if (s === 'completed' || s === 'running' || s === 'expired') {
@@ -44,24 +45,22 @@ const PredictionResult = () => {
       } else if (s === 'finished') {
         setStatus('completed');
       } else {
-        // unknown status -> treat as running
         setStatus('running');
       }
+
       setLoading(false);
 
-      // only poll again if still running
       if (data.status === 'running') {
         const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
         setPollHandle(h);
       } else {
-        // stop any pending poll
         if (pollHandle) {
           clearTimeout(pollHandle);
           setPollHandle(null);
         }
       }
     } catch (err: any) {
-      // treat 404 / not found as 'expired' (removed)
+      // 404 → expired (NO TOAST as requested)
       if (err && err.code === 404) {
         setStatus('expired');
         setLoading(false);
@@ -91,11 +90,8 @@ const PredictionResult = () => {
 
     fetchJobStatus();
 
-    // cleanup on unmount
     return () => {
-      if (pollHandle) {
-        clearTimeout(pollHandle);
-      }
+      if (pollHandle) clearTimeout(pollHandle);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
@@ -120,7 +116,6 @@ const PredictionResult = () => {
         description: 'Your prediction results are downloading'
       });
     } catch (error: any) {
-      // if 404 -> output missing (maybe expired)
       if (error && error.code === 404) {
         toast({
           title: 'Download failed',
@@ -178,6 +173,7 @@ const PredictionResult = () => {
       <Header currentPage="model" onNavigate={handleNavigate} />
       <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-12">
         <div className="container mx-auto px-4 max-w-4xl">
+
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl text-foreground mb-4">Prediction Results</h1>
@@ -188,20 +184,14 @@ const PredictionResult = () => {
 
           {/* Copy URL Button */}
           <div className="mb-6 text-center">
-            <Button
-              variant="outline"
-              onClick={copyUrl}
-              className="gap-2"
-            >
+            <Button variant="outline" onClick={copyUrl} className="gap-2">
               {urlCopied ? (
                 <>
-                  <Check className="h-4 w-4" />
-                  URL Copied!
+                  <Check className="h-4 w-4" /> URL Copied!
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" />
-                  Copy Result URL
+                  <Copy className="h-4 w-4" /> Copy Result URL For Future Use
                 </>
               )}
             </Button>
@@ -215,6 +205,7 @@ const PredictionResult = () => {
               </div>
             ) : (
               <div className="space-y-6">
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {getStatusIcon()}
@@ -230,23 +221,23 @@ const PredictionResult = () => {
                   {getStatusBadge()}
                 </div>
 
-                {/* Running State */}
+                {/* Running */}
                 {status === 'running' && (
                   <Alert>
                     <Clock className="h-4 w-4" />
                     <AlertDescription>
-                      Your prediction is being processed. This page will automatically update when results are ready.
+                      Your prediction is being processed. This page will auto-update when results are ready.
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {/* Completed State */}
+                {/* Completed */}
                 {status === 'completed' && (
                   <div className="space-y-4">
                     <Alert className="bg-green-500/10 border-green-500/20">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-600">
-                        Your prediction has completed successfully! Download the results below.
+                        Your prediction has completed successfully!
                       </AlertDescription>
                     </Alert>
 
@@ -258,13 +249,11 @@ const PredictionResult = () => {
                     >
                       {downloading ? (
                         <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Downloading...
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Downloading...
                         </>
                       ) : (
                         <>
-                          <Download className="h-5 w-5 mr-2" />
-                          Download Results (ZIP)
+                          <Download className="h-5 w-5 mr-2" /> Download Results (ZIP)
                         </>
                       )}
                     </Button>
@@ -285,12 +274,12 @@ const PredictionResult = () => {
                   </div>
                 )}
 
-                {/* Expired State */}
+                {/* Expired */}
                 {status === 'expired' && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      This prediction job has expired or was not found. Please submit a new prediction request.
+                      This prediction job has expired or was not found.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -301,9 +290,7 @@ const PredictionResult = () => {
                     <p className="text-sm text-muted-foreground text-center">
                       <Clock className="h-4 w-4 inline mr-1" />
                       This page will be available until {new Date(jobData.expiresAt).toLocaleDateString()}
-                      <span className="block mt-1 text-xs">
-                        Results are kept for 15 days
-                      </span>
+                      <span className="block mt-1 text-xs">Results are kept for 15 days</span>
                     </p>
                   </div>
                 )}
@@ -312,14 +299,18 @@ const PredictionResult = () => {
           </Card>
 
           {/* Actions */}
-          <div className="text-center">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/prediction')}
-            >
+          <div className="text-center space-y-4">
+
+            {/* 🔥 Manual Refresh Button */}
+            <Button variant="secondary" onClick={fetchJobStatus} className="gap-2">
+              <Clock className="h-4 w-4" /> Refresh Status
+            </Button>
+
+            <Button variant="outline" onClick={() => navigate('/prediction')}>
               Submit New Prediction
             </Button>
           </div>
+
         </div>
       </div>
       <Footer />
