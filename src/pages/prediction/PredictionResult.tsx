@@ -303,7 +303,7 @@ const PredictionResult = () => {
 
             {/* 🔥 Manual Refresh Button */}
             <Button variant="secondary" onClick={fetchJobStatus} className="gap-2">
-              <Clock className="h-4 w-4" /> Refresh Status
+              <Clock className="h-4 w-4" /> Refresh 
             </Button>
 
             <Button variant="outline" onClick={() => navigate('/prediction')}>
