@@ -9,7 +9,7 @@ export const Footer = () => {
           {/* About EvOlf */}
           <div>
             <h3 className="text-foreground font-semibold mb-4 transition-colors duration-300 hover:text-brand-purple">
-              About EvOlf
+              About EvOlf   
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
               A curated database of GPCR receptor-ligand interactions and deep learning platform for predicting binding affinity in drug discovery.
