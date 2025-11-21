@@ -539,7 +539,13 @@ export async function getPredictionJobStatus(jobId: string) {
     }
   });
 
-  
+  // treat 404 specially (job removed / expired)
+  if (resp.status === 404) {
+    const body = await safeJson(resp);
+    const err = new ApiError('Job not found', 404);
+    (err as any).body = body;
+    throw err;
+  }
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => '');
