@@ -16,7 +16,7 @@ interface DatasetDetail {
   class?: string;
   mutation?: string;
   chemblId?: string;
-  cid?: string;
+  pubchemId?: string;
   pubchemLink?: string;
   smiles?: string;
   inchiKey?: string;
@@ -266,7 +266,7 @@ export default function DatasetLigand() {
                 />
                 <InfoField
                   label="PubChem CID" 
-                  value={data?.cid || 'N/A'} 
+                  value={data?.pubchemId || 'N/A'} 
                   copyable 
                   fieldKey="ligand-pubchem"
                 />
