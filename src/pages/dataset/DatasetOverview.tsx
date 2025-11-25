@@ -108,19 +108,21 @@ export default function DatasetOverview() {
     value, 
     isUniprot = false,
     allowWrap = false,
+    fullWidth = false,
   }: { 
     label: string; 
     value: string | number | null | undefined;
     isUniprot?: boolean;
     allowWrap?: boolean;
+    fullWidth?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
     return (
-      <div className="py-3 border-b border-border/50 last:border-0">
+      <div className={`py-3 border-b border-border/50 last:border-0 ${fullWidth ? 'col-span-full' : ''}`}>
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
-          <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''} ${allowWrap ? 'break-words whitespace-normal leading-relaxed' : ''}`}>
+          <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''} ${allowWrap ? 'break-words whitespace-normal leading-relaxed' : ''} ${fullWidth ? 'w-full' : ''}`}>
             {!loading && (
               <>
                 {isUniprot && isMutant ? (
@@ -180,6 +182,38 @@ export default function DatasetOverview() {
             // Display as normal text for shorter mutations
             displayValue
           )}
+        </div>
+      </div>
+    );
+  };
+
+  const MethodField = ({ 
+    label, 
+    value 
+  }: { 
+    label: string; 
+    value: string | null | undefined;
+  }) => {
+    const displayValue = value || 'N/A';
+    
+    return (
+      <div className="py-3 border-b border-border/50 last:border-0 col-span-full">
+        <div className="text-sm text-muted-foreground mb-2">{label}</div>
+        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
+          <div className="space-y-2">
+            {displayValue.split('|').map((methodPart, index) => (
+              <div key={index} className="flex flex-wrap gap-1">
+                {methodPart.split(':').map((item, subIndex) => (
+                  <span 
+                    key={subIndex} 
+                    className="inline-block bg-blue-50 px-2 py-1 rounded text-sm border border-blue-200 text-blue-700"
+                  >
+                    {item.trim()}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -441,10 +475,13 @@ export default function DatasetOverview() {
               <Info className="h-5 w-5 text-cyan-500" />
               <h2 className="text-lg font-semibold">Interaction Data</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <InfoField label="Method" value={data?.method || 'N/A'} />
-              <InfoField label="Value" value={data?.value || 'N/A'} />
-             
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <MethodField label="Method" value={data?.method} />
+              <InfoField 
+                label="Value" 
+                value={data?.value || 'N/A'} 
+                allowWrap={true}
+              />
             </div>
             <Button 
               variant="outline" 
