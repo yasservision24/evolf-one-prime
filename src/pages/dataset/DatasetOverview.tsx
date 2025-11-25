@@ -196,24 +196,53 @@ export default function DatasetOverview() {
   }) => {
     const displayValue = value || 'N/A';
     
+    const parseMethodData = (methodString: string) => {
+      const keyValuePairs: { key: string; value: string }[] = [];
+      
+      // Split by | to get different sections
+      const sections = methodString.split('|');
+      
+      sections.forEach(section => {
+        // Try to split by : for key-value pairs
+        if (section.includes(':')) {
+          const [key, ...valueParts] = section.split(':');
+          const value = valueParts.join(':').trim();
+          if (key.trim()) {
+            keyValuePairs.push({ key: key.trim(), value });
+          }
+        } else {
+          // If no colon, treat as a standalone value
+          if (section.trim()) {
+            keyValuePairs.push({ key: 'method', value: section.trim() });
+          }
+        }
+      });
+      
+      return keyValuePairs;
+    };
+
+    const methodData = parseMethodData(displayValue);
+
     return (
       <div className="py-3 border-b border-border/50 last:border-0 col-span-full">
-        <div className="text-sm text-muted-foreground mb-2">{label}</div>
-        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
-          <div className="space-y-2">
-            {displayValue.split('|').map((methodPart, index) => (
-              <div key={index} className="flex flex-wrap gap-1">
-                {methodPart.split(':').map((item, subIndex) => (
-                  <span 
-                    key={subIndex} 
-                    className="inline-block bg-blue-50 px-2 py-1 rounded text-sm border border-blue-200 text-blue-700"
-                  >
-                    {item.trim()}
+        <div className="text-sm text-muted-foreground mb-3">{label}</div>
+        <div className="text-foreground font-medium">
+          {methodData.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {methodData.map((item, index) => (
+                <div key={index} className="flex items-start gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <span className="text-blue-700 font-semibold text-sm min-w-[80px] flex-shrink-0">
+                    {item.key}:
                   </span>
-                ))}
-              </div>
-            ))}
-          </div>
+                  <span className="text-blue-900 break-words whitespace-normal flex-1">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground italic">N/A</div>
+          )}
         </div>
       </div>
     );
@@ -475,13 +504,15 @@ export default function DatasetOverview() {
               <Info className="h-5 w-5 text-cyan-500" />
               <h2 className="text-lg font-semibold">Interaction Data</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <MethodField label="Method" value={data?.method} />
-              <InfoField 
-                label="Value" 
-                value={data?.value || 'N/A'} 
-                allowWrap={true}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoField 
+                  label="Value" 
+                  value={data?.value || 'N/A'} 
+                  allowWrap={true}
+                />
+              </div>
             </div>
             <Button 
               variant="outline" 
