@@ -265,7 +265,7 @@ export default function DatasetLigand() {
                   fieldKey="ligand-chembl"
                 />
                 <InfoField
-                  label="PubChem CID" 
+                  label="PubChem ID" 
                   value={data?.pubchemId || 'N/A'} 
                   copyable 
                   fieldKey="ligand-pubchem"
