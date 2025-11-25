@@ -346,7 +346,7 @@ export async function fetchDatasetDetail(evolfId: string) {
     ligand: apiResponse.ligand || '',
     ligandName: apiResponse.ligand || '',
     species: apiResponse.species || '',
-    mutation: apiResponse.mutation || 'Wild-type',
+    mutation: apiResponse.mutation || '',
     mutationType: apiResponse.mutationType || '',
     mutationImpact: apiResponse.mutationImpact || '',
     mutationStatus: apiResponse.mutationStatus || '',
@@ -360,10 +360,10 @@ export async function fetchDatasetDetail(evolfId: string) {
     pubchemId: apiResponse.pubchemId || '',
     pubchemLink: apiResponse.pubchemLink || '',
     
-    expressionSystem: apiResponse.expressionSystem || '',
-    parameter: apiResponse.parameter || '',
+    
+    
     value: apiResponse.value || '',
-    unit: apiResponse.unit || '',
+    method: apiResponse.method || '',
     structure2d: apiResponse.structure2d || '',
     image: apiResponse.image || '',
     comments: apiResponse.comments || '',
