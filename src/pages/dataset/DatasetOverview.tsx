@@ -108,10 +108,12 @@ export default function DatasetOverview() {
     label, 
     value, 
     isUniprot = false,
+    allowWrap = false,
   }: { 
     label: string; 
     value: string | number | null | undefined;
     isUniprot?: boolean;
+    allowWrap?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
@@ -119,13 +121,13 @@ export default function DatasetOverview() {
       <div className="py-3 border-b border-border/50 last:border-0">
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
-          <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''}`}>
+          <div className={`text-foreground font-medium ${loading ? 'animate-pulse bg-muted h-5 w-32 rounded' : ''} ${allowWrap ? 'break-words whitespace-normal leading-relaxed' : ''}`}>
             {!loading && (
               <>
                 {isUniprot && isMutant ? (
                   <span className="flex items-center gap-1">
                     {displayValue}
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                   </span>
                 ) : (
                   displayValue
@@ -137,12 +139,47 @@ export default function DatasetOverview() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 hover:bg-accent"
+              className="h-6 w-6 p-0 hover:bg-accent flex-shrink-0"
               onClick={() => window.open(data.uniprotLink, '_blank')}
               title="Open UniProt"
             >
               <ExternalLink className="h-3 w-3" />
             </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const MutationField = ({ 
+    label, 
+    value 
+  }: { 
+    label: string; 
+    value: string | null | undefined;
+  }) => {
+    const displayValue = value || 'N/A';
+    const isLongMutation = displayValue.length > 30;
+    
+    return (
+      <div className="py-3 border-b border-border/50 last:border-0">
+        <div className="text-sm text-muted-foreground mb-2">{label}</div>
+        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
+          {isLongMutation ? (
+            // Display as individual mutation badges for long mutation strings
+            <div className="flex flex-wrap gap-1">
+              {displayValue.split('/').map((mutation, index) => (
+                <span 
+                  key={index} 
+                  className="inline-block bg-secondary/50 px-2 py-1 rounded text-sm border border-border"
+                >
+                  {mutation}
+                </span>
+              ))}
+            </div>
+          ) : (
+            // Display as normal text for shorter mutations
+            displayValue
           )}
         </div>
       </div>
@@ -319,7 +356,6 @@ export default function DatasetOverview() {
                   value={data?.uniprotDisplay || data?.uniprotId || 'N/A'} 
                   isUniprot={true}
                 />
-                
               </div>
               <Button 
                 variant="outline" 
@@ -387,9 +423,13 @@ export default function DatasetOverview() {
                 <h2 className="text-lg font-semibold">Mutation Information</h2>
               </div>
               <div className="space-y-3">
-                <InfoField label="Mutation" value={data?.mutation || 'N/A'} />
+                <MutationField label="Mutation" value={data?.mutation} />
                 <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
-                <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
+                <InfoField 
+                  label="Mutation Impact" 
+                  value={data?.mutationImpact || 'N/A'} 
+                  allowWrap={true}
+                />
               </div>
             </div>
           </Card>
@@ -428,7 +468,7 @@ export default function DatasetOverview() {
                 <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
               </div>
             ) : (
-              <p className="text-foreground/80 whitespace-pre-wrap">
+              <p className="text-foreground/80 whitespace-pre-wrap break-words">
                 {data?.comments || 'N/A'}
               </p>
             )}
