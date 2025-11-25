@@ -18,7 +18,6 @@ interface DatasetDetail {
   mutationImpact?: string;
   species?: string;
   receptorSubtype?: string;
-  expressionSystem?: string;
   parameter?: string;
   value?: string;
   unit?: string;
@@ -320,7 +319,7 @@ export default function DatasetOverview() {
                   value={data?.uniprotDisplay || data?.uniprotId || 'N/A'} 
                   isUniprot={true}
                 />
-                <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
+                
               </div>
               <Button 
                 variant="outline" 
