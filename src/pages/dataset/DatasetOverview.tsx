@@ -18,9 +18,8 @@ interface DatasetDetail {
   mutationImpact?: string;
   species?: string;
   receptorSubtype?: string;
-  parameter?: string;
+  method?: string;
   value?: string;
-  unit?: string;
   uniprotId?: string;
   uniprotDisplay?: string;
   uniprotLink?: string;
@@ -443,9 +442,9 @@ export default function DatasetOverview() {
               <h2 className="text-lg font-semibold">Interaction Data</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
+              <InfoField label="Method" value={data?.method || 'N/A'} />
               <InfoField label="Value" value={data?.value || 'N/A'} />
-              <InfoField label="Unit" value={data?.unit || 'N/A'} />
+             
             </div>
             <Button 
               variant="outline" 
