@@ -109,6 +109,25 @@ export default function DatasetReceptor() {
     }
   };
 
+  const formatFastaSequence = (sequence: string, receptorName: string = 'Receptor'): string => {
+    if (!sequence || sequence === 'N/A') return '';
+    
+    // Create FASTA header
+    const header = `>${receptorName}|${data?.evolfId || 'unknown'}|${data?.species || 'unknown'}`;
+    
+    // Format sequence with 60 characters per line (standard FASTA format)
+    const formattedSequence = sequence.match(/.{1,60}/g)?.join('\n') || sequence;
+    
+    return `${header}\n${formattedSequence}`;
+  };
+
+  const copyFastaToClipboard = () => {
+    if (!data?.sequence || data.sequence === 'N/A') return;
+    
+    const fastaContent = formatFastaSequence(data.sequence, data.receptorName || data.receptor);
+    copyToClipboard(fastaContent, 'fasta-sequence');
+  };
+
   const InfoField = ({ 
     label, 
     value, 
@@ -319,12 +338,35 @@ export default function DatasetReceptor() {
 
           <Card className="bg-card border-border lg:col-span-2">
             <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Receptor Sequence (FASTA)</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">Receptor Sequence</h2>
+                {data?.sequence && data.sequence !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyFastaToClipboard}
+                    className="gap-2"
+                    disabled={!data?.sequence || data.sequence === 'N/A'}
+                  >
+                    {copiedField === 'fasta-sequence' ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    Copy FASTA
+                  </Button>
+                )}
+              </div>
               <div className="bg-secondary/30 p-4 rounded-lg max-h-[400px] overflow-y-auto">
                 <p className={`text-sm font-mono break-all ${loading ? 'animate-pulse bg-muted h-20 rounded' : 'text-foreground'}`}>
                   {!loading && (data?.sequence || 'N/A')}
                 </p>
               </div>
+              {data?.sequence && data.sequence !== 'N/A' && (
+                <div className="mt-3 text-xs text-muted-foreground">
+                  * Click "Copy FASTA" to copy the sequence in FASTA format with header information
+                </div>
+              )}
             </div>
           </Card>
 

@@ -16,16 +16,11 @@ interface DatasetDetail {
   class?: string;
   mutation?: string;
   method?: string;
-  expressionSystem?: string;
-  parameter?: string;
   value?: number;
-  unit?: string;
   source?: string;
   sourceLinks?: string;
-  model?: string;
   comment?: string;
   mutationStatus?: string;
- 
 }
 
 export default function DatasetInteraction() {
@@ -99,9 +94,11 @@ export default function DatasetInteraction() {
   const InfoField = ({ 
     label, 
     value, 
+    allowWrap = false,
   }: { 
     label: string; 
     value: string | number; 
+    allowWrap?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
@@ -109,7 +106,70 @@ export default function DatasetInteraction() {
       <div className="py-3">
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
-          <div className="text-foreground font-medium">{displayValue}</div>
+          <div className={`text-foreground font-medium ${allowWrap ? 'break-words whitespace-normal leading-relaxed' : ''}`}>
+            {displayValue}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const MethodField = ({ 
+    label, 
+    value 
+  }: { 
+    label: string; 
+    value: string | null | undefined;
+  }) => {
+    const displayValue = value || 'N/A';
+    
+    const parseMethodData = (methodString: string) => {
+      const keyValuePairs: { key: string; value: string }[] = [];
+      
+      // Split by | to get different sections
+      const sections = methodString.split('|');
+      
+      sections.forEach(section => {
+        // Try to split by : for key-value pairs
+        if (section.includes(':')) {
+          const [key, ...valueParts] = section.split(':');
+          const value = valueParts.join(':').trim();
+          if (key.trim()) {
+            keyValuePairs.push({ key: key.trim(), value });
+          }
+        } else {
+          // If no colon, treat as a standalone value
+          if (section.trim()) {
+            keyValuePairs.push({ key: 'method', value: section.trim() });
+          }
+        }
+      });
+      
+      return keyValuePairs;
+    };
+
+    const methodData = parseMethodData(displayValue);
+
+    return (
+      <div className="py-3 col-span-full">
+        <div className="text-sm text-muted-foreground mb-3">{label}</div>
+        <div className="text-foreground font-medium">
+          {methodData.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {methodData.map((item, index) => (
+                <div key={index} className="flex items-start gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <span className="text-blue-700 font-semibold text-sm min-w-[80px] flex-shrink-0">
+                    {item.key}:
+                  </span>
+                  <span className="text-blue-900 break-words whitespace-normal flex-1">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground italic">N/A</div>
+          )}
         </div>
       </div>
     );
@@ -125,7 +185,7 @@ export default function DatasetInteraction() {
     if (links.length === 0) return null;
 
     return (
-      <div className="py-3">
+      <div className="py-3 col-span-full">
         <div className="text-sm text-muted-foreground mb-2">Source Links</div>
         <div className="bg-secondary/30 rounded-lg p-3">
           <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
@@ -262,13 +322,17 @@ export default function DatasetInteraction() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Experimental Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoField label="Method" value={data?.method || 'N/A'} />
-                <InfoField label="Expression System" value={data?.expressionSystem || 'N/A'} />
-                <InfoField label="Model" value={data?.model || 'N/A'} />
-                <InfoField label="Parameter" value={data?.parameter || 'N/A'} />
-                <InfoField label="Value" value={data?.value || 'N/A'} />
-                <InfoField label="Unit" value={data?.unit || 'N/A'} />
-                <InfoField label="Source" value={data?.source || 'N/A'} />
+                <MethodField label="Method" value={data?.method} />
+                <InfoField 
+                  label="Value" 
+                  value={data?.value || 'N/A'} 
+                  allowWrap={true}
+                />
+                <InfoField 
+                  label="Source" 
+                  value={data?.source || 'N/A'} 
+                  allowWrap={true}
+                />
               </div>
               
               {/* Source Links - Scrollable Section */}
@@ -281,16 +345,21 @@ export default function DatasetInteraction() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Comments</h2>
               <div className="bg-secondary/30 p-4 rounded-lg">
-                <p className={`text-sm ${loading ? 'animate-pulse bg-muted h-16 rounded' : 'text-foreground'}`}>
-                  {!loading && (data?.comment || 'N/A')}
-                </p>
+                {loading ? (
+                  <div className="space-y-2">
+                    <div className="animate-pulse bg-muted h-4 w-full rounded" />
+                    <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
+                  </div>
+                ) : (
+                  <p className="text-foreground/80 whitespace-pre-wrap break-words">
+                    {data?.comment || 'N/A'}
+                  </p>
+                )}
               </div>
             </div>
           </Card>
         </div>
       </div>
-
-      
 
       <Footer />
     </div>
