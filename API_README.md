@@ -25,7 +25,7 @@ Complete REST API reference for the EvOlf platform with detailed examples in mul
 
 ## Base Configuration
 
-**Base URL**: `http://127.0.0.1:3000/api` (configurable via `VITE_API_BASE_URL`)
+**Base URL**: `https://evolf.ahujalab.iiitd.edu.in/api` (configurable via `VITE_API_BASE_URL`)
 
 **Required Headers**:
 ```json
@@ -67,16 +67,16 @@ GET /dataset
 **cURL**:
 ```bash
 # Basic request
-curl "http://127.0.0.1:3000/api/dataset?page=1&limit=20"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=20"
 
 # With search and filters
-curl "http://127.0.0.1:3000/api/dataset?page=1&limit=20&search=dopamine&species=Human&class=1&sortBy=Receptor&sortOrder=asc"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=20&search=dopamine&species=Human&class=1&sortBy=Receptor&sortOrder=asc"
 ```
 
 **JavaScript/TypeScript**:
 ```javascript
 // Using fetch
-const response = await fetch('http://127.0.0.1:3000/api/dataset?page=1&limit=20&search=dopamine&species=Human', {
+const response = await fetch('https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=20&search=dopamine&species=Human', {
   method: 'GET',
   headers: {
     'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ import requests
 
 # Basic request
 response = requests.get(
-    'http://127.0.0.1:3000/api/dataset',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset',
     params={
         'page': 1,
         'limit': 20,
@@ -129,7 +129,7 @@ library(httr)
 library(jsonlite)
 
 response <- GET(
-  "http://127.0.0.1:3000/api/dataset",
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset",
   query = list(
     page = 1,
     limit = 20,
@@ -219,13 +219,13 @@ GET /dataset/details/{evolfId}
 
 **cURL**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/details/EvOlf0100001"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001"
 ```
 
 **JavaScript/TypeScript**:
 ```javascript
 // Using fetch
-const response = await fetch('http://127.0.0.1:3000/api/dataset/details/EvOlf0100001', {
+const response = await fetch('https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001', {
   method: 'GET',
   headers: { 'Content-Type': 'application/json' }
 });
@@ -243,7 +243,7 @@ console.log('Sequence:', details.sequence);
 import requests
 
 response = requests.get(
-    'http://127.0.0.1:3000/api/dataset/details/EvOlf0100001',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001',
     headers={'Content-Type': 'application/json'}
 )
 details = response.json()
@@ -259,7 +259,7 @@ library(httr)
 library(jsonlite)
 
 response <- GET(
-  "http://127.0.0.1:3000/api/dataset/details/EvOlf0100001",
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001",
   add_headers("Content-Type" = "application/json")
 )
 details <- fromJSON(content(response, "text"))
@@ -285,11 +285,11 @@ cat("Ligand:", details$ligand, "\n")
   "mutationImpact": "",
   "receptorSubtype": "Dopamine D2",
   "uniprotId": "P14416",
-  "uniprotLink": "https://www.uniprot.org/uniprotkb/P14416",
+  "uniprotLink": "httpss://www.uniprot.org/uniprotkb/P14416",
   "chemblId": "CHEMBL228",
   "cid": "681",
   "pubchemId": "681",
-  "pubchemLink": "https://pubchem.ncbi.nlm.nih.gov/compound/681",
+  "pubchemLink": "httpss://pubchem.ncbi.nlm.nih.gov/compound/681",
   "smiles": "NCCc1ccc(O)c(O)c1",
   "inchi": "InChI=1S/C8H11NO2/c9-4-3-6-1-2-7(10)8(11)5-6/h1-2,5,10-11H,3-4,9H2",
   "inchiKey": "VYFYYTLLBUKUHU-UHFFFAOYSA-N",
@@ -297,9 +297,9 @@ cat("Ligand:", details$ligand, "\n")
   "sequence": "MDPLNLSWYDDDLERQNWSRPFNGSDGKADRPPYNYYATLLTLLIAVIVFGNVLVCMAVSREKALQTTTNYLIVSLAVADLLVATLVMPWVVYLEVVGEWKFSRIHCDIFVTLDVMMCTASILNLCAISIDRYTAVAMPMLYNT...",
   "pdbData": "ATOM      1  N   MET A   1     -12.345   8.901  23.456...",
   "sdfData": "\n  Mrv0541...",
-  "structure2d": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
-  "image": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
-  "structure3d": "http://127.0.0.1:3000/media/pdb_files/EvOlf0100001.pdb",
+  "structure2d": "httpss://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
+  "image": "httpss://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
+  "structure3d": "https://evolf.ahujalab.iiitd.edu.in/media/pdb_files/EvOlf0100001.pdb",
   "expressionSystem": "HEK293",
   "parameter": "Ki",
   "value": "2.1",
@@ -307,7 +307,7 @@ cat("Ligand:", details$ligand, "\n")
   "comments": "High affinity binding measured at 25°C",
   "geneSymbol": "DRD2",
   "source": "12345678",
-  "sourceLinks": "https://pubmed.ncbi.nlm.nih.gov/12345678/"
+  "sourceLinks": "httpss://pubmed.ncbi.nlm.nih.gov/12345678/"
 }
 ```
 
@@ -373,13 +373,13 @@ POST /dataset/export
 **cURL**:
 ```bash
 # Export by IDs
-curl -X POST "http://127.0.0.1:3000/api/dataset/export" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{"evolfIds": ["EvOlf0100001", "EvOlf0100002"]}' \
   --output dataset_export.zip
 
 # Export by filters
-curl -X POST "http://127.0.0.1:3000/api/dataset/export" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{"species": "Human", "class": "1"}' \
   --output filtered_export.zip
@@ -408,7 +408,7 @@ import requests
 
 # Export by IDs
 response = requests.post(
-    'http://127.0.0.1:3000/api/dataset/export',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
     json={'evolfIds': ['EvOlf0100001', 'EvOlf0100002']},
     headers={'Content-Type': 'application/json'}
 )
@@ -418,7 +418,7 @@ with open('dataset_export.zip', 'wb') as f:
 
 # Export by filters
 response = requests.post(
-    'http://127.0.0.1:3000/api/dataset/export',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
     json={
         'species': 'Human',
         'class': '1',
@@ -437,7 +437,7 @@ library(httr)
 
 # Export by IDs
 response <- POST(
-  "http://127.0.0.1:3000/api/dataset/export",
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export",
   body = list(evolfIds = c("EvOlf0100001", "EvOlf0100002")),
   encode = "json",
   add_headers("Content-Type" = "application/json")
@@ -486,7 +486,7 @@ GET /dataset/export/{evolfId}
 
 **cURL**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/export/EvOlf0100001" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001" \
   --output single_entry.zip
 ```
 
@@ -508,7 +508,7 @@ window.URL.revokeObjectURL(url);
 import requests
 
 response = requests.get(
-    'http://127.0.0.1:3000/api/dataset/export/EvOlf0100001',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001',
     headers={'Content-Type': 'application/json'}
 )
 
@@ -545,7 +545,7 @@ GET /dataset/download
 
 **cURL**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/download" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download" \
   --output evolf_complete_dataset.zip
 ```
 
@@ -567,7 +567,7 @@ window.URL.revokeObjectURL(url);
 import requests
 
 response = requests.get(
-    'http://127.0.0.1:3000/api/dataset/download',
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/download',
     headers={'Content-Type': 'application/json'}
 )
 
@@ -582,7 +582,7 @@ print(f"Downloaded {len(response.content)} bytes")
 library(httr)
 
 response <- GET(
-  "http://127.0.0.1:3000/api/dataset/download",
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download",
   add_headers("Content-Type" = "application/json")
 )
 
@@ -629,7 +629,7 @@ GET /search/?q={query}
 
 **cURL**:
 ```bash
-curl "http://127.0.0.1:3000/api/search/?q=dopamine"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/search/?q=dopamine"
 ```
 
 **JavaScript/TypeScript**:
@@ -645,7 +645,7 @@ console.log(results.results);
 import requests
 
 response = requests.get(
-    'http://127.0.0.1:3000/api/search/',
+    'https://evolf.ahujalab.iiitd.edu.in/api/search/',
     params={'q': 'dopamine'},
     headers={'Content-Type': 'application/json'}
 )
@@ -661,7 +661,7 @@ library(httr)
 library(jsonlite)
 
 response <- GET(
-  "http://127.0.0.1:3000/api/search/",
+  "https://evolf.ahujalab.iiitd.edu.in/api/search/",
   query = list(q = "dopamine"),
   add_headers("Content-Type" = "application/json")
 )
@@ -754,7 +754,7 @@ POST /predict/smiles/
 
 **cURL**:
 ```bash
-curl -X POST "http://127.0.0.1:3000/api/predict/smiles/" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
   -H "Content-Type: application/json" \
   -d '{
     "smiles": "NCCc1c[nH]c2ccc(O)cc12",
@@ -783,7 +783,7 @@ console.log('Job ID:', result.job_id);
 import requests
 
 response = requests.post(
-    'http://127.0.0.1:3000/api/predict/smiles/',
+    'https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/',
     json={
         'smiles': 'NCCc1c[nH]c2ccc(O)cc12',
         'sequence': 'MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN',
@@ -804,7 +804,7 @@ library(httr)
 library(jsonlite)
 
 response <- POST(
-  "http://127.0.0.1:3000/api/predict/smiles/",
+  "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/",
   body = list(
     smiles = "NCCc1c[nH]c2ccc(O)cc12",
     sequence = "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN",
@@ -894,10 +894,10 @@ GET /predict/job/{job_id}/
 **cURL**:
 ```bash
 # Check status
-curl "http://127.0.0.1:3000/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
 
 # Download results
-curl "http://127.0.0.1:3000/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
   --output results.zip
 ```
 
@@ -924,7 +924,7 @@ job_id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 # Poll for status
 while True:
     response = requests.get(
-        f'http://127.0.0.1:3000/api/predict/job/{job_id}/',
+        f'https://evolf.ahujalab.iiitd.edu.in/api/predict/job/{job_id}/',
         headers={'Content-Type': 'application/json'}
     )
     
@@ -949,7 +949,7 @@ library(jsonlite)
 job_id <- "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 
 response <- GET(
-  paste0("http://127.0.0.1:3000/api/predict/job/", job_id, "/"),
+  paste0("https://evolf.ahujalab.iiitd.edu.in/api/predict/job/", job_id, "/"),
   add_headers("Content-Type" = "application/json")
 )
 
@@ -1018,11 +1018,11 @@ GET /predict/download/{job_id}/
 **cURL**:
 ```bash
 # Method 1
-curl "http://127.0.0.1:3000/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
   --output prediction_results.zip
 
 # Method 2
-curl "http://127.0.0.1:3000/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
   --output prediction_results.zip
 ```
 
@@ -1049,7 +1049,7 @@ job_id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 
 # Method 1: Using query parameter
 response = requests.get(
-    f'http://127.0.0.1:3000/api/predict/job/{job_id}/',
+    f'https://evolf.ahujalab.iiitd.edu.in/api/predict/job/{job_id}/',
     params={'download': 'output'}
 )
 
@@ -1058,7 +1058,7 @@ with open('prediction_results.zip', 'wb') as f:
 
 # Method 2: Using dedicated download endpoint
 response = requests.get(
-    f'http://127.0.0.1:3000/api/predict/download/{job_id}/'
+    f'https://evolf.ahujalab.iiitd.edu.in/api/predict/download/{job_id}/'
 )
 
 with open('prediction_results.zip', 'wb') as f:
@@ -1072,7 +1072,7 @@ library(httr)
 job_id <- "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 
 response <- GET(
-  paste0("http://127.0.0.1:3000/api/predict/job/", job_id, "/"),
+  paste0("https://evolf.ahujalab.iiitd.edu.in/api/predict/job/", job_id, "/"),
   query = list(download = "output")
 )
 
@@ -1115,7 +1115,7 @@ All API endpoints follow consistent error response formats.
 }
 ```
 
-### HTTP Status Codes
+### https Status Codes
 
 | Code | Meaning | Common Causes |
 |------|---------|---------------|
@@ -1128,7 +1128,7 @@ All API endpoints follow consistent error response formats.
 
 #### 1. Invalid EvOlf ID
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/details/InvalidID"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/InvalidID"
 ```
 **Response (404)**:
 ```json
@@ -1140,7 +1140,7 @@ curl "http://127.0.0.1:3000/api/dataset/details/InvalidID"
 
 #### 2. Invalid SMILES Format
 ```bash
-curl -X POST "http://127.0.0.1:3000/api/predict/smiles/" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
   -H "Content-Type: application/json" \
   -d '{"smiles": "invalid smiles"}'
 ```
@@ -1153,7 +1153,7 @@ curl -X POST "http://127.0.0.1:3000/api/predict/smiles/" \
 
 #### 3. Job Not Found
 ```bash
-curl "http://127.0.0.1:3000/api/predict/job/nonexistent-job-id/"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/nonexistent-job-id/"
 ```
 **Response (404)**:
 ```json
@@ -1164,7 +1164,7 @@ curl "http://127.0.0.1:3000/api/predict/job/nonexistent-job-id/"
 
 #### 4. No Records Match Filters
 ```bash
-curl -X POST "http://127.0.0.1:3000/api/dataset/export" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{"species": "NonexistentSpecies"}'
 ```
@@ -1198,10 +1198,10 @@ try {
 import requests
 
 try:
-    response = requests.get('http://127.0.0.1:3000/api/dataset/details/EvOlf0100001')
+    response = requests.get('https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001')
     response.raise_for_status()
     data = response.json()
-except requests.exceptions.HTTPError as e:
+except requests.exceptions.httpsError as e:
     if e.response.status_code == 404:
         print("Entry not found")
     elif e.response.status_code == 500:
@@ -1246,7 +1246,7 @@ Default timeout: 30 seconds
 To modify (JavaScript):
 ```javascript
 export const API_CONFIG = {
-  BASE_URL: 'http://127.0.0.1:3000/api',
+  BASE_URL: 'https://evolf.ahujalab.iiitd.edu.in/api',
   TIMEOUT: 60000, // 60 seconds
   HEADERS: { 'Content-Type': 'application/json' }
 };
