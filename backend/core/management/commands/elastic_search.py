@@ -134,3 +134,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f"⚠ Index error: {e}"))
 
         self.stdout.write(self.style.SUCCESS("🎯 All docs indexed successfully!"))
+
+        
+#python manage.py elastic_search
