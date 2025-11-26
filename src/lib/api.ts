@@ -283,7 +283,7 @@ export async function fetchDatasetPaginated(
     species: item.species || '',
     ligand: item.ligand || '',
     chemblId: item.chemblId || '',
-    mutation: item.mutation || 'Wild-type',
+    mutation: item.mutation || '',
     class: item.class_field || item.class || '',  // Handle class_field from API
     uniprotId: item.uniprotId || '',
     ensembleId: item.ensembleId || '',
