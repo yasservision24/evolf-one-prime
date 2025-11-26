@@ -261,7 +261,7 @@ const PredictionResult = () => {
                       <AlertDescription className="text-green-600">
                         Your prediction has completed successfully!
                         <br />
-                        <span className="text-xs mt-1 block">Still auto-refreshing every 10 seconds to check for updates...</span>
+                        
                       </AlertDescription>
                     </Alert>
 
