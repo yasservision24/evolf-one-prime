@@ -117,10 +117,10 @@ export const system = {
     name: 'EvOlf',
     description: 'GPCR receptor-ligand interaction database and prediction platform',
     stats: {
-      interactions: '10K+',
-      receptors: '487',
-      ligands: '3.5K+',
-      accuracy: '95%',
+      interactions: '100K+',
+      receptors: '1000+',
+      ligands: '40K+',
+      accuracy: '95%+',
     },
   },
 };

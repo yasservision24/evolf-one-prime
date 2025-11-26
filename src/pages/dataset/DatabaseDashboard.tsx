@@ -541,32 +541,32 @@ const DatabaseDashboard = () => {
   const stats = [
     { 
       label: 'Total Interactions', 
-      value: "10,234", 
+      value: "110502", 
       change: 'Curated records', 
       icon: Database, 
       color: 'text-[hsl(var(--brand-teal))]',
       bgColor: 'bg-[hsl(var(--brand-teal))]/10'
     },
     { 
-      label: 'GPCR Classes', 
-      value: 487, 
-      change: 'Unique classes', 
+      label: 'Total Receptors', 
+      value: 1160, 
+      change: 'Unique Receptors', 
       icon: Dna, 
       color: 'text-green-400',
       bgColor: 'bg-green-400/10'
     },
     { 
       label: 'Species', 
-      value: "3,542", 
+      value: 24, 
       change: 'Organisms studied', 
       icon: FlaskConical, 
       color: 'text-[hsl(var(--brand-purple))]',
       bgColor: 'bg-[hsl(var(--brand-purple))]/10'
     },
     { 
-      label: 'Mutation Types', 
-      value: "1,876", 
-      change: 'Variants analyzed', 
+      label: 'Ligands', 
+      value: "41093", 
+      change: 'Unique Ligands', 
       icon: CheckCircle, 
       color: 'text-red-400',
       bgColor: 'bg-red-400/10'
