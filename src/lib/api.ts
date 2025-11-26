@@ -286,7 +286,8 @@ export async function fetchDatasetPaginated(
     mutation: item.mutation || 'Wild-type',
     class: item.class_field || item.class || '',  // Handle class_field from API
     uniprotId: item.uniprotId || '',
-    ensembleId: item.ensembleId || ''
+    ensembleId: item.ensembleId || '',
+    cid: item.cid || ''
   });
   
   // Transform API response to match expected structure
@@ -356,8 +357,8 @@ export async function fetchDatasetDetail(evolfId: string) {
     uniprotLink: apiResponse.uniprotLink || '',
     chemblId: apiResponse.chemblId || '',
    
-    
-    cid: apiResponse.pubchemId || '',
+    cid: apiResponse.cid || '',
+    pubchemId: apiResponse.pubchemId || '',
     pubchemLink: apiResponse.pubchemLink || '',
     
     
