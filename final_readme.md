@@ -302,15 +302,15 @@ python manage.py elastic_search --rebuild
 python manage.py runserver 0.0.0.0:3000
 ```
 
-**Backend now running at**: `http://127.0.0.1:3000`
+**Backend now running at**: `http://127.0.0.1:8001`
 
-**Admin panel**: `http://127.0.0.1:3000/admin`
+
 
 #### 11. Verify Installation
 
 ```bash
 # Test API endpoint
-curl http://127.0.0.1:3000/api/dataset?page=1&limit=5
+curl https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=5
 
 # Should return JSON with dataset entries
 ```
@@ -348,7 +348,7 @@ Create `.env` file in frontend root:
 
 ```env
 # API Base URL
-VITE_API_BASE_URL=http://127.0.0.1:3000/api
+VITE_API_BASE_URL=https://evolf.ahujalab.iiitd.edu.in/api
 
 # Optional: Analytics, feature flags, etc.
 ```
@@ -433,7 +433,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      VITE_API_BASE_URL: http://localhost:3000/api
+      VITE_API_BASE_URL: https://evolf.ahujalab.iiitd.edu.in/api
 
 volumes:
   postgres_data:
@@ -454,7 +454,7 @@ Complete REST API reference with all endpoints, parameters, and examples.
 
 ### Base Configuration
 
-**Base URL**: `http://127.0.0.1:3000/api`
+**Base URL**: `https://evolf.ahujalab.iiitd.edu.in/api`
 
 **Request Headers**:
 ```json
@@ -485,7 +485,7 @@ Retrieve filtered and paginated dataset with server-side processing.
 
 **Example Request**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset?page=1&limit=20&search=dopamine&species=Human&sortBy=Receptor&sortOrder=asc"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=20&search=dopamine&species=Human&sortBy=Receptor&sortOrder=asc"
 ```
 
 **Response (200 OK)**:
@@ -537,7 +537,7 @@ Fetch complete details for a specific EvOlf entry.
 
 **Example Request**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/details/EvOlf0100001"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001"
 ```
 
 **Response (200 OK)**:
@@ -561,7 +561,7 @@ curl "http://127.0.0.1:3000/api/dataset/details/EvOlf0100001"
   "sequence": "MDPLNLSWYDDDLERQNWSRPFNGSDGKADRPPYNYYATLLTLLIAVIVFGNVLVCMAVSREKALQTTTNYLIVSLAVADLLVATLVMPWVVYLEVVGEWKFSRIHCDIFVTLDVMMCTASILNLCAISIDRYTAVAMPMLYNT...",
   "pdbData": "ATOM      1  N   MET A   1...",
   "sdfData": "\\n  Mrv0541...",
-  "structure3d": "http://127.0.0.1:3000/media/pdb_files/EvOlf0100001.pdb",
+  "structure3d": "https://evolf.ahujalab.iiitd.edu.in/media/pdb_files/EvOlf0100001.pdb",
   "expressionSystem": "HEK293",
   "parameter": "Ki",
   "value": "2.1",
@@ -603,7 +603,7 @@ Export dataset entries as ZIP file (CSV + metadata).
 
 **Example**:
 ```bash
-curl -X POST "http://127.0.0.1:3000/api/dataset/export" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{"evolfIds": ["EvOlf0100001", "EvOlf0100002"]}' \
   --output export.zip
@@ -619,7 +619,7 @@ Export a single entry's files (PDB, SDF, PNG).
 
 **Example**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/export/EvOlf0100001" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001" \
   --output entry_files.zip
 ```
 
@@ -631,7 +631,7 @@ Download entire database as cached ZIP.
 
 **Example**:
 ```bash
-curl "http://127.0.0.1:3000/api/dataset/download" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download" \
   --output complete_dataset.zip
 ```
 
@@ -648,7 +648,7 @@ Full-text search with ElasticSearch (PostgreSQL fallback).
 
 **Example**:
 ```bash
-curl "http://127.0.0.1:3000/api/search/?q=dopamine"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/search/?q=dopamine"
 ```
 
 **Response (200 OK)**:
@@ -710,7 +710,7 @@ Submit SMILES for binding affinity prediction.
 
 **Example**:
 ```bash
-curl -X POST "http://127.0.0.1:3000/api/predict/smiles/" \
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
   -H "Content-Type: application/json" \
   -d '{
     "smiles": "NCCc1c[nH]c2ccc(O)cc12",
@@ -740,7 +740,7 @@ Check prediction job status.
 
 **Example**:
 ```bash
-curl "http://127.0.0.1:3000/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
 ```
 
 **Response (Processing)**:
@@ -771,7 +771,7 @@ Download job results as ZIP.
 
 **Example**:
 ```bash
-curl "http://127.0.0.1:3000/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
   --output results.zip
 ```
 
