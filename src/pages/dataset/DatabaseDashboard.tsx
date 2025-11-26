@@ -1000,6 +1000,7 @@ const DatabaseDashboard = () => {
                         <p className="text-xs text-muted-foreground font-medium md:block">Ligand</p>
                         <p className="font-heading font-semibold text-sm md:text-base">{item.ligand}</p>
                         
+                      </div>
 
                       {/* Class */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
