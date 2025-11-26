@@ -50,14 +50,10 @@ const PredictionResult = () => {
 
       setLoading(false);
 
-      if (data.status === 'running') {
+      // 🔥 ALWAYS set up next poll regardless of status (except expired)
+      if (status !== 'expired') {
         const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
         setPollHandle(h);
-      } else {
-        if (pollHandle) {
-          clearTimeout(pollHandle);
-          setPollHandle(null);
-        }
       }
     } catch (err: any) {
       // 404 → expired (NO TOAST as requested)
@@ -65,6 +61,11 @@ const PredictionResult = () => {
         setStatus('expired');
         setLoading(false);
         setJobData(null);
+        // 🔥 Stop polling when expired
+        if (pollHandle) {
+          clearTimeout(pollHandle);
+          setPollHandle(null);
+        }
         return;
       }
 
@@ -74,6 +75,12 @@ const PredictionResult = () => {
         variant: 'destructive'
       });
       setLoading(false);
+      
+      // 🔥 Continue polling even on error (unless expired)
+      if (status !== 'expired') {
+        const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
+        setPollHandle(h);
+      }
     }
   };
 
@@ -95,6 +102,19 @@ const PredictionResult = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
+
+  // 🔥 NEW: Hard refresh every 10 seconds regardless of status
+  useEffect(() => {
+    const hardRefreshInterval = setInterval(() => {
+      if (status !== 'expired') {
+        fetchJobStatus();
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      clearInterval(hardRefreshInterval);
+    };
+  }, [status]); // Re-run when status changes
 
   const handleDownload = async () => {
     if (!jobId) return;
@@ -227,6 +247,8 @@ const PredictionResult = () => {
                     <Clock className="h-4 w-4" />
                     <AlertDescription>
                       Your prediction is being processed. This page will auto-update when results are ready.
+                      <br />
+                      <span className="text-xs mt-1 block">Auto-refreshing every 10 seconds...</span>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -238,6 +260,8 @@ const PredictionResult = () => {
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-600">
                         Your prediction has completed successfully!
+                        <br />
+                        <span className="text-xs mt-1 block">Still auto-refreshing every 10 seconds to check for updates...</span>
                       </AlertDescription>
                     </Alert>
 
@@ -290,7 +314,7 @@ const PredictionResult = () => {
                     <p className="text-sm text-muted-foreground text-center">
                       <Clock className="h-4 w-4 inline mr-1" />
                       This page will be available until {new Date(jobData.expiresAt).toLocaleDateString()}
-                      <span className="block mt-1 text-xs">Results are kept for 15 days</span>
+                      <span className="block mt-1 text-xs">Results are kept for 15 days • Auto-refresh every 10 seconds</span>
                     </p>
                   </div>
                 )}
@@ -303,7 +327,7 @@ const PredictionResult = () => {
 
             {/* 🔥 Manual Refresh Button */}
             <Button variant="secondary" onClick={fetchJobStatus} className="gap-2">
-              <Clock className="h-4 w-4" /> Refresh 
+              <Clock className="h-4 w-4" /> Refresh Now
             </Button>
 
             <Button variant="outline" onClick={() => navigate('/prediction')}>
