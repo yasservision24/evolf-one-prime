@@ -118,7 +118,7 @@ export const system = {
     description: 'GPCR receptor-ligand interaction database and prediction platform',
     stats: {
       interactions: '100K+',
-      receptors: '1000+',
+      receptors: '2K+',
       ligands: '40K+',
       accuracy: '95%+',
     },

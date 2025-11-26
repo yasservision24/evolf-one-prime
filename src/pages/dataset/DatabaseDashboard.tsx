@@ -541,7 +541,7 @@ const DatabaseDashboard = () => {
   const stats = [
     { 
       label: 'Total Interactions', 
-      value: "110502", 
+      value: "110,502", 
       change: 'Curated records', 
       icon: Database, 
       color: 'text-[hsl(var(--brand-teal))]',
@@ -549,7 +549,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'Total Receptors', 
-      value: 1160, 
+      value: "2,199", 
       change: 'Unique Receptors', 
       icon: Dna, 
       color: 'text-green-400',
@@ -565,7 +565,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'Ligands', 
-      value: "41093", 
+      value: "41,343", 
       change: 'Unique Ligands', 
       icon: CheckCircle, 
       color: 'text-red-400',
@@ -959,7 +959,7 @@ const DatabaseDashboard = () => {
 
                     {/* Mutation */}
                     <div className="min-w-[100px]">
-                      Mutation
+                      Status
                     </div>
 
                     {/* Database IDs */}
@@ -999,30 +999,7 @@ const DatabaseDashboard = () => {
                       <div className="flex flex-col gap-1">
                         <p className="text-xs text-muted-foreground font-medium md:block">Ligand</p>
                         <p className="font-heading font-semibold text-sm md:text-base">{item.ligand}</p>
-                        {item.chemblId && item.chemblId.startsWith('CHEMBL') ? (
-                          <a
-                            href={`https://www.ebi.ac.uk/chembl/compound_report_card/${item.chemblId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[hsl(var(--brand-teal))] hover:underline text-xs md:text-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {item.chemblId}
-                          </a>
-                        ) : item.chemblId ? (
-                          <a
-                            href={`https://pubmed.ncbi.nlm.nih.gov/${item.chemblId.replace('PMID:', '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[hsl(var(--brand-teal))] hover:underline text-xs md:text-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {item.chemblId}
-                          </a>
-                        ) : (
-                          <span className="text-xs md:text-sm text-muted-foreground">N/A</span>
-                        )}
-                      </div>
+                        
 
                       {/* Class */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
@@ -1037,7 +1014,7 @@ const DatabaseDashboard = () => {
 
                       {/* Mutation */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
-                        <p className="text-xs text-muted-foreground font-medium md:block">Mutation</p>
+                        <p className="text-xs text-muted-foreground font-medium md:block">Status</p>
                         {item.mutation && item.mutation !== 'Wild-type' ? (
                           <Badge 
                             variant="secondary" 

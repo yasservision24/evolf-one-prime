@@ -356,8 +356,8 @@ export async function fetchDatasetDetail(evolfId: string) {
     uniprotLink: apiResponse.uniprotLink || '',
     chemblId: apiResponse.chemblId || '',
    
-    cid: apiResponse.cid || '',
-    pubchemId: apiResponse.pubchemId || '',
+    
+    cid: apiResponse.pubchemId || '',
     pubchemLink: apiResponse.pubchemLink || '',
     
     
