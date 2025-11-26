@@ -187,11 +187,7 @@ const DatabaseDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dataset:', error);
-      toast({
-        title: 'Error Loading Data',
-        description: 'Failed to fetch dataset from API.',
-        variant: 'destructive',
-      });
+    
       
       setDatasetItems([]);
       setTotalItems(0);
