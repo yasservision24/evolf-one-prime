@@ -1,10 +1,18 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const TermsOfUse = () => {
+  const navigate = useNavigate();
+  
+  const handleNavigate = (page: 'home' | 'model') => {
+    if (page === 'home') navigate('/');
+    else if (page === 'model') navigate('/prediction');
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Header currentPage="home" onNavigate={() => {}} />
+      <Header currentPage="other" onNavigate={handleNavigate} />
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">Terms of Use</h1>

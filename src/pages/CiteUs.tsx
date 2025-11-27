@@ -4,22 +4,22 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CiteUs = () => {
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [copiedType, setCopiedType] = useState('');
+
+  const handleNavigate = (page: 'home' | 'model') => {
+    if (page === 'home') navigate('/');
+    else if (page === 'model') navigate('/prediction');
+  };
 
   const citation = `Ahuja, G., et al. (2025). EvOlf: A deep learning framework for predicting ligand-GPCR interactions across multiple species. Nature Communications, 16(1), 123-135. doi:10.1038/s41467-025-00123-4`;
 
   const bibtex = `@article{ahuja2025evolf,
-  title={EvOlf: A deep learning framework for predicting ligand-GPCR interactions across multiple species},
-  author={Ahuja, Gaurav and The Ahuja Lab},
-  journal={Nature Communications},
-  volume={16},
-  number={1},
-  pages={123--135},
-  year={2025},
-  publisher={Nature Publishing Group},
+...
   doi={10.1038/s41467-025-00123-4}
 }`;
 
@@ -35,7 +35,7 @@ const CiteUs = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header currentPage="cite" onNavigate={() => {}} />
+      <Header currentPage="other" onNavigate={handleNavigate} />
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           {/* Centered Header */}

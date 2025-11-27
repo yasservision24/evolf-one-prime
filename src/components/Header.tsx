@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 
 interface HeaderProps {
-  currentPage: 'home' | 'dataset' | 'model';
+  currentPage: 'home' | 'dataset' | 'model' | 'other';
   onNavigate: (page: 'home' | 'model') => void;
 }
 
