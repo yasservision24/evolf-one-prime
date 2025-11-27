@@ -119,7 +119,10 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setReceptorSequence(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Only amino acid sequences allowed. FASTA headers (&gt;) are not accepted.And the number of amino acids need to be less than 1024.
+                      Only amino acid sequences allowed. FASTA headers (&gt;) are not accepted.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      And the number of amino acids need to be less than 1024.
                     </p>
                   </div>
 
@@ -134,6 +137,9 @@ const PredictionDashboard: React.FC = () => {
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       For best results, convert your SMILES into canonical format using OpenBabel.
+                      
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       The characters of SMILES have to be less than 512.
                     </p>
                   </div>
@@ -166,8 +172,11 @@ const PredictionDashboard: React.FC = () => {
                 <h3 className="text-lg text-foreground mb-3">Quick Tips</h3>
                 <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-2">
                   <li>Only plain receptor sequences allowed.</li>
+                  <li>The number of amino acids need to be less than 1024.</li>
                   <li>For best results, convert your SMILES into canonical format using OpenBabel.</li>
+                  <li>The characters of SMILES have to be less than 512.</li>
                   <li>One ligand per prediction.</li>
+                  
                 </ul>
               </Card>
 
