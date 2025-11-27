@@ -12,14 +12,17 @@ import DatasetStructures from "./pages/dataset/DatasetStructures";
 import PredictionDashboard from "./pages/prediction/PredictionDashboard";
 import PredictionResult from "./pages/prediction/PredictionResult";
 import NotFound from "./pages/NotFound";
+
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
+import Links from "./pages/Links";
+import Api from "./pages/api";
 
 
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import CiteUs from "./pages/CiteUs";
-import SubmitData from "./pages/SubmitData";
+
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import License from "./pages/License";
@@ -41,12 +44,15 @@ const App = () => (
         <Route path="/dataset/structures" element={<DatasetStructures />} />
         <Route path="/prediction" element={<PredictionDashboard />} />
         <Route path="/prediction-result" element={<PredictionResult />} />
+
         <Route path="/documentation" element={<Documentation />} />
-          <Route path="/model-info" element={<ModelInfo />} />
+        <Route path="/model-info" element={<ModelInfo />} />
+        <Route path="/api" element={<Api/>} />
+        <Route path="/links" element={<Links />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cite-us" element={<CiteUs />} />
-        <Route path="/submit-data" element={<SubmitData />} />
+        
         <Route path="/terms-of-use" element={<TermsOfUse />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/license" element={<License />} />

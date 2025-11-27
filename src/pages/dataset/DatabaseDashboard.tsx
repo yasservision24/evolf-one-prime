@@ -39,7 +39,7 @@ export interface DatasetItem {
   species: string;            // Organism species in scientific name (e.g., "Homo sapiens")
   ligand: string;             // Ligand/compound name
   chemblId: string;           // ChEMBL database ID or PubMed ID
-  mutation: string;           // Mutation information (e.g., "L249A", "Wild-type")
+  mutationStatus: string;           // Mutation information (e.g., "L249A", "Wild-type")
   class: string;              // GPCR class (e.g., "Class A", "Class B", "Class C")
   uniprotId?: string;         // Optional: UniProt identifier
   cid?: string;               // Optional: Compound ID
@@ -569,23 +569,7 @@ const DatabaseDashboard = () => {
     },
   ];
 
-  const features = [
-    {
-      title: 'Comprehensive Coverage',
-      description: 'Curated data from thousands of peer-reviewed publications',
-      icon: Database,
-    },
-    {
-      title: 'Validated Data',
-      description: 'Quality-controlled experimental binding affinity measurements',
-      icon: FileText,
-    },
-    {
-      title: 'Rich Annotations',
-      description: 'Detailed mutation data, 3D structures, and experimental conditions',
-      icon: Search,
-    },
-  ];
+  
 
   // Get active filter count
   const activeFilterCount = getActiveFilterCount();
@@ -608,22 +592,7 @@ const DatabaseDashboard = () => {
             </p>
           </div>
 
-          {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {features.map((feature, index) => (
-              <Card key={index} className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-[hsl(var(--brand-teal))]/10">
-                    <feature.icon className="w-6 h-6 text-[hsl(var(--brand-teal))]" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading font-semibold text-lg mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          
 
           {/* Statistics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -786,7 +755,7 @@ const DatabaseDashboard = () => {
                     <Input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Search by EvOlf ID, receptor name, ligand, ChEMBL ID, species..."
+                      placeholder="Search by receptor name, ligand, species..."
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
@@ -1012,15 +981,15 @@ const DatabaseDashboard = () => {
                       {/* Mutation */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
                         <p className="text-xs text-muted-foreground font-medium md:block">Status</p>
-                        {item.mutation && item.mutation !== 'Wild-type' ? (
+                        {item.mutationStatus && item.mutationStatus !== 'Wild type' ? (
                           <Badge 
                             variant="secondary" 
                             className="w-fit bg-[hsl(var(--brand-purple))]/10 text-[hsl(var(--brand-purple))] border-[hsl(var(--brand-purple))]/20 font-mono text-xs"
                           >
-                            {item.mutation}
+                            {item.mutationStatus  }
                           </Badge>
                         ) : (
-                          <span className="text-xs md:text-sm text-muted-foreground">Wild-type</span>
+                          <span className="text-xs md:text-sm text-muted-foreground">Wild type</span>
                         )}
                       </div>
 

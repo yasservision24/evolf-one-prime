@@ -23,10 +23,10 @@ export const Footer = () => {
             </h3>
             <ul className="space-y-2">
               {[
-                { to: "/documentation", label: "Documentation" },
+                { to: "/documentation", label: "How To Use EvOlf" },
                 { to: "/model-info", label: "Model Info" },
                 { to: "/api", label: "API" },
-                { to: "/download-dataset", label: "Download Dataset" },
+                { to: "/links", label: "Usefull Links" },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
@@ -50,7 +50,7 @@ export const Footer = () => {
                 { to: "/faq", label: "FAQ" },
                 { to: "/contact", label: "Contact" },
                 { to: "/cite-us", label: "Cite Us" },
-                { to: "/submit-data", label: "Submit Data" },
+                
               ].map((link) => (
                 <li key={link.to}>
                   <Link

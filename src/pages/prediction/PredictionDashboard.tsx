@@ -93,9 +93,9 @@ const PredictionDashboard: React.FC = () => {
               <Brain className="h-4 w-4" />
               <span className="text-sm">Deep Learning Model</span>
             </div>
-            <h1 className="text-3xl md:text-4xl text-foreground mb-3">evolf Prediction Model</h1>
+            <h1 className="text-3xl md:text-4xl text-foreground mb-3">EvOlf Prediction Model</h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Predict GPCR-ligand binding affinity using our state-of-the-art deep learning model.
+              Predict Binding Interaction using our state-of-the-art deep learning model.
             </p>
           </div>
 
@@ -132,6 +132,9 @@ const PredictionDashboard: React.FC = () => {
                       value={ligandSmiles}
                       onChange={(e) => setLigandSmiles(e.target.value)}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      For best results, convert your SMILES into canonical format using OpenBabel.
+                    </p>
                   </div>
                 </div>
 
@@ -141,7 +144,7 @@ const PredictionDashboard: React.FC = () => {
                   onClick={handlePredict}
                   disabled={predicting}
                 >
-                  {predicting ? 'Predicting...' : 'Predict Binding Affinity'}
+                  {predicting ? 'Predicting...' : 'Predict Binding Interaction'}
                 </Button>
               </Card>
             </div>
@@ -154,18 +157,19 @@ const PredictionDashboard: React.FC = () => {
                   <h3 className="text-lg text-foreground">Model Information</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Transformer-based model trained on GPCR-ligand interaction datasets.
+                  Deep-Learning Architectures -trained on GPCR-ligand interaction datasets.
                 </p>
               </Card>
 
               <Card className="p-6 border-border">
                 <h3 className="text-lg text-foreground mb-3">Quick Tips</h3>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Only plain receptor sequences allowed</li>
-                  <li>• Enter SMILES in standard notation</li>
-                  <li>• One ligand per prediction</li>
+                <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-2">
+                  <li>Only plain receptor sequences allowed.</li>
+                  <li>For best results, convert your SMILES into canonical format using OpenBabel.</li>
+                  <li>One ligand per prediction.</li>
                 </ul>
               </Card>
+
             </div>
 
           </div>

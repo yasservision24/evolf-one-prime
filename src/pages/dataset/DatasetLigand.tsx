@@ -113,25 +113,29 @@ export default function DatasetLigand() {
     label, 
     value, 
     copyable = false, 
-    fieldKey = '' 
+    fieldKey = '',
+    multiline = false
   }: { 
     label: string; 
     value: string | number; 
     copyable?: boolean; 
     fieldKey?: string;
+    multiline?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
     return (
       <div className="py-3">
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-foreground font-medium">{displayValue}</div>
+        <div className="flex items-start justify-between gap-2">
+          <div className={`text-foreground font-medium flex-1 ${multiline ? 'break-all whitespace-pre-wrap max-h-32 overflow-y-auto' : 'break-all'}`}>
+            {displayValue}
+          </div>
           {copyable && displayValue !== 'N/A' && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 flex-shrink-0"
               onClick={() => copyToClipboard(displayValue, fieldKey)}
             >
               {copiedField === fieldKey ? (
@@ -257,13 +261,9 @@ export default function DatasetLigand() {
                   value={data?.smiles || 'N/A'} 
                   copyable 
                   fieldKey="smiles"
+                  multiline
                 />
-                <InfoField 
-                  label="ChEMBL ID" 
-                  value={data?.chemblId || 'N/A'} 
-                  copyable 
-                  fieldKey="ligand-chembl"
-                />
+                
                 <InfoField
                   label="PubChem ID" 
                   value={data?.pubchemId || 'N/A'} 
@@ -302,8 +302,13 @@ export default function DatasetLigand() {
                   value={data?.inchi || 'N/A'} 
                   copyable 
                   fieldKey="inchi"
+                  multiline
                 />
-                <InfoField label="IUPAC Name" value={data?.iupacName || 'N/A'} />
+                <InfoField 
+                  label="IUPAC Name" 
+                  value={data?.iupacName || 'N/A'} 
+                  multiline
+                />
               </div>
             </div>
           </Card>
@@ -329,9 +334,37 @@ export default function DatasetLigand() {
                 )}
               </div>
               <div className="bg-secondary/30 p-4 rounded-lg">
-                <p className="text-sm font-mono break-all text-foreground">
+                <pre className="text-sm font-mono break-all whitespace-pre-wrap text-foreground max-h-48 overflow-y-auto">
                   {data?.smiles || 'N/A'}
-                </p>
+                </pre>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-card border-border lg:col-span-2">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">InChI Structure</h2>
+                {data?.inchi && data.inchi !== 'N/A' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(data.inchi!, 'inchi-structure')}
+                    className="gap-2"
+                  >
+                    {copiedField === 'inchi-structure' ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    Copy InChI
+                  </Button>
+                )}
+              </div>
+              <div className="bg-secondary/30 p-4 rounded-lg">
+                <pre className="text-sm font-mono break-all whitespace-pre-wrap text-foreground max-h-48 overflow-y-auto">
+                  {data?.inchi || 'N/A'}
+                </pre>
               </div>
             </div>
           </Card>

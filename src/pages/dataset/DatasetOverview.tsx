@@ -439,8 +439,8 @@ export default function DatasetOverview() {
               </div>
               <div className="space-y-3">
                 <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
-                <InfoField label="ChEMBL ID" value={data?.chemblId || 'N/A'} />
-                <InfoField label="PubChem ID" value={data?.pubchemId || 'N/A'} />
+                
+               
                 
                 {/* 2D Structure Image */}
                 <div className="py-3 border-b border-border/50">
