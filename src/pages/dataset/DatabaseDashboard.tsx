@@ -741,7 +741,7 @@ const DatabaseDashboard = () => {
                     <Input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Search by receptor name, ligand, species..."
+                      placeholder="Search by receptor, ligand, species, UniProt ID, PubChem ID..."
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
@@ -776,7 +776,7 @@ const DatabaseDashboard = () => {
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
                                   <Badge variant="outline" className="text-xs bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
                                     {suggestion.EvOlf_ID}
                                   </Badge>
@@ -784,6 +784,18 @@ const DatabaseDashboard = () => {
                                 </div>
                                 <p className="font-medium text-sm truncate">{suggestion.Receptor}</p>
                                 <p className="text-xs text-muted-foreground truncate mt-0.5">{suggestion.Ligand}</p>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  {suggestion.UniProt_ID && (
+                                    <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+                                      UniProt: {suggestion.UniProt_ID}
+                                    </span>
+                                  )}
+                                  {suggestion.CID && (
+                                    <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+                                      PubChem: {suggestion.CID}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
                             </div>
