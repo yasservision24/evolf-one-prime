@@ -39,7 +39,7 @@ export interface DatasetItem {
   species: string;            // Organism species in scientific name (e.g., "Homo sapiens")
   ligand: string;             // Ligand/compound name
   chemblId: string;           // ChEMBL database ID or PubMed ID
-  mutationStatus: string;           // Mutation information (e.g., "L249A", "Wild-type")
+  mutation: string;           // Mutation information (e.g., "L249A", "Wild-type")
   class: string;              // GPCR class (e.g., "Class A", "Class B", "Class C")
   uniprotId?: string;         // Optional: UniProt identifier
   cid?: string;               // Optional: Compound ID
@@ -981,15 +981,15 @@ const DatabaseDashboard = () => {
                       {/* Mutation */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
                         <p className="text-xs text-muted-foreground font-medium md:block">Status</p>
-                        {item.mutationStatus && item.mutationStatus !== 'Mutant' ? (
+                        {item.mutation  ? (
                           <Badge 
                             variant="secondary" 
                             className="w-fit bg-[hsl(var(--brand-purple))]/10 text-[hsl(var(--brand-purple))] border-[hsl(var(--brand-purple))]/20 font-mono text-xs"
                           >
-                            {item.mutationStatus  }
+                            {"Mutant"}
                           </Badge>
                         ) : (
-                          <span className="text-xs md:text-sm text-muted-foreground">Wild type</span>
+                          <span className="text-xs md:text-sm text-muted-foreground">Wild-type</span>
                         )}
                       </div>
 
