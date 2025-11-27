@@ -120,7 +120,7 @@ export const system = {
       interactions: '100K+',
       receptors: '2K+',
       ligands: '40K+',
-      species: '20',
+      species: '20+',
     },
   },
 };
