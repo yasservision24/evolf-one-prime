@@ -156,8 +156,8 @@ export default function DatasetLigand() {
       
       {/* Header Section */}
       <div className="bg-card/30 border-b border-border">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
             <Button 
               variant="outline" 
               size="sm" 
@@ -165,7 +165,8 @@ export default function DatasetLigand() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Database
+              <span className="hidden sm:inline">Back to Database</span>
+              <span className="sm:hidden">Back</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -173,7 +174,8 @@ export default function DatasetLigand() {
               onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
               className="text-muted-foreground hover:text-foreground"
             >
-              Back to Overview
+              <span className="hidden sm:inline">Back to Overview</span>
+              <span className="sm:hidden">Overview</span>
             </Button>
             <div className="ml-auto">
               <Button 
@@ -184,30 +186,29 @@ export default function DatasetLigand() {
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
-                {exporting ? 'Exporting...' : 'Export Data'}
+                <span className="hidden sm:inline">{exporting ? 'Exporting...' : 'Export'}</span>
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mb-6 flex-wrap">
-            <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+          <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-wrap">
+            <h1 className={`text-lg md:text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-48 md:w-96 rounded' : 'text-foreground'}`}>
               {!loading && `${data?.receptorName || data?.receptor || 'N/A'} - ${data?.ligandName || data?.ligand || 'N/A'}`}
             </h1>
             {!loading && data?.class && (
-              <Badge variant="outline" className="bg-secondary/50 border-border">
+              <Badge variant="outline" className="bg-secondary/50 border-border text-xs md:text-sm">
                 {data.class}
               </Badge>
             )}
-            
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex gap-1 border-t border-border pt-4 -mb-6">
+          <div className="flex gap-1 border-t border-border pt-4 -mb-4 md:-mb-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/detail?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
               Overview
             </Button>
@@ -215,30 +216,30 @@ export default function DatasetLigand() {
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
-              Receptor Details
+              Receptor
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              className="bg-accent/10 text-foreground font-medium"
+              className="bg-accent/10 text-foreground font-medium whitespace-nowrap text-xs md:text-sm"
             >
-              Ligand Details
+              Ligand
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
-              Interaction Data
+              Interaction
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
               3D Structures
             </Button>
@@ -247,7 +248,7 @@ export default function DatasetLigand() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
 
         {/* Ligand Details Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

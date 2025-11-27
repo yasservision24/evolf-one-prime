@@ -355,9 +355,9 @@ export default function DatasetOverview() {
       
       {/* Header Section */}
       <div className="bg-card/30 border-b border-border">
-        <div className="container mx-auto px-6 py-6">
+        <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
           {/* Back Button */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-2 md:gap-4 mb-4 md:mb-6">
             <Button 
               variant="outline" 
               size="sm" 
@@ -365,29 +365,30 @@ export default function DatasetOverview() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Database
+              <span className="hidden sm:inline">Back to Database</span>
+              <span className="sm:hidden">Back</span>
             </Button>
           </div>
 
           {/* Title Row */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center gap-3 flex-1 flex-wrap">
-              <h1 className={`text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-96 rounded' : 'text-foreground'}`}>
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4 md:mb-6">
+            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+              <h1 className={`text-lg md:text-2xl font-normal ${loading ? 'animate-pulse bg-muted h-8 w-48 md:w-96 rounded' : 'text-foreground'}`}>
                 {!loading && (data?.receptorName || 'N/A')} {!loading && '-'} {!loading && (data?.ligandName || 'N/A')}
               </h1>
               {!loading && (
                 <>
-                  <Badge variant="outline" className="bg-secondary/50 border-border">
+                  <Badge variant="outline" className="bg-secondary/50 border-border text-xs md:text-sm">
                     {data?.class || 'N/A'}
                   </Badge>
                   {isMutant && (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs md:text-sm">
                       <Star className="h-3 w-3 fill-yellow-600 mr-1" />
                       Mutant
                     </Badge>
                   )}
                   {isWildType && (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs md:text-sm">
                       Wild Type
                     </Badge>
                   )}
@@ -396,7 +397,7 @@ export default function DatasetOverview() {
             </div>
             
             {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -405,34 +406,34 @@ export default function DatasetOverview() {
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
-                {exporting ? 'Exporting...' : 'Export Data'}
+                <span className="hidden sm:inline">{exporting ? 'Exporting...' : 'Export'}</span>
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="gap-2" 
+                className="gap-1 md:gap-2" 
                 disabled={loading || !hasUniProtLink}
                 onClick={() => data?.uniprotLink && window.open(data.uniprotLink, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
-                UniProt
+                <span className="hidden sm:inline">UniProt</span>
                 {isMutant && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="gap-2" 
+                className="gap-1 md:gap-2" 
                 disabled={loading || !data?.pubchemId}
                 onClick={() => data?.pubchemId && window.open(`https://pubchem.ncbi.nlm.nih.gov/compound/${data.pubchemId}`, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
-                PubChem
+                <span className="hidden sm:inline">PubChem</span>
               </Button>
             </div>
           </div>
           
           {/* Info Row */}
-          <div className="flex items-center flex-wrap gap-x-8 gap-y-2 text-sm mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-x-4 md:gap-x-8 gap-y-2 text-xs md:text-sm mb-4 md:mb-6">
             <div>
               <span className="text-muted-foreground">EvOlf ID: </span>
               <span className={`text-cyan-400 font-mono font-medium ${loading ? 'animate-pulse' : ''}`}>
@@ -446,19 +447,20 @@ export default function DatasetOverview() {
               </span>
             </div>
             {!loading && isMutant && (
-              <div className="flex items-center gap-1 text-amber-600">
+              <div className="flex items-center gap-1 text-amber-600 text-xs">
                 <Star className="h-3 w-3 fill-amber-500" />
-                <span>Mutant variant - UniProt links to wild-type protein</span>
+                <span className="hidden sm:inline">Mutant variant - UniProt links to wild-type protein</span>
+                <span className="sm:hidden">Mutant variant</span>
               </div>
             )}
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex gap-1 border-t border-border pt-4 -mb-6">
+          <div className="flex gap-1 border-t border-border pt-4 -mb-4 md:-mb-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
             <Button 
               variant="ghost" 
               size="sm"
-              className="bg-accent/10 text-foreground font-medium"
+              className="bg-accent/10 text-foreground font-medium whitespace-nowrap text-xs md:text-sm"
             >
               Overview
             </Button>
@@ -466,31 +468,31 @@ export default function DatasetOverview() {
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
-              Receptor Details
+              Receptor
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/ligand?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
-              Ligand Details
+              Ligand
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/interaction?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
-              Interaction Data
+              Interaction
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate(`/dataset/structures?evolfid=${evolfId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap text-xs md:text-sm"
             >
               3D Structures
             </Button>
@@ -499,16 +501,16 @@ export default function DatasetOverview() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
 
         {/* Overview Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
           {/* Receptor Information */}
           <Card className="bg-card border-border">
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Database className="h-5 w-5 text-blue-500" />
-                <h2 className="text-lg font-semibold">Receptor Information</h2>
+            <div className="p-4 md:p-6">
+              <div className="flex items-center gap-2 mb-4 md:mb-6">
+                <Database className="h-4 w-4 md:h-5 md:w-5 text-blue-500" />
+                <h2 className="text-base md:text-lg font-semibold">Receptor Information</h2>
               </div>
               <div className="space-y-3">
                 <InfoField label="Receptor Name" value={data?.receptorName || 'N/A'} />
@@ -523,7 +525,7 @@ export default function DatasetOverview() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full mt-6"
+                className="w-full mt-4 md:mt-6 text-xs md:text-sm"
                 onClick={() => navigate(`/dataset/receptor?evolfid=${evolfId}`)}
               >
                 View Full Receptor Details

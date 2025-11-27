@@ -567,11 +567,11 @@ const DatabaseDashboard = () => {
       <main className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Hero Section */}
-          <div className="mb-12">
-            <h1 className="text-4xl font-heading font-bold mb-4">
+          <div className="mb-8 md:mb-12">
+            <h1 className="text-2xl md:text-4xl font-heading font-bold mb-3 md:mb-4">
               EvOlf Dataset Explorer
             </h1>
-            <p className="text-muted-foreground text-lg max-w-3xl">
+            <p className="text-muted-foreground text-sm md:text-lg max-w-3xl">
               A comprehensive, curated database of GPCR receptor-ligand interactions from scientific
               literature. Providing high-quality training data for machine learning models in drug discovery
               and computational biology.
@@ -581,26 +581,26 @@ const DatabaseDashboard = () => {
           
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
             {stats.map((stat, index) => (
-              <Card key={index} className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-muted-foreground text-sm font-medium">{stat.label}</p>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <Card key={index} className="p-4 md:p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-[hsl(var(--brand-teal))]/50 transition-all">
+                <div className="flex items-center justify-between mb-2 md:mb-4">
+                  <p className="text-muted-foreground text-xs md:text-sm font-medium">{stat.label}</p>
+                  <div className={`p-1.5 md:p-2 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
                   </div>
                 </div>
                 <div>
-                  <p className={`text-3xl font-bold ${stat.color} mb-1`}>{stat.value}</p>
-                  <p className="text-muted-foreground text-xs">{stat.change}</p>
+                  <p className={`text-xl md:text-3xl font-bold ${stat.color} mb-1`}>{stat.value}</p>
+                  <p className="text-muted-foreground text-[10px] md:text-xs">{stat.change}</p>
                 </div>
               </Card>
             ))}
           </div>
 
           {/* Search and Filter Controls */}
-          <div className="flex flex-col gap-4 mb-6">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+          <div className="flex flex-col gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full overflow-x-auto pb-2 scrollbar-hide">
               {/* Sort Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
