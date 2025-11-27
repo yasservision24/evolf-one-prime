@@ -664,7 +664,7 @@ const DatabaseDashboard = () => {
               {/* Class Filter */}
               <Select value={selectedClass} onValueChange={(value) => { setSelectedClass(value); setCurrentPage(1); }}>
                 <SelectTrigger className="w-full sm:w-[180px] bg-background/50 border-border/50">
-                  <SelectValue placeholder="GPCR Class" />
+                  <SelectValue placeholder="Binding Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-[10001]">
                   <SelectItem value=" ">All Classes</SelectItem>
@@ -918,7 +918,7 @@ const DatabaseDashboard = () => {
                       className="flex items-center gap-1 min-w-[100px] cursor-pointer hover:text-foreground transition-colors"
                       onClick={() => handleSort('class')}
                     >
-                      <span>Class</span>
+                      <span>Binding Status</span>
                       {getSortIcon('class')}
                     </div>
 
