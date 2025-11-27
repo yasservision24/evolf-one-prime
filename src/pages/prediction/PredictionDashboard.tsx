@@ -157,7 +157,7 @@ const PredictionDashboard: React.FC = () => {
                   <h3 className="text-lg text-foreground">Model Information</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Deep-Learning Architectures -trained on GPCR-ligand interaction datasets.
+                  Deep-Learning Architectures-trained on GPCR-ligand interaction datasets.
                 </p>
               </Card>
 
