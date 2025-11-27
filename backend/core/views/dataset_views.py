@@ -18,7 +18,8 @@ import json
 from core.models import EvOlf
 from core.serializers import EvOlfSerializer
 from core.views.structure_views import format_dataset_detail, FetchLocalStructureAPIView
-
+import pandas as pd
+from django.conf import settings
 
 # ES import
 try:
@@ -26,7 +27,7 @@ try:
 
     # Load environment variables
     ES_HOST = os.getenv("ELASTIC_HOST", "http://localhost:9200")
-    ES_USERNAME = os.getenv("ELASTIC_USERNAME", "elastic")
+    ES_USERNAME = os.getenv("ELASTIC_USERNAME", "")
     ES_PASSWORD = os.getenv("ELASTIC_PASSWORD", "")
 
     es = Elasticsearch(
@@ -329,7 +330,7 @@ class DatasetDownloadAPIView(APIView):
     GET /api/dataset/download
     Pre-generates and caches a full ZIP once, reused afterward.
     """
-    CACHE_PATH = os.path.join("core", "management", "evolf_complete_dataset.zip")
+    CACHE_PATH = os.path.join(settings.BASE_DIR,settings.PATH_AFTER_BASE_DIR, "evolf_complete_dataset.zip")
 
     def get(self, request):
         if os.path.exists(self.CACHE_PATH):
@@ -368,8 +369,7 @@ class DatasetDownloadAPIView(APIView):
 
 
 
-import pandas as pd
-from django.conf import settings
+
 
 
 def json_safe(obj):
@@ -408,7 +408,7 @@ class FetchDatasetDetails(APIView):
     """
     def get(self, request, evolfId):
         try:
-            csv_path = os.path.join(settings.BASE_DIR,"EvOlf_internal", "core", "management", "evolf_data.csv")
+            csv_path = os.path.join(settings.BASE_DIR,settings.PATH_AFTER_BASE_DIR,"evolf_data.csv")
             if not os.path.exists(csv_path):
                 return Response({"error": "Dataset CSV not found", "path": csv_path}, status=status.HTTP_404_NOT_FOUND)
 
@@ -465,7 +465,7 @@ class DownloadByEvolfId(APIView):
         try:
             csv_path = os.path.join(
                 settings.BASE_DIR,
-                "EvOlf_internal", "core", "management",
+                settings.PATH_AFTER_BASE_DIR,
                 "evolf_data.csv"
             )
             df = pd.read_csv(csv_path)
