@@ -189,7 +189,7 @@ const Index = () => {
                 Data Curation
               </h3>
               <p className="text-foreground/80 text-sm md:text-base leading-relaxed">
-                Aggregates and cleans GPCR–ligand interaction datasets from peer-reviewed sources, integrating structural and binding affinity data for downstream modeling.
+                Aggregates and cleans GPCR–ligand interaction datasets from peer-reviewed sources, integrating structural and interaction data for downstream modeling.
               </p>
             </div>
 
@@ -215,7 +215,7 @@ const Index = () => {
                 Prediction
               </h3>
               <p className="text-foreground/80 text-sm md:text-base leading-relaxed">
-                Predicts GPCR–ligand binding affinities with confidence scores, supporting custom receptor sequences and mutation analyses for experimental validation.
+                Predicts GPCR–ligand interaction with confidence scores, supporting custom receptor sequences and mutation analyses for experimental validation.
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ const Index = () => {
                 Drug Discovery
               </h3>
               <p className="text-xs md:text-sm text-foreground/80">
-                Screen compounds against GPCR targets and predict binding affinities for lead optimization.
+                Screen compounds against GPCR targets and predict interaction for lead optimization.
               </p>
             </Card>
 
@@ -264,7 +264,7 @@ const Index = () => {
                 Mutation Analysis
               </h3>
               <p className="text-xs md:text-sm text-foreground/80">
-                Study how receptor mutations affect ligand binding and predict effects of novel mutations.
+                Study how receptor mutations affect ligand interaction and predict effects of novel mutations.
               </p>
             </Card>
 
@@ -286,7 +286,7 @@ const Index = () => {
                 Target Validation
               </h3>
               <p className="text-xs md:text-sm text-foreground/80">
-                Validate GPCR targets using comprehensive binding data and 3D structure analysis.
+                Validate GPCR targets using comprehensive interaction data and 3D structure analysis.
               </p>
             </Card>
 
