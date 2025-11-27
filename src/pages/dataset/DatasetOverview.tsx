@@ -42,6 +42,11 @@ export default function DatasetOverview() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     if (!evolfId) {
       navigate('/dataset/dashboard');
@@ -549,7 +554,7 @@ export default function DatasetOverview() {
                         link !== 'N/A' && 
                         link !== 'nan' && 
                         link !== '' 
-                                        )
+                      )
                   : [];
 
                 return validLinks.length > 0 ? (
