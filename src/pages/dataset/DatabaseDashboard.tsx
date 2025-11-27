@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
-import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, CheckCircle, ChevronDown, ArrowUpDown, X } from 'lucide-react';
+import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, Globe, ChevronDown, ArrowUpDown, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { fetchDatasetPaginated, downloadDatasetByIds, downloadCompleteDataset, searchDataset } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
@@ -554,8 +554,8 @@ const DatabaseDashboard = () => {
     { 
       label: 'Species', 
       value: 24, 
-      change: 'Organisms studied', 
-      icon: FlaskConical, 
+      change: 'Species studied', 
+      icon: Globe, 
       color: 'text-[hsl(var(--brand-purple))]',
       bgColor: 'bg-[hsl(var(--brand-purple))]/10'
     },
@@ -563,7 +563,7 @@ const DatabaseDashboard = () => {
       label: 'Ligands', 
       value: "41,343", 
       change: 'Unique Ligands', 
-      icon: CheckCircle, 
+      icon: FlaskConical, 
       color: 'text-red-400',
       bgColor: 'bg-red-400/10'
     },

@@ -103,7 +103,7 @@ const Index = () => {
 
               <ul className="space-y-3 mb-8 flex-grow">
                 {[
-                  '10,000+ curated receptor–ligand interactions',
+                  '100,000+ curated receptor–ligand interactions',
                   '3D molecular visualization & interactive plots',
                   'Advanced filtering by mutation, species, & GPCR class',
                   'Data export for machine learning integration',
@@ -137,7 +137,7 @@ const Index = () => {
               </h3>
 
               <p className="text-sm md:text-base text-foreground/80 mb-6 leading-relaxed">
-                Leverage our deep learning engine to predict GPCR-ligand binding affinity with high accuracy, confidence scores, and support for mutated receptor sequences.
+                Leverage our deep learning engine to predict GPCR-ligand interaction with high accuracy, confidence scores, and support for mutated receptor sequences.
               </p>
 
               <ul className="space-y-3 mb-8 flex-grow">
@@ -202,7 +202,7 @@ const Index = () => {
                 Model Training
               </h3>
               <p className="text-foreground/80 text-sm md:text-base leading-relaxed">
-                Employs deep learning and graph-based architectures to learn molecular binding patterns, ensuring high generalization and interpretability across GPCR families.
+                Employs deep learning architectures to learn molecular ineteraction patterns , ensuring high generalization and interpretability across GPCR families.
               </p>
             </div>
 

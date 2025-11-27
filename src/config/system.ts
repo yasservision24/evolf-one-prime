@@ -120,7 +120,7 @@ export const system = {
       interactions: '100K+',
       receptors: '2K+',
       ligands: '40K+',
-      accuracy: '95%+',
+      species: '20',
     },
   },
 };

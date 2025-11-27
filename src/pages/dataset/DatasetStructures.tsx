@@ -54,7 +54,7 @@ export default function DatasetStructures() {
           class: response.class,
           mutation: response.mutation,
           structure3d: response.structure3d,
-          method: 'X-ray Diffraction', // TODO: Add method field to API response if available
+        
           receptorStructure: response.pdbData, // PDB data from API
           ligandStructure: response.sdfData,   // SDF data from API
           receptorFormat: 'pdb',
@@ -367,16 +367,7 @@ export default function DatasetStructures() {
             </div>
           </Card>
 
-          {/* Additional Structure Info */}
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Additional Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <InfoField label="Method" value={data?.method || 'N/A'} />
-              </div>
-            </div>
-          </Card>
+          
         </div>
       </div>
 

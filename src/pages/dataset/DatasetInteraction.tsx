@@ -340,24 +340,7 @@ export default function DatasetInteraction() {
             </div>
           </Card>
 
-          {/* Comments Card */}
-          <Card className="bg-card border-border">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-6">Comments</h2>
-              <div className="bg-secondary/30 p-4 rounded-lg">
-                {loading ? (
-                  <div className="space-y-2">
-                    <div className="animate-pulse bg-muted h-4 w-full rounded" />
-                    <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
-                  </div>
-                ) : (
-                  <p className="text-foreground/80 whitespace-pre-wrap break-words">
-                    {data?.comment || 'N/A'}
-                  </p>
-                )}
-              </div>
-            </div>
-          </Card>
+          
         </div>
       </div>
 

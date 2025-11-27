@@ -525,22 +525,7 @@ export default function DatasetOverview() {
           </div>
         </Card>
 
-        {/* Comments */}
-        <Card className="bg-card border-border">
-          <div className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Comments</h2>
-            {loading ? (
-              <div className="space-y-2">
-                <div className="animate-pulse bg-muted h-4 w-full rounded" />
-                <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
-              </div>
-            ) : (
-              <p className="text-foreground/80 whitespace-pre-wrap break-words">
-                {data?.comments || 'N/A'}
-              </p>
-            )}
-          </div>
-        </Card>
+        
       </div>
 
       {/* UniProt Link Footnote for Mutants */}
