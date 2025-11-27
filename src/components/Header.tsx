@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 
 interface HeaderProps {
-  currentPage: 'home' | 'dataset' | 'model';
+  currentPage: 'home' | 'dataset' | 'model' | 'other';
   onNavigate: (page: 'home' | 'model') => void;
 }
 
@@ -72,26 +72,29 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="md:hidden h-10 w-10">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
-              <SheetHeader>
-                <button
-                  onClick={() => onNavigate('home')}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                >
-                  <h1 className="text-xl font-semibold gradient-evolf">EvOlf</h1>
-                </button>
+              <SheetHeader className="border-b pb-4">
+                <SheetTitle>
+                  <button
+                    onClick={() => onNavigate('home')}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  >
+                    <h1 className="text-2xl font-semibold gradient-evolf">EvOlf</h1>
+                  </button>
+                </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-4 mt-6">
+              <nav className="flex flex-col gap-2 mt-6">
                 <Button
                   variant="ghost"
                   onClick={() => onNavigate('home')}
-                  className={`justify-start hover:text-foreground ${
+                  className={`justify-start h-14 text-base hover:bg-accent ${
                     currentPage === 'home'
-                      ? 'text-foreground font-extrabold'
+                      ? 'bg-accent text-foreground font-semibold'
                       : 'text-muted-foreground'
                   }`}
                 >
@@ -100,25 +103,25 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 <Button
                   variant="ghost"
                   onClick={() => navigate('/dataset/dashboard')}
-                  className={`justify-start hover:text-foreground ${
+                  className={`justify-start h-14 text-base hover:bg-accent ${
                     currentPage === 'dataset'
-                      ? 'text-foreground font-extrabold'
+                      ? 'bg-accent text-foreground font-semibold'
                       : 'text-muted-foreground'
                   }`}
                 >
-                  <DatabaseIcon className="h-4 w-4 mr-2" />
+                  <DatabaseIcon className="h-5 w-5 mr-3" />
                   Dataset Explorer
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => onNavigate('model')}
-                  className={`justify-start hover:text-foreground ${
+                  onClick={() => navigate('/prediction')}
+                  className={`justify-start h-14 text-base hover:bg-accent ${
                     currentPage === 'model'
-                      ? 'text-foreground font-extrabold'
+                      ? 'bg-accent text-foreground font-semibold'
                       : 'text-muted-foreground'
                   }`}
                 >
-                  <Brain className="h-4 w-4 mr-2" />
+                  <Brain className="h-5 w-5 mr-3" />
                   Prediction Model
                 </Button>
               </nav>
