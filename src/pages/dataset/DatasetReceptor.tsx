@@ -293,12 +293,7 @@ export default function DatasetReceptor() {
                     </Button>
                   </div>
                 )}
-                <InfoField 
-                  label="Source" 
-                  value={data?.source || 'N/A'} 
-                  copyable 
-                  fieldKey="receptor-source"
-                />
+                
                 
               </div>
             </div>
