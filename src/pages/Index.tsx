@@ -81,7 +81,7 @@ const Index = () => {
               Two Powerful Tools in One Platform
             </h2>
             <p className="text-base md:text-xl text-foreground/80 max-w-2xl mx-auto px-4">
-              Explore curated GPCR data or predict new interactions with our state-of-the-art deep learning model
+              Explore curated GPCR data and predict new interactions with our state-of-the-art deep learning model
             </p>
           </div>
 
@@ -105,7 +105,7 @@ const Index = () => {
                 {[
                   '100,000+ curated receptor–ligand interactions',
                   '3D molecular visualization & interactive plots',
-                  'Advanced filtering by mutation, species, & GPCR class',
+                  'Advanced filtering by mutation, species & GPCR class',
                   'Data export for machine learning integration',
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
