@@ -28,6 +28,8 @@ interface DatasetDetail {
   structure2d?: string;
   comments?: string;
   mutationStatus?: string;
+  source?: string;
+  sourceLinks?: string;
 }
 
 export default function DatasetOverview() {
@@ -440,8 +442,6 @@ export default function DatasetOverview() {
               <div className="space-y-3">
                 <InfoField label="Ligand Name" value={data?.ligandName || 'N/A'} />
                 
-               
-                
                 {/* 2D Structure Image */}
                 <div className="py-3 border-b border-border/50">
                   <div className="text-sm text-muted-foreground mb-2">2D Structure</div>
@@ -525,7 +525,70 @@ export default function DatasetOverview() {
           </div>
         </Card>
 
-        
+        {/* Source Information */}
+        <Card className="bg-card border-border">
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <ExternalLink className="h-5 w-5 text-orange-500" />
+              <h2 className="text-lg font-semibold">Source Information</h2>
+            </div>
+            <div className="space-y-4">
+              <InfoField 
+                label="Source" 
+                value={data?.source || 'N/A'} 
+                allowWrap={true}
+              />
+              
+              {/* Source Links */}
+              {(() => {
+                const validLinks = data?.sourceLinks 
+                  ? data.sourceLinks.split('|')
+                      .map(link => link.trim())
+                      .filter(link => 
+                        link && 
+                        link !== 'N/A' && 
+                        link !== 'nan' && 
+                        link !== '' 
+                                        )
+                  : [];
+
+                return validLinks.length > 0 ? (
+                  <div className="pt-2">
+                    <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {validLinks.map((link, index) => {
+                        // Try to extract a meaningful display name
+                        let displayName = `Source ${index + 1}`;
+                        try {
+                          const url = new URL(link);
+                          if (url.hostname.includes('pubmed')) displayName = 'PubMed';
+                          else if (url.hostname.includes('uniprot')) displayName = 'UniProt';
+                          else if (url.hostname.includes('rcsb')) displayName = 'PDB';
+                          else displayName = url.hostname.replace('www.', '');
+                        } catch (e) {
+                          // Keep default display name if URL parsing fails
+                        }
+
+                        return (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(link, '_blank')}
+                            className="gap-2"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            {displayName}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* UniProt Link Footnote for Mutants */}

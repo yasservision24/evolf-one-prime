@@ -299,28 +299,7 @@ export default function DatasetReceptor() {
                   copyable 
                   fieldKey="receptor-source"
                 />
-                {data?.sourceLinks && data.sourceLinks !== 'N/A'  && data.sourceLinks !== 'nan' && data.sourceLinks !== '' && (
-                  <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {data.sourceLinks.split('|').map((link, index) => {
-                        const trimmedLink = link.trim();
-                        return trimmedLink && (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => window.open(trimmedLink, '_blank')}
-                            className="gap-2"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            Source {index + 1}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                
               </div>
             </div>
           </Card>
