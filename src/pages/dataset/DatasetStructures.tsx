@@ -19,6 +19,7 @@ interface DatasetDetail {
   structure3d?: string;
   method?: string;
   receptorStructure?: string;
+  species?:string;
   ligandStructure?: string;
   receptorFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
   ligandFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
@@ -244,6 +245,23 @@ export default function DatasetStructures() {
                 {data.class}
               </Badge>
             )}
+          </div>
+
+          {/* Info Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-x-4 md:gap-x-8 gap-y-2 text-xs md:text-sm mb-4 md:mb-6">
+            <div>
+              <span className="text-muted-foreground">EvOlf ID: </span>
+              <span className={`text-cyan-400 font-mono font-medium ${loading ? 'animate-pulse' : ''}`}>
+                {loading ? 'Loading...' : (data?.evolfId || evolfId || 'N/A')}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Species: </span>
+              <span className={`text-foreground italic ${loading ? 'animate-pulse' : ''}`}>
+                {loading ? 'Loading...' : (data?.species || 'N/A')}
+              </span>
+            </div>
+            
           </div>
 
           {/* Navigation Tabs */}
