@@ -328,11 +328,7 @@ export default function DatasetInteraction() {
                   value={data?.value || 'N/A'} 
                   allowWrap={true}
                 />
-                <InfoField 
-                  label="Source" 
-                  value={data?.source || 'N/A'} 
-                  allowWrap={true}
-                />
+                
               </div>
               
               {/* Source Links - Scrollable Section */}
