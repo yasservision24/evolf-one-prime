@@ -612,7 +612,10 @@ async function safeJson(resp: Response) {
  *     EvOlf_ID: string,
  *     Receptor: string,
  *     Ligand: string,
- *     Species: string
+ *     Species: string,
+ *     UniProt_ID: string,
+ *     CID: string,
+ *     ChEMBL_ID: string
  *   }>
  * }
  * 
