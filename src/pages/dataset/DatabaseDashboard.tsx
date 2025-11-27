@@ -702,7 +702,7 @@ const DatabaseDashboard = () => {
                 )}
                 {selectedClass && selectedClass !== ' ' && (
                   <Badge variant="secondary" className="gap-1 bg-[hsl(var(--brand-teal))]/10 text-[hsl(var(--brand-teal))] border-[hsl(var(--brand-teal))]/30">
-                    Class: {selectedClass}
+                    Binding Status: {selectedClass}
                     <X className="w-3 h-3 cursor-pointer hover:opacity-70" onClick={() => removeFilter('class')} />
                   </Badge>
                 )}
@@ -955,7 +955,7 @@ const DatabaseDashboard = () => {
 
                       {/* Class */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
-                        <p className="text-xs text-muted-foreground font-medium md:block">Class</p>
+                        <p className="text-xs text-muted-foreground font-medium md:block">Binding Status</p>
                         <Badge 
                           variant="secondary" 
                           className="w-fit bg-blue-500/10 text-blue-500 border-blue-500/20 text-xs"
