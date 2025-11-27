@@ -1,4 +1,4 @@
-import { ArrowRight, Database, Brain, Beaker, FileText, Dna, TrendingUp, CheckCircle2, Sparkles,Cpu } from 'lucide-react';
+import {  Database, Brain, Beaker, FileText, Dna, TrendingUp, CheckCircle2, Sparkles,Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +47,7 @@ const Index = () => {
               >
                 <Database className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                 Explore Dataset
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+               
               </Button>
 
               <Button
@@ -120,6 +120,7 @@ const Index = () => {
                 shadow-md transition-all duration-300 hover:bg-brand-teal hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] hover:scale-[1.02] group"
                 onClick={() => navigate('/dataset/dashboard')}
               >
+                <Database className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                 Explore Database
                 
               </Button> 
@@ -159,8 +160,9 @@ const Index = () => {
                 shadow-md transition-all duration-300 hover:bg-brand-purple hover:text-white hover:shadow-[0_0_20px_-5px_hsl(var(--brand-purple))] hover:scale-[1.02] group flex items-center justify-center gap-2"
                 onClick={() => handleNavigate('model')}
               >
-                Try Prediction Model
                 <Brain className="h-4 w-4 md:h-5 md:w-5 group-hover:scale-110 transition-transform duration-300" />
+                Try Prediction Model
+                
               </Button>
             </Card>
           </div>
@@ -321,7 +323,7 @@ const Index = () => {
             >
               <Database className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
               Explore Dataset
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              
             </Button>
 
             <Button
