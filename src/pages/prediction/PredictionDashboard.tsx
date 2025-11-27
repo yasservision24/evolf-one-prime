@@ -119,7 +119,7 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setReceptorSequence(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Only amino acid sequences allowed. FASTA headers (&gt;) are not accepted.
+                      Only amino acid sequences allowed. FASTA headers (&gt;) are not accepted.And the number of amino acids need to be less than 1024.
                     </p>
                   </div>
 
@@ -134,6 +134,7 @@ const PredictionDashboard: React.FC = () => {
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       For best results, convert your SMILES into canonical format using OpenBabel.
+                      The characters of SMILES have to be less than 512.
                     </p>
                   </div>
                 </div>
