@@ -16,7 +16,7 @@ import NotFound from "./pages/NotFound";
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
 import Links from "./pages/Links";
-import Api from "./pages/api";
+import Api from "./pages/Api";
 
 
 import FAQ from "./pages/FAQ";
