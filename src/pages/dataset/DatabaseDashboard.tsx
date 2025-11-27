@@ -981,7 +981,7 @@ const DatabaseDashboard = () => {
                       {/* Mutation */}
                       <div className="flex flex-col gap-1 md:gap-2 md:min-w-[100px]">
                         <p className="text-xs text-muted-foreground font-medium md:block">Status</p>
-                        {item.mutationStatus && item.mutationStatus !== 'Wild type' ? (
+                        {item.mutationStatus && item.mutationStatus !== 'Mutant' ? (
                           <Badge 
                             variant="secondary" 
                             className="w-fit bg-[hsl(var(--brand-purple))]/10 text-[hsl(var(--brand-purple))] border-[hsl(var(--brand-purple))]/20 font-mono text-xs"
