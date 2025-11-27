@@ -382,6 +382,7 @@ export async function fetchDatasetDetail(evolfId: string) {
     structure3d: apiResponse.structure3d || '', 
     source:apiResponse.source || "",
     sourceLinks: apiResponse.sourceLinks || "",
+    
   };
 }
 

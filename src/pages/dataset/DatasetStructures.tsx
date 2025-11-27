@@ -55,6 +55,7 @@ export default function DatasetStructures() {
           class: response.class,
           mutation: response.mutation,
           structure3d: response.structure3d,
+          species:response.species,
         
           receptorStructure: response.pdbData, // PDB data from API
           ligandStructure: response.sdfData,   // SDF data from API
