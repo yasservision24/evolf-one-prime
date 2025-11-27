@@ -121,7 +121,7 @@ const Index = () => {
                 onClick={() => navigate('/dataset/dashboard')}
               >
                 Explore Database
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                
               </Button> 
             </Card>
 
@@ -202,7 +202,7 @@ const Index = () => {
                 Model Training
               </h3>
               <p className="text-foreground/80 text-sm md:text-base leading-relaxed">
-                Employs deep learning architectures to learn molecular ineteraction patterns , ensuring high generalization and interpretability across GPCR families.
+                Employs deep learning architectures to learn molecular ineteraction patterns, ensuring high generalization and interpretability across GPCR families.
               </p>
             </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, ExternalLink, Download } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink, Download, Star, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -40,6 +40,11 @@ export default function DatasetReceptor() {
   const [loading, setLoading] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (!evolfId) {
@@ -128,29 +133,126 @@ export default function DatasetReceptor() {
     copyToClipboard(fastaContent, 'fasta-sequence');
   };
 
+  // Function to parse mutation impact and create hyperlinks for EvOlf IDs
+  const parseMutationImpact = (impact: string) => {
+    if (!impact || impact === 'N/A') return null;
+
+    // Check which pattern the impact follows
+    if (impact === 'Wild-type data not available for direct comparison') {
+      return { type: 'no-data', text: impact };
+    }
+
+    // Patterns that contain EvOlf IDs - handle all three formats
+    const patterns = [
+      // Format 1: With brackets [EvOlfXXXXX]
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference \[(EvOlf\d+)\]/,
+      // Format 2: Without brackets EvOlfXXXXX
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference (EvOlf\d+)/,
+      // Format 3: Just the EvOlf ID at the end
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference(.*)(EvOlf\d+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = impact.match(pattern);
+      if (match) {
+        let functionType, evolfId;
+        
+        if (pattern === patterns[0]) {
+          // Format 1: With brackets
+          [, functionType, evolfId] = match;
+        } else if (pattern === patterns[1]) {
+          // Format 2: Without brackets
+          [, functionType, evolfId] = match;
+        } else {
+          // Format 3: Mixed/other format
+          [, functionType, , evolfId] = match;
+        }
+
+        const baseText = `${functionType} with respect to wild type reference`;
+        return { 
+          type: 'with-reference', 
+          baseText, 
+          evolfId,
+          fullText: impact,
+          functionType
+        };
+      }
+    }
+
+    // Default case for unknown patterns
+    return { type: 'unknown', text: impact };
+  };
+
+  const MutationImpactField = () => {
+    const impactData = parseMutationImpact(data?.mutationImpact || 'N/A');
+    
+    if (!impactData) {
+      return (
+        <div className="py-3 border-b border-border/50 last:border-0">
+          <div className="text-sm text-muted-foreground mb-2">Mutation Impact</div>
+          <div className="text-foreground font-medium">N/A</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="py-3 border-b border-border/50 last:border-0">
+        <div className="text-sm text-muted-foreground mb-2">Mutation Impact</div>
+        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
+          {impactData.type === 'no-data' && (
+            <span className="text-muted-foreground italic">{impactData.text}</span>
+          )}
+          
+          {impactData.type === 'with-reference' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span>{impactData.baseText}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-mono gap-1"
+                onClick={() => window.open(`/dataset/detail?evolfid=${impactData.evolfId}`)}
+              >
+                <LinkIcon className="h-3 w-3" />
+                {impactData.evolfId}
+              </Button>
+            </div>
+          )}
+          
+          {impactData.type === 'unknown' && (
+            <span>{impactData.text}</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const InfoField = ({ 
     label, 
     value, 
     copyable = false, 
-    fieldKey = '' 
+    fieldKey = '',
+    allowWrap = false 
   }: { 
     label: string; 
     value: string | number; 
     copyable?: boolean; 
     fieldKey?: string;
+    allowWrap?: boolean;
   }) => {
     const displayValue = value?.toString() || 'N/A';
     
     return (
-      <div className="py-3">
+      <div className="py-3 border-b border-border/50 last:border-0">
         <div className="text-sm text-muted-foreground mb-1">{label}</div>
         <div className="flex items-center justify-between gap-2">
-          <div className="text-foreground font-medium">{displayValue}</div>
+          <div className={`text-foreground font-medium ${allowWrap ? 'break-words whitespace-normal leading-relaxed' : ''}`}>
+            {displayValue}
+          </div>
           {copyable && displayValue !== 'N/A' && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0"
+              className="h-7 w-7 p-0 flex-shrink-0"
               onClick={() => copyToClipboard(displayValue, fieldKey)}
             >
               {copiedField === fieldKey ? (
@@ -164,6 +266,44 @@ export default function DatasetReceptor() {
       </div>
     );
   };
+
+  const MutationField = ({ 
+    label, 
+    value 
+  }: { 
+    label: string; 
+    value: string | null | undefined;
+  }) => {
+    const displayValue = value || 'N/A';
+    const isLongMutation = displayValue.length > 30;
+    
+    return (
+      <div className="py-3 border-b border-border/50 last:border-0">
+        <div className="text-sm text-muted-foreground mb-2">{label}</div>
+        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
+          {isLongMutation ? (
+            // Display as individual mutation badges for long mutation strings
+            <div className="flex flex-wrap gap-1">
+              {displayValue.split('/').map((mutation, index) => (
+                <span 
+                  key={index} 
+                  className="inline-block bg-secondary/50 px-2 py-1 rounded text-sm border border-border"
+                >
+                  {mutation}
+                </span>
+              ))}
+            </div>
+          ) : (
+            // Display as normal text for shorter mutations
+            displayValue
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const isMutant = data?.mutationStatus === 'Mutant';
+  const isWildType = data?.mutationStatus === 'Wild type';
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -213,7 +353,17 @@ export default function DatasetReceptor() {
                 {data.class}
               </Badge>
             )}
-            
+            {!loading && isMutant && (
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                <Star className="h-3 w-3 fill-yellow-600 mr-1" />
+                Mutant
+              </Badge>
+            )}
+            {!loading && isWildType && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                Wild Type
+              </Badge>
+            )}
           </div>
 
           {/* Navigation Tabs */}
@@ -271,7 +421,6 @@ export default function DatasetReceptor() {
               <h2 className="text-lg font-semibold mb-6">Basic Information</h2>
               <div className="space-y-4">
                 <InfoField label="Receptor Name" value={data?.receptorName || data?.receptor || 'N/A'} />
-                <InfoField label="Class" value={data?.class || 'N/A'} />
                 <InfoField label="Species" value={data?.species || 'N/A'} />
                 <InfoField label="Receptor Subtype" value={data?.receptorSubtype || 'N/A'} />
                 <InfoField 
@@ -293,8 +442,6 @@ export default function DatasetReceptor() {
                     </Button>
                   </div>
                 )}
-                
-                
               </div>
             </div>
           </Card>
@@ -303,9 +450,9 @@ export default function DatasetReceptor() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Mutation Information</h2>
               <div className="space-y-4">
+                <MutationField label="Mutation" value={data?.mutation} />
                 <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
-                <InfoField label="Mutation" value={data?.mutation || 'N/A'} />
-                <InfoField label="Mutation Impact" value={data?.mutationImpact || 'N/A'} />
+                <MutationImpactField />
               </div>
             </div>
           </Card>
@@ -343,11 +490,10 @@ export default function DatasetReceptor() {
               )}
             </div>
           </Card>
-
         </div>
 
         {/* Wild Type Link for Mutants */}
-        {!loading && data?.mutationStatus?.toLowerCase() === 'mutant' && data?.wildTypeEvolfId && (
+        {!loading && isMutant && data?.wildTypeEvolfId && (
           <Card className="bg-card border-border mt-6">
             <div className="p-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -362,6 +508,24 @@ export default function DatasetReceptor() {
                 <ExternalLink className="h-4 w-4" />
                 View Wild Type Receptor
               </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* UniProt Link Footnote for Mutants */}
+        {!loading && isMutant && (
+          <Card className="bg-card border-yellow-200 bg-yellow-50 mt-6">
+            <div className="p-4">
+              <div className="flex items-start gap-2 text-sm text-yellow-800">
+                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium mb-1">Note about UniProt links:</p>
+                  <p>
+                    This is a mutant protein variant. The UniProt link points to the wild-type protein entry 
+                    for reference. The star icon indicates this is a mutant version of the linked protein.
+                  </p>
+                </div>
+              </div>
             </div>
           </Card>
         )}

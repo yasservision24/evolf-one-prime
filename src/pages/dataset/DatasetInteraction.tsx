@@ -322,6 +322,7 @@ export default function DatasetInteraction() {
             <div className="p-6">
               <h2 className="text-lg font-semibold mb-6">Experimental Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoField label="Binding Status" value={data?.class || 'N/A'} />
                 <MethodField label="Method" value={data?.method} />
                 <InfoField 
                   label="Value" 

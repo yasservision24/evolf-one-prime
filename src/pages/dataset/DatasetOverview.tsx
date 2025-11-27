@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2, FlaskConical, Info, Star } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Download, Database, TestTube, Loader2, FlaskConical, Info, Star, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
@@ -30,6 +30,7 @@ interface DatasetDetail {
   mutationStatus?: string;
   source?: string;
   sourceLinks?: string;
+  wildTypeEvolfId?: string;
 }
 
 export default function DatasetOverview() {
@@ -104,6 +105,99 @@ export default function DatasetOverview() {
     } finally {
       setExporting(false);
     }
+  };
+
+  // Function to parse mutation impact and create hyperlinks for EvOlf IDs
+  const parseMutationImpact = (impact: string) => {
+    if (!impact || impact === 'N/A') return null;
+
+    // Check which pattern the impact follows
+    if (impact === 'Wild-type data not available for direct comparison') {
+      return { type: 'no-data', text: impact };
+    }
+
+    // Patterns that contain EvOlf IDs - handle all three formats
+    const patterns = [
+      // Format 1: With brackets [EvOlfXXXXX]
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference \[(EvOlf\d+)\]/,
+      // Format 2: Without brackets EvOlfXXXXX
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference (EvOlf\d+)/,
+      // Format 3: Just the EvOlf ID at the end
+      /(No Change|Loss of Function|Gain of Function) with respect to wild type reference(.*)(EvOlf\d+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = impact.match(pattern);
+      if (match) {
+        let functionType, evolfId;
+        
+        if (pattern === patterns[0]) {
+          // Format 1: With brackets
+          [, functionType, evolfId] = match;
+        } else if (pattern === patterns[1]) {
+          // Format 2: Without brackets
+          [, functionType, evolfId] = match;
+        } else {
+          // Format 3: Mixed/other format
+          [, functionType, , evolfId] = match;
+        }
+
+        const baseText = `${functionType} with respect to wild type reference`;
+        return { 
+          type: 'with-reference', 
+          baseText, 
+          evolfId,
+          fullText: impact,
+          functionType
+        };
+      }
+    }
+
+    // Default case for unknown patterns
+    return { type: 'unknown', text: impact };
+  };
+
+  const MutationImpactField = () => {
+    const impactData = parseMutationImpact(data?.mutationImpact || 'N/A');
+    
+    if (!impactData) {
+      return (
+        <div className="py-3 border-b border-border/50 last:border-0">
+          <div className="text-sm text-muted-foreground mb-2">Mutation Impact</div>
+          <div className="text-foreground font-medium">N/A</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="py-3 border-b border-border/50 last:border-0">
+        <div className="text-sm text-muted-foreground mb-2">Mutation Impact</div>
+        <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
+          {impactData.type === 'no-data' && (
+            <span className="text-muted-foreground italic">{impactData.text}</span>
+          )}
+          
+          {impactData.type === 'with-reference' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span>{impactData.baseText}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-mono gap-1"
+                onClick={() => window.open(`/dataset/detail?evolfid=${impactData.evolfId}`)}
+              >
+                <LinkIcon className="h-3 w-3" />
+                {impactData.evolfId}
+              </Button>
+            </div>
+          )}
+          
+          {impactData.type === 'unknown' && (
+            <span>{impactData.text}</span>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const isMutant = data?.mutationStatus === 'Mutant';
@@ -492,11 +586,7 @@ export default function DatasetOverview() {
               <div className="space-y-3">
                 <MutationField label="Mutation" value={data?.mutation} />
                 <InfoField label="Mutation Status" value={data?.mutationStatus || 'N/A'} />
-                <InfoField 
-                  label="Mutation Impact" 
-                  value={data?.mutationImpact || 'N/A'} 
-                  allowWrap={true}
-                />
+                <MutationImpactField />
               </div>
             </div>
           </Card>
@@ -595,6 +685,28 @@ export default function DatasetOverview() {
           </div>
         </Card>
       </div>
+
+      {/* Wild Type Link for Mutants */}
+      {!loading && isMutant && data?.wildTypeEvolfId && (
+        <div className="container mx-auto px-6 pb-8">
+          <Card className="bg-card border-border">
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <span>* This is a mutant variant.</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/dataset/detail?evolfid=${data.wildTypeEvolfId}`)}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Wild Type Entry
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* UniProt Link Footnote for Mutants */}
       {!loading && isMutant && (
