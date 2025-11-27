@@ -299,7 +299,7 @@ export default function DatasetReceptor() {
                   copyable 
                   fieldKey="receptor-source"
                 />
-                {data?.sourceLinks && data.sourceLinks !== 'N/A'  && data.sourceLinks !== 'nan' && (
+                {data?.sourceLinks && data.sourceLinks !== 'N/A'  && data.sourceLinks !== 'nan' && data.sourceLinks !== '' && (
                   <div className="pt-2">
                     <div className="text-sm text-muted-foreground mb-2">Source Links:</div>
                     <div className="flex flex-wrap gap-2">
