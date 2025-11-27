@@ -490,7 +490,7 @@ export async function submitPrediction(data: PredictionRequestBody) {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new ApiError(
-      errorData.message || `Failed to submit prediction: ${response.statusText}`,
+      errorData.error || `Failed to submit prediction: ${response.statusText}`,
       response.status,
       errorData
     );
