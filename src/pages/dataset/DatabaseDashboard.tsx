@@ -339,31 +339,27 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Handle suggestion click - navigate directly to the entry
+   * Handle suggestion click - navigate directly to the entry by EvOlf_ID
    */
   const handleSuggestionClick = async (suggestion: any) => {
     console.log('Suggestion clicked:', suggestion);
+    console.log('EvOlf_ID:', suggestion.EvOlf_ID);
     
     // Hide suggestions dropdown
     setShowSuggestions(false);
     setFocusedSuggestionIndex(-1);
     
-    // Navigate directly to the detail page using EvOlf_ID
+    // Always navigate using EvOlf_ID - no fallback to search
     if (suggestion.EvOlf_ID) {
       navigate(`/dataset/detail?evolfid=${suggestion.EvOlf_ID}`);
     } else {
-      // Fallback: if no EvOlf_ID, perform a search with the available term
-      const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || '';
-      if (searchTerm) {
-        setSearchQuery(searchTerm);
-        setCurrentPage(1);
-        
-        if (searchDebounceRef.current) {
-          clearTimeout(searchDebounceRef.current);
-        }
-        
-        await fetchDatasetItems(searchTerm, 1);
-      }
+      // Show error if EvOlf_ID is missing
+      toast({
+        title: 'Navigation Error',
+        description: 'Unable to open entry: Missing EvOlf ID in suggestion data.',
+        variant: 'destructive',
+      });
+      console.error('Missing EvOlf_ID in suggestion:', suggestion);
     }
   };
 
