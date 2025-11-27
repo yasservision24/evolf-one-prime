@@ -531,7 +531,7 @@ const DatabaseDashboard = () => {
     },
     { 
       label: 'Total Receptors', 
-      value: "2,199", 
+      value: "1,196", 
       change: 'Unique Receptors', 
       icon: Dna, 
       color: 'text-green-400',
