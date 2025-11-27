@@ -339,41 +339,31 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Handle suggestion click - sets search term and triggers search
+   * Handle suggestion click - navigate directly to the entry
    */
   const handleSuggestionClick = async (suggestion: any) => {
-    // Extract search term from suggestion with better fallback logic
-    const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || suggestion.EvOlf_ID || '';
-    
-    console.log('Suggestion clicked:', { suggestion, searchTerm });
-    
-    // Auto-fill search input
-    setSearchQuery(searchTerm);
+    console.log('Suggestion clicked:', suggestion);
     
     // Hide suggestions dropdown
     setShowSuggestions(false);
     setFocusedSuggestionIndex(-1);
     
-    // Reset to first page for new search
-    setCurrentPage(1);
-    
-    // Clear any existing debounce timeout
-    if (searchDebounceRef.current) {
-      clearTimeout(searchDebounceRef.current);
-    }
-    
-    // Trigger search immediately with the new search term
-    try {
-      await fetchDatasetItems(searchTerm, 1);
-      
-      // Show success feedback
-      toast({
-        title: 'Search Updated',
-        description: `Searching for: ${searchTerm}`,
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error('Error performing search after suggestion click:', error);
+    // Navigate directly to the detail page using EvOlf_ID
+    if (suggestion.EvOlf_ID) {
+      navigate(`/dataset/detail?evolfid=${suggestion.EvOlf_ID}`);
+    } else {
+      // Fallback: if no EvOlf_ID, perform a search with the available term
+      const searchTerm = suggestion.Receptor || suggestion.Ligand || suggestion.Species || '';
+      if (searchTerm) {
+        setSearchQuery(searchTerm);
+        setCurrentPage(1);
+        
+        if (searchDebounceRef.current) {
+          clearTimeout(searchDebounceRef.current);
+        }
+        
+        await fetchDatasetItems(searchTerm, 1);
+      }
     }
   };
 
