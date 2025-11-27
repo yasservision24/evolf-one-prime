@@ -12,7 +12,7 @@ export const Footer = () => {
               About EvOlf   
             </h3>
             <p className="text-muted-foreground text-sm md:text-sm leading-relaxed">
-              A curated database of GPCR receptor-ligand interactions and deep learning platform for predicting binding affinity in drug discovery.
+              A curated database of GPCR receptor-ligand interactions and deep learning platform for predicting Binding Interactions.
             </p>
           </div>
 
@@ -26,7 +26,7 @@ export const Footer = () => {
                 { to: "/documentation", label: "How To Use EvOlf" },
                 { to: "/model-info", label: "Model Info" },
                 { to: "/api", label: "API" },
-                { to: "/links", label: "Usefull Links" },
+                { to: "/links", label: "Useful Links" },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
