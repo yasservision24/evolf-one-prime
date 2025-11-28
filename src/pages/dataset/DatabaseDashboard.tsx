@@ -91,7 +91,8 @@ const DatabaseDashboard = () => {
 
   // Pagination and search state
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState(''); // Input value for suggestions only
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search query that triggers pagination
   const [totalItems, setTotalItems] = useState(0);
   const [datasetItems, setDatasetItems] = useState<DatasetItem[]>([]);
   const [allEvolfIds, setAllEvolfIds] = useState<string[]>([]);
@@ -108,6 +109,7 @@ const DatabaseDashboard = () => {
   const searchDebounceRef = useRef<NodeJS.Timeout>();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   // Statistics from backend
   const [statistics, setStatistics] = useState({
@@ -145,6 +147,15 @@ const DatabaseDashboard = () => {
    * Fetch paginated dataset items with backend filtering
    */
   const fetchDatasetItems = async (overrideSearch?: string, overridePage?: number) => {
+    // Cancel previous request if exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller for this request
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    
     setIsLoading(true);
     try {
       const effectiveSearch = overrideSearch !== undefined ? overrideSearch : searchQuery;
@@ -172,28 +183,34 @@ const DatabaseDashboard = () => {
         selectedMutation || undefined
       );
       
-      setDatasetItems(data.data);
-      setTotalItems(data.pagination.totalItems);
-      setAllEvolfIds(data.all_evolf_ids || []);
-      
-      // Update statistics and filter options
-      if (data.statistics) {
-        setStatistics(data.statistics);
+      // Only update state if this request wasn't cancelled
+      if (!abortController.signal.aborted) {
+        setDatasetItems(data.data);
+        setTotalItems(data.pagination.totalItems);
+        setAllEvolfIds(data.all_evolf_ids || []);
+        
+        // Update statistics and filter options
+        if (data.statistics) {
+          setStatistics(data.statistics);
+        }
+        
+        // Update available filter options from API response
+        if (data.filterOptions) {
+          setFilterOptions(data.filterOptions);
+        }
       }
-      
-      // Update available filter options from API response
-      if (data.filterOptions) {
-        setFilterOptions(data.filterOptions);
+    } catch (error: any) {
+      // Don't show error if request was aborted
+      if (error.name !== 'AbortError' && !abortController.signal.aborted) {
+        console.error('Error fetching dataset:', error);
+        setDatasetItems([]);
+        setTotalItems(0);
       }
-    } catch (error) {
-      console.error('Error fetching dataset:', error);
-    
-      
-      setDatasetItems([]);
-      setTotalItems(0);
     } finally {
-      setIsLoading(false);
-      setIsInitialLoad(false);
+      if (!abortController.signal.aborted) {
+        setIsLoading(false);
+        setIsInitialLoad(false);
+      }
     }
   };
 
@@ -316,10 +333,10 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Handle search input change with debounce
+   * Handle search input change with debounce (only for suggestions, not pagination)
    */
   const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
+    setSearchInput(value);
     setFocusedSuggestionIndex(-1); // Reset focus when typing
     
     // Clear previous debounce timeout
@@ -327,7 +344,7 @@ const DatabaseDashboard = () => {
       clearTimeout(searchDebounceRef.current);
     }
 
-    // Debounce search suggestions
+    // Debounce search suggestions (no pagination API call)
     if (value.trim().length > 0) {
       searchDebounceRef.current = setTimeout(() => {
         fetchSearchSuggestions(value);
@@ -395,7 +412,7 @@ const DatabaseDashboard = () => {
   };
 
   /**
-   * Improved search submit handler
+   * Improved search submit handler - triggers pagination API call
    */
   const handleSearchSubmit = async () => {
     setShowSuggestions(false);
@@ -407,8 +424,8 @@ const DatabaseDashboard = () => {
       clearTimeout(searchDebounceRef.current);
     }
     
-    // Trigger search with current query
-    await fetchDatasetItems(searchQuery, 1);
+    // Update search query from input (this triggers the useEffect)
+    setSearchQuery(searchInput);
   };
 
   /**
@@ -428,6 +445,7 @@ const DatabaseDashboard = () => {
     setSelectedSpecies('');
     setSelectedClass('');
     setSelectedMutation('');
+    setSearchInput('');
     setSearchQuery('');
     setCurrentPage(1);
   };
@@ -439,7 +457,10 @@ const DatabaseDashboard = () => {
     if (type === 'species') setSelectedSpecies('');
     else if (type === 'class') setSelectedClass('');
     else if (type === 'mutation') setSelectedMutation('');
-    else if (type === 'search') setSearchQuery('');
+    else if (type === 'search') {
+      setSearchInput('');
+      setSearchQuery('');
+    }
     setCurrentPage(1);
   };
 
@@ -742,11 +763,11 @@ const DatabaseDashboard = () => {
                       ref={searchInputRef}
                       type="text"
                       placeholder="Search by receptor, ligand, species, UniProt ID, PubChem ID..."
-                      value={searchQuery}
+                      value={searchInput}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
                       onFocus={() => {
-                        if (searchQuery.trim().length > 0 && searchSuggestions.length > 0) {
+                        if (searchInput.trim().length > 0 && searchSuggestions.length > 0) {
                           setShowSuggestions(true);
                         }
                       }}
