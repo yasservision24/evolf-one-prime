@@ -69,8 +69,13 @@ const TermsOfUse = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-3">Contact</h2>
               <p className="text-muted-foreground">
-                If you have questions about appropriate usage or need higher volume access, 
-                please contact us at gaurav.ahuaja@iiitd.ac.in.
+                If you have questions about appropriate usage or need higher volume access, please contact us at {" "}
+                <a 
+                  href="mailto:gaurav.ahuja@iiitd.ac.in"
+                  className="text-accent hover:underline"
+                >
+                  gaurav.ahuja@iiitd.ac.in
+                </a>
               </p>
             </section>
           </div>

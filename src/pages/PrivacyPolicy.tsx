@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-muted-foreground text-sm mb-8">Last updated: November 2025</p>
+          <p className="text-muted-foreground text-sm mb-8">Last updated: January 2025</p>
 
           <div className="prose prose-invert max-w-none space-y-6">
             <section>
@@ -40,29 +40,36 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold mb-3">Recommendation for Sensitive Data</h2>
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 my-4">
                 <h3 className="font-semibold text-blue-400 mb-2">Important Notice</h3>
-                <p className="text-muted-foreground text-sm mb-4">
+                <p className="text-muted-foreground text-sm mb-3">
                   If you are working with sensitive or confidential data, we strongly recommend 
                   running EvOlf locally on your own infrastructure to maintain full data control 
                   and privacy.
                 </p>
-                <p className="text-muted-foreground text-sm mb-4">
-                  You can access our Docker images and run EvOlf locally:
+                <p className="text-muted-foreground text-sm">
+                  You can access our open-source pipeline and run it locally:
+                  <br />
+                  <a 
+                    href="https://github.com/evolf/evolf-pipeline" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline inline-flex items-center gap-1 mt-2"
+                  >
+                    GitHub Repository: evolf-pipeline
+                  </a>
                 </p>
-                <a 
-                  href="https://hub.docker.com/repositories/ahujalab" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Docker Hub: ahujalab
-                </a>
               </div>
             </section>
 
-            <section>
+              <section>
               <h2 className="text-2xl font-semibold mb-3">Contact</h2>
               <p className="text-muted-foreground">
-                If you have questions about data handling practices, please contact us at privacy@evolf.com.
+                If you have questions about data handling practices, please contact us at{" "}
+                <a 
+                  href="mailto:gaurav.ahuja@iiitd.ac.in"
+                  className="text-accent hover:underline"
+                >
+                  gaurav.ahuja@iiitd.ac.in
+                </a>
               </p>
             </section>
           </div>

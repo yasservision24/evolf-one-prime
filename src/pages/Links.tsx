@@ -70,8 +70,25 @@ const Links = () => {
                     >
                       <Github className="h-6 w-6 text-accent flex-shrink-0" />
                       <div className="text-left">
-                        <h3 className="font-semibold">Web Server Source Code</h3>
+                        <h3 className="font-semibold">EvOlf Web Server Source Code</h3>
                         <p className="text-sm text-muted-foreground">EvOlf</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground ml-auto" />
+                    </a>
+
+                    
+
+                    {/* Pipeline Source Code */}
+                    <a 
+                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-accent/10 hover:border-accent transition-colors"
+                    >
+                      <Github className="h-6 w-6 text-accent flex-shrink-0" />
+                      <div className="text-left">
+                        <h3 className="font-semibold">Evolf Local Pipeline</h3>
+                        <p className="text-sm text-muted-foreground">evolf-pipeline</p>
                       </div>
                       <ExternalLink className="h-4 w-4 text-muted-foreground ml-auto" />
                     </a>
@@ -85,23 +102,8 @@ const Links = () => {
                     >
                       <Github className="h-6 w-6 text-accent flex-shrink-0" />
                       <div className="text-left">
-                        <h3 className="font-semibold">Models Source Code</h3>
+                        <h3 className="font-semibold">EvOlf Source Code</h3>
                         <p className="text-sm text-muted-foreground">evolf-pipeline-source</p>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground ml-auto" />
-                    </a>
-
-                    {/* Pipeline Source Code */}
-                    <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-accent/10 hover:border-accent transition-colors"
-                    >
-                      <Github className="h-6 w-6 text-accent flex-shrink-0" />
-                      <div className="text-left">
-                        <h3 className="font-semibold">Pipeline Source Code</h3>
-                        <p className="text-sm text-muted-foreground">evolf-pipeline</p>
                       </div>
                       <ExternalLink className="h-4 w-4 text-muted-foreground ml-auto" />
                     </a>

@@ -25,7 +25,7 @@ export const Footer = () => {
               {[
                 { to: "/documentation", label: "How To Use EvOlf" },
                 { to: "/model-info", label: "Model Info" },
-                { to: "/api", label: "API" },
+                { to: "/api-docs", label: "API" },
                 { to: "/links", label: "Useful Links" },
               ].map((link) => (
                 <li key={link.to}>
@@ -47,7 +47,7 @@ export const Footer = () => {
             </h3>
             <ul className="space-y-3 md:space-y-2">
               {[
-                { to: "/faq", label: "FAQ" },
+                { to: "/faq", label: "FAQs" },
                 { to: "/contact", label: "Contact" },
                 { to: "/cite-us", label: "Cite Us" },
                 

@@ -89,7 +89,13 @@ const License = () => {
                 in all copies or substantial portions of the software.
               </p>
               <p className="text-muted-foreground">
-                For more questions, please contact: gaurav.ahuja@iiitd.ac.in
+                For more questions, please contact:{" "}
+                <a 
+                  href="mailto:gaurav.ahuja@iiitd.ac.in"
+                  className="text-accent hover:underline"
+                >
+                  gaurav.ahuja@iiitd.ac.in
+                </a>
               </p>
             </Card>
           </div>

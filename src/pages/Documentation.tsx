@@ -110,7 +110,7 @@ const Documentation = () => {
                   rel="noopener noreferrer"
                   className="text-accent hover:underline font-semibold"
                 >
-                  Web Server Source Code: EvOlf
+                  EvOlf Web Server Source Code: EvOlf
                 </a>
               </div>
               <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
@@ -121,7 +121,7 @@ const Documentation = () => {
                   rel="noopener noreferrer"
                   className="text-accent hover:underline font-semibold"
                 >
-                  Models Source Code: evolf-pipeline-source
+                  Evolf Source Code: evolf-pipeline-source
                 </a>
               </div>
               <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
@@ -132,7 +132,7 @@ const Documentation = () => {
                   rel="noopener noreferrer"
                   className="text-accent hover:underline font-semibold"
                 >
-                  Pipeline Source Code: evolf-pipeline
+                  EvOlf Local Pipeline: evolf-pipeline
                 </a>
               </div>
             </div>
