@@ -19,81 +19,77 @@ const License = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">License</h1>
           <p className="text-muted-foreground text-lg mb-8">
-            evolf database and software licensing information
+            evolf software licensing information
           </p>
 
           <div className="space-y-6">
             <Card className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Database License</h2>
-              <h3 className="text-lg font-semibold mb-2">Creative Commons Attribution 4.0 International (CC BY 4.0)</h3>
-              <p className="text-muted-foreground mb-4">
-                The evolf database is licensed under CC BY 4.0. This allows you to:
-              </p>
-              <ul className="space-y-2 mb-4">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    <strong>Share</strong> — copy and redistribute the material in any medium or format
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    <strong>Adapt</strong> — remix, transform, and build upon the material for any purpose
-                  </span>
-                </li>
-              </ul>
-              <p className="text-muted-foreground text-sm">
-                <strong>Under the following terms:</strong> You must give appropriate credit, provide a link 
-                to the license, and indicate if changes were made. You may not apply legal terms or technological 
-                measures that legally restrict others from doing anything the license permits.
-              </p>
-            </Card>
-
-            <Card className="p-6">
               <h2 className="text-2xl font-semibold mb-4">Software License</h2>
               <h3 className="text-lg font-semibold mb-2">MIT License</h3>
-              <div className="bg-secondary p-4 rounded-lg text-sm">
-                <p className="text-muted-foreground mb-2">Copyright (c) 2025 evolf Team</p>
+              <p className="text-muted-foreground mb-4">
+                The evolf software, including all source code, is licensed under the MIT License.
+              </p>
+              <div className="bg-secondary p-4 rounded-lg text-sm font-mono">
                 <p className="text-muted-foreground mb-4">
-                  Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-                  software and associated documentation files (the "Software"), to deal in the Software 
-                  without restriction, including without limitation the rights to use, copy, modify, merge, 
-                  publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons 
-                  to whom the Software is furnished to do so, subject to the following conditions:
-                </p>
-                <p className="text-muted-foreground mb-4">
-                  The above copyright notice and this permission notice shall be included in all copies or 
-                  substantial portions of the Software.
-                </p>
-                <p className="text-muted-foreground">
-                  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-                  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-                  PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-                  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-                  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-                  DEALINGS IN THE SOFTWARE.
+                  MIT License<br /><br />
+                  Copyright (c) 2025 evolf Team<br /><br />
+                  Permission is hereby granted, free of charge, to any person obtaining a copy<br />
+                  of this software and associated documentation files (the "Software"), to deal<br />
+                  in the Software without restriction, including without limitation the rights<br />
+                  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br />
+                  copies of the Software, and to permit persons to whom the Software is<br />
+                  furnished to do so, subject to the following conditions:<br /><br />
+                  The above copyright notice and this permission notice shall be included in all<br />
+                  copies or substantial portions of the Software.<br /><br />
+                  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br />
+                  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br />
+                  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br />
+                  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br />
+                  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br />
+                  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br />
+                  SOFTWARE.
                 </p>
               </div>
             </Card>
 
             <Card className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Model License</h2>
-              <p className="text-muted-foreground mb-4">
-                The evolf prediction model is available for academic and research use under CC BY-NC 4.0 
-                (Attribution-NonCommercial). Commercial use requires a separate license agreement.
-              </p>
-              <p className="text-muted-foreground">
-                For commercial licensing inquiries, please contact: licensing@evolf.com
-              </p>
+              <h2 className="text-2xl font-semibold mb-4">What You Can Do</h2>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    <strong>Use commercially</strong> - Use in proprietary software and commercial products
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    <strong>Modify</strong> - Change the source code to fit your needs
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    <strong>Distribute</strong> - Share original or modified versions
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    <strong>Sublicense</strong> - Include in larger projects with different licenses
+                  </span>
+                </li>
+              </ul>
             </Card>
 
-            <Card className="p-6 bg-secondary/50">
-              <h3 className="text-lg font-semibold mb-2">Third-Party Licenses</h3>
-              <p className="text-muted-foreground text-sm">
-                evolf incorporates open-source software components. A complete list of third-party licenses 
-                is available in our GitHub repository. We are grateful to the open-source community for their 
-                contributions.
+            <Card className="p-6">
+              <h2 className="text-2xl font-semibold mb-4">Your Responsibilities</h2>
+              <p className="text-muted-foreground mb-4">
+                The MIT License only requires that you include the copyright notice and license text 
+                in all copies or substantial portions of the software.
+              </p>
+              <p className="text-muted-foreground">
+                For more questions, please contact: gaurav.ahuja@iiitd.ac.in
               </p>
             </Card>
           </div>

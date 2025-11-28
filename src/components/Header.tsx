@@ -27,6 +27,11 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               onClick={() => onNavigate('home')}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
+              <img 
+                src="/favicon.ico" 
+                alt="EvOlf Logo" 
+                className="h-8 w-8"
+              />
               <h1 className="text-xl font-semibold gradient-evolf">EvOlf</h1>
             </button>
             {/* Navigation */}
@@ -84,6 +89,11 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                     onClick={() => onNavigate('home')}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
+                    <img 
+                      src="/favicon.ico" 
+                      alt="EvOlf Logo" 
+                      className="h-8 w-8"
+                    />
                     <h1 className="text-2xl font-semibold gradient-evolf">EvOlf</h1>
                   </button>
                 </SheetTitle>

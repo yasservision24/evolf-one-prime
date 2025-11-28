@@ -16,80 +16,61 @@ const TermsOfUse = () => {
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">Terms of Use</h1>
-          <p className="text-muted-foreground text-sm mb-8">Last updated: January 2025</p>
+          <p className="text-muted-foreground text-sm mb-8">Last updated: November 2025</p>
 
           <div className="prose prose-invert max-w-none space-y-6">
             <section>
-              <h2 className="text-2xl font-semibold mb-3">1. Acceptance of Terms</h2>
+              <h2 className="text-2xl font-semibold mb-3">Acceptance of Terms</h2>
               <p className="text-muted-foreground">
-                By accessing and using evolf, you accept and agree to be bound by the terms and provision 
-                of this agreement. If you do not agree to these terms, please do not use our services.
+                By accessing and using EvOlf, you accept and agree to be bound by these terms of use. 
+                If you do not agree to these terms, please do not use our services.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3">2. Use License</h2>
+              <h2 className="text-2xl font-semibold mb-3">Resource Usage Limitations</h2>
+              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 my-4">
+                <h3 className="font-semibold text-yellow-400 mb-2">Important: Responsible Usage</h3>
+                <p className="text-muted-foreground text-sm">
+                  Users are expected to be respectful of resource constraints when using the EvOlf web 
+                  interface and APIs. Do not send continuous calls or automated requests to the EvOlf 
+                  server for predictions.
+                </p>
+              </div>
               <p className="text-muted-foreground">
-                Permission is granted to temporarily access the materials on evolf for personal, 
-                non-commercial transitory viewing only. This license shall automatically terminate if you 
-                violate any of these restrictions.
+                The EvOlf service operates on shared academic infrastructure with limited computational 
+                resources. Excessive or abusive usage that impacts service availability for other users 
+                may result in temporary or permanent access restrictions.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3">3. Data Usage</h2>
+              <h2 className="text-2xl font-semibold mb-3">Fair Use Policy</h2>
               <p className="text-muted-foreground mb-2">
-                The evolf database is provided under CC BY 4.0 license. You may:
+                To ensure fair access for all users:
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                <li>Use the data for academic and research purposes</li>
-                <li>Download and analyze the dataset</li>
-                <li>Cite the data in publications</li>
+                <li>Do not attempt to overwhelm the service with high-frequency requests</li>
+                <li>Allow reasonable intervals between prediction requests</li>
+                
+                <li>Consider running EvOlf locally for high-volume or production usage</li>
               </ul>
-              <p className="text-muted-foreground mt-2">
-                Commercial use requires a separate license agreement. Contact us for more information.
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-3">Service Limitations</h2>
+              <p className="text-muted-foreground">
+                The EvOlf web service is provided for research and academic use. We do not guarantee 
+                uninterrupted service availability and reserve the right to limit usage or implement 
+                rate limiting as necessary to maintain service stability for all users.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-3">4. API Usage</h2>
+              <h2 className="text-2xl font-semibold mb-3">Contact</h2>
               <p className="text-muted-foreground">
-                API access is subject to rate limits and fair use policies. Excessive usage may result 
-                in temporary suspension of access. Commercial API usage requires a paid subscription.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-3">5. Disclaimer</h2>
-              <p className="text-muted-foreground">
-                The materials on evolf are provided on an 'as is' basis. We make no warranties, expressed 
-                or implied, and hereby disclaim and negate all other warranties including, without limitation, 
-                implied warranties or conditions of merchantability, fitness for a particular purpose, or 
-                non-infringement of intellectual property.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-3">6. Limitations</h2>
-              <p className="text-muted-foreground">
-                In no event shall evolf or its suppliers be liable for any damages (including, without 
-                limitation, damages for loss of data or profit, or due to business interruption) arising 
-                out of the use or inability to use the materials on evolf.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-3">7. Modifications</h2>
-              <p className="text-muted-foreground">
-                We may revise these terms of service at any time without notice. By using this website, 
-                you are agreeing to be bound by the then current version of these terms of service.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-3">8. Contact</h2>
-              <p className="text-muted-foreground">
-                If you have any questions about these Terms, please contact us at legal@evolf.com.
+                If you have questions about appropriate usage or need higher volume access, 
+                please contact us at gaurav.ahuaja@iiitd.ac.in.
               </p>
             </section>
           </div>
