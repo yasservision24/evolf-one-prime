@@ -16,12 +16,9 @@ const CiteUs = () => {
     else if (page === 'model') navigate('/prediction');
   };
 
-  const citation = `Ahuja, G., et al. (2025). EvOlf: A deep learning framework for predicting ligand-GPCR interactions across multiple species. Nature Communications, 16(1), 123-135. doi:10.1038/s41467-025-00123-4`;
+  const citation = `Under Review`;
 
-  const bibtex = `@article{ahuja2025evolf,
-...
-  doi={10.1038/s41467-025-00123-4}
-}`;
+  const bibtex = `Under Review`;
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
