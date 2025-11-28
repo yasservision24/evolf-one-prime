@@ -124,9 +124,19 @@ const Links = () => {
                       For high-throughput predictions, we recommend using our local Nextflow pipeline 
                       with the Docker images for easy deployment.
                     </p>
-                    <p className="text-sm mt-4">
-                      Maintained by <strong>The Ahuja Lab</strong>
-                    </p>
+
+                    <a 
+                      href="https://www.ahuja-lab.in/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm mt-4"
+                    >
+                    <div className="text-center">
+                      <h3 className="hover:text-accent mb-4 mx-auto">Maintained By Ahuja Lab</h3>
+                    </div>
+                    </a>
+                  
+                   
                   </div>
                 </div>
               </Card>

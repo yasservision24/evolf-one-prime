@@ -19,9 +19,15 @@ export const Footer = () => {
             <h3 className="text-foreground font-semibold mb-3 md:mb-4 text-base md:text-base transition-colors duration-300 hover:text-brand-purple">
               About EvOlf   
             </h3>
-            <p className="text-muted-foreground text-sm md:text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm md:text-sm leading-relaxed mb-3">
               A curated database of GPCR receptor-ligand interactions and deep learning platform for predicting Binding Interactions.
             </p>
+            <Link
+              to="/team"
+              className="text-muted-foreground font-semibold  text-sm md:text-sm block py-1 transition-colors duration-300 hover:text-brand-purple hover:underline"
+            >
+              Meet The Developers
+            </Link>
           </div>
 
           {/* Resources */}

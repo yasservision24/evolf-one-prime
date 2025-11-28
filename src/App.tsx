@@ -13,6 +13,8 @@ import DatasetStructures from "./pages/dataset/DatasetStructures";
 import PredictionDashboard from "./pages/prediction/PredictionDashboard";
 import PredictionResult from "./pages/prediction/PredictionResult";
 import NotFound from "./pages/NotFound";
+import Team from "./pages/Team";
+
 
 import Documentation from "./pages/Documentation";
 import ModelInfo from "./pages/ModelInfo";
@@ -55,6 +57,7 @@ const App = () => (
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cite-us" element={<CiteUs />} />
+        <Route path = "/team" element={<Team/>}/>
         
         <Route path="/terms-of-use" element={<TermsOfUse />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
