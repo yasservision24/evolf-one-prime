@@ -1,6 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export const Footer = () => {
+  const location = useLocation();
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <footer className="bg-background border-t border-border">
       <div className="container mx-auto px-4 py-8 md:py-12">
@@ -102,4 +110,3 @@ export const Footer = () => {
     </footer>
   );
 };
- 
