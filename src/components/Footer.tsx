@@ -23,7 +23,7 @@ export const Footer = () => {
               A curated database of GPCR receptor-ligand interactions and deep learning platform for predicting Binding Interactions.
             </p>
             <Link
-              to="/team"
+              to="/dev-team"
               className="text-muted-foreground font-semibold  text-sm md:text-sm block py-1 transition-colors duration-300 hover:text-brand-purple hover:underline"
             >
               Meet The Developers
