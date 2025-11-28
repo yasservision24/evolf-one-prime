@@ -9,7 +9,6 @@ import re
 
 from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.db.models import Q
-from django.contrib.postgres.search import TrigramSimilarity
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
