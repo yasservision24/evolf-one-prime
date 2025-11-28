@@ -1,6 +1,6 @@
 # EvOlf Platform - Complete Documentation
 
-Comprehensive documentation for the EvOlf GPCR research platform, covering architecture, setup, API, and features.
+Comprehensive documentation for the EvOlf GPCR research platform, covering full-stack architecture, setup, features, and deployment.
 
 ---
 
@@ -8,165 +8,396 @@ Comprehensive documentation for the EvOlf GPCR research platform, covering archi
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
+   - [Frontend Stack](#frontend-stack)
+   - [Backend Stack](#backend-stack)
 3. [System Architecture](#system-architecture)
+   - [Full-Stack Data Flow](#full-stack-data-flow)
+   - [Backend Architecture](#backend-architecture)
+   - [Frontend Architecture](#frontend-architecture)
 4. [Setup Instructions](#setup-instructions)
    - [Backend Setup](#backend-setup)
    - [Frontend Setup](#frontend-setup)
-   - [Docker Setup (Optional)](#docker-setup-optional)
-5. [API Documentation](#api-documentation)
-   - [Dataset Endpoints](#dataset-endpoints)
-   - [Search Endpoints](#search-endpoints)
-   - [Prediction Endpoints](#prediction-endpoints)
-6. [Frontend Features](#frontend-features)
-7. [Database Schema](#database-schema)
-8. [Search Functionality](#search-functionality)
-9. [File Structure](#file-structure)
-10. [Deployment](#deployment)
-11. [Troubleshooting](#troubleshooting)
+   - [Docker Setup](#docker-setup-optional)
+5. [Features](#features)
+   - [Dataset Browser](#dataset-browser)
+   - [Detail Pages](#detail-pages)
+   - [Search Functionality](#search-functionality)
+   - [Prediction System](#prediction-system)
+6. [Performance Optimizations](#performance-optimizations)
+7. [API Documentation](#api-documentation)
+8. [Database Schema](#database-schema)
+9. [Deployment](#deployment)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Project Overview
 
-**EvOlf** is a comprehensive platform for GPCR (G Protein-Coupled Receptors) research, providing:
+**EvOlf** is a full-stack web platform for GPCR (G Protein-Coupled Receptors) research, providing:
 
-- **Curated Database**: Browse 250+ GPCR-ligand interactions with detailed annotations
-- **Advanced Search**: ElasticSearch-powered full-text search with filtering
-- **Prediction System**: Submit SMILES-based ligand predictions for binding affinity
-- **3D Visualization**: Interactive molecular structure viewers (PDB/SDF)
-- **Data Export**: Download datasets in multiple formats (CSV, ZIP)
-- **RESTful API**: Complete programmatic access for integration
+### Core Features
 
-**Key Features**:
-- Server-side pagination and filtering for performance
-- Real-time search with autocomplete
-- Asynchronous job processing for predictions
-- Responsive design with dark mode support
-- Export filtered or complete datasets
+- **Curated Database**: Browse 250+ GPCR-ligand interactions with comprehensive annotations
+- **Advanced Search**: ElasticSearch-powered full-text search with PostgreSQL fallback
+- **Detail Views**: Multi-tab interface for receptors, ligands, interactions, and 3D structures
+- **Prediction System**: Submit SMILES-based binding affinity predictions
+- **3D Visualization**: Interactive molecular structure viewers (PDB/SDF formats)
+- **Data Export**: Bulk downloads in CSV/ZIP formats
+- **RESTful API**: Complete programmatic access for researchers
+
+### Key Capabilities
+
+- **Server-Side Operations**: Pagination, filtering, and sorting on the backend
+- **Real-Time Search**: Debounced search with instant results
+- **Async Job Processing**: Background prediction pipeline
+- **Responsive Design**: Mobile-optimized with hamburger navigation
+- **Dark Mode**: Full dark mode support
+- **Context-Based State**: Shared data across tabs to prevent duplicate API calls
 
 ---
 
 ## Technology Stack
 
-### Frontend
+### Frontend Stack
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **React** | 18.3.1 | UI framework |
+| **React** | 18.3.1 | UI library |
 | **TypeScript** | 5.x | Type safety |
-| **Vite** | Latest | Build tool and dev server |
+| **Vite** | Latest | Build tool & dev server (port 8080) |
 | **React Router** | 6.30.1 | Client-side routing |
 | **TanStack Query** | 5.83.0 | Server state management |
 | **Tailwind CSS** | 3.x | Utility-first styling |
 | **Radix UI** | Latest | Accessible UI primitives |
-| **shadcn/ui** | Latest | Pre-built components |
+| **shadcn/ui** | Latest | Pre-built component library |
 
-**UI Component Libraries**:
-- `lucide-react`: Icons
+**Additional Libraries**:
+- `lucide-react`: Icon system
 - `recharts`: Data visualization
 - `sonner`: Toast notifications
-- `vaul`: Drawer components
+- `vaul`: Drawer/sheet components
+- `react-hook-form`: Form management
+- `zod`: Schema validation
 
-### Backend
+**State Management**:
+- **Context API**: Shared dataset details across tabs
+- **TanStack Query**: API response caching
+- **Local State**: Component-specific UI state
+
+### Backend Stack
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **Django** | 4.x | Web framework |
 | **Django REST Framework** | 3.x | API framework |
 | **PostgreSQL** | 14+ | Primary database |
-| **ElasticSearch** | 8.x | Search engine |
+| **ElasticSearch** | 8.x | Full-text search engine |
 | **Pandas** | Latest | Data processing |
+| **Gunicorn** | Latest | WSGI server (production) |
 
 **Backend Dependencies**:
-- `psycopg2`: PostgreSQL adapter
-- `django-cors-headers`: CORS support
-- `python-decouple`: Environment config
+- `psycopg2-binary`: PostgreSQL adapter
+- `django-cors-headers`: CORS middleware
+- `python-decouple`: Environment variables
+- `elasticsearch-dsl`: ElasticSearch integration
 
 ### Design System
 
-**Color Scheme** (EMBO-inspired):
-- **Primary**: White, Black, Yellow
+**Color Palette** (EMBO-inspired):
+- **Primary**: White (#FFFFFF), Black (#000000), Yellow (#FFD700)
 - **Accent Colors**:
-  - **Green** (#00C9A7 - teal): Database/Curation section
+  - **Teal** (#00C9A7): Database/Curation section
   - **Purple** (#8B5CF6): Prediction section
-- **Gradient**: "EvOlf" logo uses teal-to-purple gradient
-- **Semantic Tokens**: All colors defined in `index.css` using HSL
+- **Gradients**: Teal-to-purple for branding ("EvOlf" logo)
+- **Semantic Tokens**: All colors use HSL format in `index.css`
 
 **Typography**:
-- Responsive font scaling
 - System font stack with fallbacks
-- Semantic heading hierarchy
+- Responsive scaling (text-xs to text-2xl)
+- Consistent heading hierarchy
 
 ---
 
 ## System Architecture
 
+### Full-Stack Data Flow
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         Frontend                            │
-│  ┌────────────┐  ┌──────────────┐  ┌─────────────────┐    │
-│  │   React    │  │ React Router │  │  TanStack Query │    │
-│  │ Components │→ │   (Routes)   │→ │  (API Calls)    │    │
-│  └────────────┘  └──────────────┘  └─────────────────┘    │
-│         ↓                                    ↓              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │         API Client (src/lib/api.ts)                │    │
-│  │  - fetchDatasetPaginated()                         │    │
-│  │  - fetchDatasetDetail()                            │    │
-│  │  - submitPrediction()                              │    │
-│  │  - searchDataset()                                 │    │
-│  └────────────────────────────────────────────────────┘    │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ HTTP/REST
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│                         Backend                             │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │      Django REST Framework API Views               │    │
-│  │  - DatasetListAPIView (GET /dataset)               │    │
-│  │  - FetchDatasetDetails (GET /dataset/details/:id)  │    │
-│  │  - SmilesPredictionAPIView (POST /predict/smiles/) │    │
-│  │  - ElasticSearchView (GET /search/)                │    │
-│  └─────────────┬──────────────────────┬─────────────────┘  │
-│                ↓                      ↓                     │
-│  ┌──────────────────────┐  ┌───────────────────────┐      │
-│  │   PostgreSQL DB      │  │   ElasticSearch       │      │
-│  │  - EvOlf Model       │  │  - Full-text search   │      │
-│  │  - Relationships     │  │  - Fuzzy matching     │      │
-│  └──────────────────────┘  └───────────────────────┘      │
-│                ↓                                            │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │         File Storage (MEDIA_ROOT)                   │   │
-│  │  - pdb_files/     (3D protein structures)           │   │
-│  │  - sdf_files/     (3D ligand structures)            │   │
-│  │  - smiles_2d/     (2D structure images)             │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│               Prediction Pipeline (Docker)                  │
-│  - Accepts CSV with SMILES and sequences                    │
-│  - Processes binding affinity predictions                   │
-│  - Returns results to job directory                         │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                            Frontend (React)                         │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    User Interface Layer                       │  │
+│  │  • Home Page          • Dataset Browser                      │  │
+│  │  • Detail Pages       • Prediction Dashboard                 │  │
+│  └───────────────────────┬──────────────────────────────────────┘  │
+│                          │                                          │
+│  ┌───────────────────────▼──────────────────────────────────────┐  │
+│  │              Routing (React Router)                          │  │
+│  │  • Nested routes for dataset details                        │  │
+│  │  • DatasetDetailLayout wraps detail tabs                    │  │
+│  └───────────────────────┬──────────────────────────────────────┘  │
+│                          │                                          │
+│  ┌───────────────────────▼──────────────────────────────────────┐  │
+│  │         State Management Layer                               │  │
+│  │                                                               │  │
+│  │  ┌──────────────────┐  ┌────────────────┐                   │  │
+│  │  │ Context API      │  │ TanStack Query │                   │  │
+│  │  │ (Shared State)   │  │ (API Caching)  │                   │  │
+│  │  └──────────────────┘  └────────────────┘                   │  │
+│  │         ↓                      ↓                              │  │
+│  │  DatasetDetailContext   queryClient                          │  │
+│  │  - Fetches once per ID   - Caches responses                  │  │
+│  │  - Shares across tabs     - Auto-refetch                     │  │
+│  └───────────────────────┬──────────────────────────────────────┘  │
+│                          │                                          │
+│  ┌───────────────────────▼──────────────────────────────────────┐  │
+│  │              API Client (lib/api.ts)                         │  │
+│  │  • fetchDatasetPaginated()  • fetchDatasetDetail()          │  │
+│  │  • searchDataset()          • submitPrediction()            │  │
+│  │  • downloadDataset()        • checkJobStatus()              │  │
+│  └───────────────────────┬──────────────────────────────────────┘  │
+└────────────────────────────┼─────────────────────────────────────────┘
+                             │
+                   HTTP/REST (JSON)
+                             │
+┌────────────────────────────▼─────────────────────────────────────────┐
+│                      Backend (Django + DRF)                          │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    URL Router (urls.py)                       │  │
+│  │  • /api/dataset                • /api/search/                │  │
+│  │  • /api/dataset/details/:id   • /api/predict/smiles/        │  │
+│  │  • /api/dataset/export        • /api/job-status/:id         │  │
+│  └───────────────────────┬──────────────────────────────────────┘  │
+│                          │                                          │
+│  ┌───────────────────────▼──────────────────────────────────────┐  │
+│  │                  API Views (DRF ViewSets)                    │  │
+│  │                                                               │  │
+│  │  • DatasetListAPIView        (GET /dataset)                 │  │
+│  │  • FetchDatasetDetails       (GET /dataset/details/:id)     │  │
+│  │  • DatasetExportView         (POST /dataset/export)         │  │
+│  │  • ElasticSearchView         (GET /search/)                 │  │
+│  │  • SmilesPredictionAPIView   (POST /predict/smiles/)        │  │
+│  │  • JobStatusAPIView          (GET /job-status/:id)          │  │
+│  └──────────┬─────────────────────────────┬─────────────────────┘  │
+│             │                             │                         │
+│  ┌──────────▼──────────┐     ┌───────────▼──────────────┐         │
+│  │  Serializers        │     │  Services/Utils          │         │
+│  │  (Data Transform)   │     │  • job_scheduler.py      │         │
+│  └──────────┬──────────┘     │  • Data processors       │         │
+│             │                 └──────────────────────────┘         │
+│             │                                                       │
+│  ┌──────────▼──────────────────────────────────────────────────┐  │
+│  │                    ORM (Django Models)                       │  │
+│  │                    core/models.py                            │  │
+│  │  • EvOlf model with all fields                               │  │
+│  └──────────┬─────────────────────────┬────────────────────────┘  │
+└─────────────┼─────────────────────────┼────────────────────────────┘
+              │                         │
+       ┌──────▼─────────┐     ┌────────▼─────────────┐
+       │  PostgreSQL    │     │  ElasticSearch       │
+       │  Database      │     │  Search Index        │
+       │                │     │                      │
+       │  • core_evolf  │     │  • Full-text search  │
+       │  • Indexes     │     │  • Fuzzy matching    │
+       │  • Constraints │     │  • Autocomplete      │
+       └────────┬───────┘     └──────────────────────┘
+                │
+       ┌────────▼───────────────────────┐
+       │     File Storage               │
+       │     (MEDIA_ROOT)               │
+       │                                │
+       │  • pdb_files/                  │
+       │  • sdf_files/                  │
+       │  • smiles_2d/                  │
+       │  • job_data/                   │
+       └────────────────────────────────┘
 ```
 
-### Request Flow
+### Backend Architecture
 
-**1. Dataset Retrieval**:
+**Directory Structure**:
 ```
-User → Frontend → API Client → Backend View → PostgreSQL/ElasticSearch → Response
+backend/
+├── core/
+│   ├── __init__.py
+│   ├── models.py                  # Database models
+│   ├── serializers.py             # DRF serializers
+│   ├── admin.py                   # Django admin config
+│   ├── urls.py                    # URL routing
+│   ├── views/
+│   │   ├── __init__.py
+│   │   ├── admin_views.py         # Admin endpoints
+│   │   ├── dataset_views.py       # Dataset CRUD
+│   │   ├── elastic_search_views.py  # Search
+│   │   ├── prediction_views.py    # ML predictions
+│   │   ├── job_status_views.py    # Job polling
+│   │   └── structure_views.py     # 3D structures
+│   ├── services/
+│   │   └── job_scheduler.py       # Async jobs
+│   ├── management/
+│   │   └── commands/
+│   │       ├── import_evolf_data.py
+│   │       ├── fetch_evolf_data.py
+│   │       └── elastic_search.py
+│   └── migrations/
+│       └── 0001_initial.py
+├── evo_backend/
+│   ├── __init__.py
+│   ├── settings.py                # Django settings
+│   ├── urls.py                    # Root URL config
+│   └── wsgi.py                    # WSGI entry point
+├── manage.py
+└── requirements.txt
 ```
 
-**2. Search**:
-```
-User Types → Frontend → API Client → Backend → ElasticSearch (primary) 
-                                              → PostgreSQL (fallback) → Results
+**Key Components**:
+
+1. **Models (`core/models.py`)**:
+```python
+class EvOlf(models.Model):
+    EvOlf_ID = models.CharField(max_length=100, unique=True, db_index=True)
+    Receptor = models.CharField(max_length=500)
+    Receptor_Name = models.CharField(max_length=500)
+    Species = models.CharField(max_length=200, db_index=True)
+    Class = models.CharField(max_length=100, db_index=True)
+    Ligand = models.CharField(max_length=500)
+    Ligand_Name = models.CharField(max_length=500)
+    Mutation = models.TextField(blank=True, null=True)
+    Mutation_Status = models.CharField(max_length=100, db_index=True)
+    ChEMBL_ID = models.CharField(max_length=100)
+    UniProt_ID = models.CharField(max_length=100)
+    CID = models.CharField(max_length=100)
+    Sequence = models.TextField(blank=True, null=True)
+    SMILES = models.TextField(blank=True, null=True)
+    InChI = models.TextField(blank=True, null=True)
+    InChIKey = models.CharField(max_length=500, blank=True, null=True)
+    IUPAC_Name = models.TextField(blank=True, null=True)
+    PDB_Data = models.TextField(blank=True, null=True)
+    SDF_Data = models.TextField(blank=True, null=True)
+    Comments = models.TextField(blank=True, null=True)
+    Source = models.CharField(max_length=500, blank=True, null=True)
+    Source_Links = models.TextField(blank=True, null=True)
+    # ... additional fields
 ```
 
-**3. Prediction**:
+2. **Serializers (`core/serializers.py`)**:
+- Transform database models to/from JSON
+- Handle nested relationships
+- Custom field mappings
+
+3. **Views (`core/views/`)**:
+- RESTful endpoints using Django REST Framework
+- Pagination, filtering, sorting logic
+- ElasticSearch integration with PostgreSQL fallback
+
+4. **Services (`core/services/job_scheduler.py`)**:
+- Background job management
+- Prediction pipeline coordination
+- Status tracking
+
+### Frontend Architecture
+
+**Directory Structure**:
 ```
-User Submits → Frontend → API → CSV Creation → Async Pipeline → Job Status Polling
+src/
+├── components/
+│   ├── Header.tsx                 # Main navigation
+│   ├── Footer.tsx                 # Footer links
+│   ├── Molecular3DViewer.tsx      # 3D molecular viewer
+│   └── ui/                        # shadcn/ui components
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── table.tsx
+│       ├── dialog.tsx
+│       └── ... (30+ components)
+├── contexts/
+│   └── DatasetDetailContext.tsx   # Shared state for detail pages
+├── hooks/
+│   ├── use-toast.ts               # Toast notifications
+│   └── use-mobile.tsx             # Mobile detection
+├── lib/
+│   ├── api.ts                     # API client functions
+│   └── utils.ts                   # Utility functions
+├── pages/
+│   ├── Index.tsx                  # Home page
+│   ├── dataset/
+│   │   ├── DatabaseDashboard.tsx       # Main browser
+│   │   ├── DatasetDetailLayout.tsx     # Context wrapper
+│   │   ├── DatasetOverview.tsx         # Overview tab
+│   │   ├── DatasetReceptor.tsx         # Receptor tab
+│   │   ├── DatasetLigand.tsx           # Ligand tab
+│   │   ├── DatasetInteraction.tsx      # Interaction tab
+│   │   └── DatasetStructures.tsx       # 3D structures tab
+│   ├── prediction/
+│   │   ├── PredictionDashboard.tsx     # Submit predictions
+│   │   └── PredictionResult.tsx        # View results
+│   ├── Documentation.tsx
+│   ├── ModelInfo.tsx
+│   ├── Links.tsx
+│   ├── FAQ.tsx
+│   ├── Contact.tsx
+│   └── CiteUs.tsx
+├── config/
+│   └── system.ts                  # System configuration
+├── App.tsx                        # Root component & routing
+├── main.tsx                       # Entry point
+└── index.css                      # Global styles & design tokens
+```
+
+**Key Patterns**:
+
+1. **Context API for Shared State**:
+```typescript
+// DatasetDetailContext.tsx
+export function DatasetDetailProvider({ children }: { children: ReactNode }) {
+  const [data, setData] = useState<DatasetDetail | null>(null);
+  const lastFetchedIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Fetch data only once per evolfId
+    if (lastFetchedIdRef.current === evolfId && data) return;
+    
+    const loadData = async () => {
+      lastFetchedIdRef.current = evolfId;
+      const response = await fetchDatasetDetail(evolfId!);
+      setData(response);
+    };
+    loadData();
+  }, [evolfId]);
+
+  return (
+    <DatasetDetailContext.Provider value={{ data, loading, evolfId }}>
+      {children}
+    </DatasetDetailContext.Provider>
+  );
+}
+```
+
+2. **Nested Routing**:
+```typescript
+// App.tsx
+<Route element={<DatasetDetailLayout />}>
+  <Route path="/dataset/detail" element={<DatasetOverview />} />
+  <Route path="/dataset/receptor" element={<DatasetReceptor />} />
+  <Route path="/dataset/ligand" element={<DatasetLigand />} />
+  <Route path="/dataset/interaction" element={<DatasetInteraction />} />
+  <Route path="/dataset/structures" element={<DatasetStructures />} />
+</Route>
+```
+
+3. **API Client**:
+```typescript
+// lib/api.ts
+export const fetchDatasetDetail = async (evolfId: string): Promise<DatasetDetail> => {
+  const response = await fetch(
+    `${API_BASE_URL}/dataset/details/${evolfId}`,
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+  if (!response.ok) throw new Error('Failed to fetch dataset details');
+  return response.json();
+};
 ```
 
 ---
@@ -175,62 +406,57 @@ User Submits → Frontend → API → CSV Creation → Async Pipeline → Job St
 
 ### Backend Setup
 
-#### 1. Prerequisites
-
+#### Prerequisites
 - Python 3.9+
 - PostgreSQL 14+
-- ElasticSearch 8.x (optional, fallback to PostgreSQL)
+- ElasticSearch 8.x (optional)
 
-#### 2. Clone Repository
+#### Installation Steps
 
+1. **Clone Repository**:
 ```bash
 git clone <repository-url>
-cd evolf-platform
+cd evolf-platform/backend
 ```
 
-#### 3. Create Virtual Environment
-
+2. **Create Virtual Environment**:
 ```bash
-cd backend
 python -m venv venv
-
-# Activate virtual environment
-# Linux/Mac:
-source venv/bin/activate
-# Windows:
-venv\Scripts\activate
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate  # Windows
 ```
 
-#### 4. Install Dependencies
-
+3. **Install Dependencies**:
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**Key Dependencies**:
+**requirements.txt**:
 ```txt
-Django>=4.2
+Django>=4.2,<5.0
 djangorestframework>=3.14
 psycopg2-binary>=2.9
 django-cors-headers>=4.0
 elasticsearch>=8.0
+elasticsearch-dsl>=8.0
 pandas>=2.0
 python-decouple>=3.8
+gunicorn>=20.1
 ```
 
-#### 5. Configure Environment
+4. **Configure Environment**:
 
-Create `.env` file in `backend/` directory:
-
+Create `backend/.env`:
 ```env
-# Django Settings
+# Django
 DEBUG=True
-SECRET_KEY=your-secret-key-here-change-in-production
+SECRET_KEY=your-secret-key-change-in-production
 ALLOWED_HOSTS=localhost,127.0.0.1,192.168.24.13
 
 # Database
-DATABASE_URL=postgresql://username:password@localhost:5432/evolf_db
+DATABASE_URL=postgresql://evolf_user:password@localhost:5432/evolf_db
 
 # CORS
 CORS_ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
@@ -238,102 +464,82 @@ CORS_ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
 # ElasticSearch (optional)
 ELASTIC_HOST=http://localhost:9200
 ELASTIC_USERNAME=elastic
-ELASTIC_PASSWORD=your-elastic-password
+ELASTIC_PASSWORD=your-password
 
 # File Storage
-MEDIA_ROOT=/path/to/media/files
+MEDIA_ROOT=/path/to/media
 MEDIA_URL=/media/
 
-# Prediction Pipeline
+# Prediction
 PREDICT_DOCKER_URL=http://localhost:5000
-JOB_DATA_DIR=/path/to/job/data
+JOB_DATA_DIR=/path/to/jobs
 ENABLE_SCHEDULER=False
-DEBUG_LOG=True
-
-# Pagination
-DEFAULT_PAGE_SIZE=20
 ```
 
-#### 6. Setup PostgreSQL Database
-
+5. **Setup PostgreSQL**:
 ```bash
 # Create database
 createdb evolf_db
 
-# Or using psql:
+# Or via psql
 psql -U postgres
 CREATE DATABASE evolf_db;
-CREATE USER evolf_user WITH PASSWORD 'your_password';
+CREATE USER evolf_user WITH PASSWORD 'password';
 GRANT ALL PRIVILEGES ON DATABASE evolf_db TO evolf_user;
+
+# Enable trigram extension for fuzzy search
+\c evolf_db
+CREATE EXTENSION pg_trgm;
 \q
 ```
 
-#### 7. Run Migrations
-
+6. **Run Migrations**:
 ```bash
-cd backend
 python manage.py migrate
 ```
 
-**This creates tables**:
-- `core_evolf`: Main dataset table
-- Django admin tables
-- Migration history
-
-#### 8. Create Superuser
-
+7. **Create Superuser**:
 ```bash
 python manage.py createsuperuser
 ```
 
-#### 9. Import Initial Data
-
+8. **Import Data**:
 ```bash
-# Import dataset from CSV
+# Import dataset
 python manage.py import_evolf_data
 
-# Build ElasticSearch index (if using ES)
+# Build search index (if using ElasticSearch)
 python manage.py elastic_search --rebuild
 ```
 
-#### 10. Start Development Server
-
+9. **Start Server**:
 ```bash
-python manage.py runserver 0.0.0.0:3000
+# Development
+python manage.py runserver 0.0.0.0:8001
+
+# Production
+gunicorn evo_backend.wsgi:application --bind 0.0.0.0:8001
 ```
 
-**Backend now running at**: `http://127.0.0.1:8001`
-
-
-
-#### 11. Verify Installation
-
-```bash
-# Test API endpoint
-curl https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=5
-
-# Should return JSON with dataset entries
-```
+**Backend running at**: `http://localhost:8001`
 
 ---
 
 ### Frontend Setup
 
-#### 1. Prerequisites
-
+#### Prerequisites
 - Node.js 18+ (or Bun)
-- npm or bun package manager
+- npm or bun
 
-#### 2. Navigate to Frontend
+#### Installation Steps
 
+1. **Navigate to Frontend**:
 ```bash
 cd frontend
-# or if in root:
-cd ..
+# or from root: cd ../
 ```
 
-#### 3. Install Dependencies
-
+2. **Install Dependencies**:
 ```bash
 # Using npm
 npm install
@@ -342,19 +548,14 @@ npm install
 bun install
 ```
 
-#### 4. Configure Environment
+3. **Configure Environment**:
 
-Create `.env` file in frontend root:
-
+Create `.env`:
 ```env
-# API Base URL
 VITE_API_BASE_URL=https://evolf.ahujalab.iiitd.edu.in/api
-
-# Optional: Analytics, feature flags, etc.
 ```
 
-#### 5. Start Development Server
-
+4. **Start Development Server**:
 ```bash
 # Using npm
 npm run dev
@@ -363,28 +564,19 @@ npm run dev
 bun dev
 ```
 
-**Frontend now running at**: `http://localhost:8080`
+**Frontend running at**: `http://localhost:8080`
 
-#### 6. Build for Production
-
+5. **Build for Production**:
 ```bash
-# Using npm
 npm run build
-
-# Or using bun
-bun run build
+# Output: dist/ directory
 ```
-
-**Output**: `dist/` directory contains production-ready files
 
 ---
 
 ### Docker Setup (Optional)
 
-#### Docker Compose Configuration
-
-Create `docker-compose.yml`:
-
+**docker-compose.yml**:
 ```yaml
 version: '3.8'
 
@@ -394,7 +586,7 @@ services:
     environment:
       POSTGRES_DB: evolf_db
       POSTGRES_USER: evolf_user
-      POSTGRES_PASSWORD: your_password
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
@@ -412,17 +604,17 @@ services:
 
   backend:
     build: ./backend
-    command: python manage.py runserver 0.0.0.0:3000
+    command: gunicorn evo_backend.wsgi:application --bind 0.0.0.0:8001
     volumes:
       - ./backend:/app
+      - media_files:/app/media
     ports:
-      - "3000:3000"
+      - "8001:8001"
     depends_on:
       - postgres
       - elasticsearch
-    environment:
-      DATABASE_URL: postgresql://evolf_user:your_password@postgres:5432/evolf_db
-      ELASTIC_HOST: http://elasticsearch:9200
+    env_file:
+      - ./backend/.env
 
   frontend:
     build: ./frontend
@@ -433,659 +625,297 @@ services:
     ports:
       - "8080:8080"
     environment:
-      VITE_API_BASE_URL: https://evolf.ahujalab.iiitd.edu.in/api
+      VITE_API_BASE_URL: http://localhost:8001/api
 
 volumes:
   postgres_data:
   es_data:
+  media_files:
 ```
 
-#### Run with Docker
-
+**Run**:
 ```bash
 docker-compose up -d
 ```
 
 ---
 
-## API Documentation
+## Features
 
-Complete REST API reference with all endpoints, parameters, and examples.
+### Dataset Browser
 
-### Base Configuration
-
-**Base URL**: `https://evolf.ahujalab.iiitd.edu.in/api`
-
-**Request Headers**:
-```json
-{
-  "Content-Type": "application/json"
-}
-```
-
-**Timeout**: 30 seconds
-
----
-
-### Dataset Endpoints
-
-#### 1. GET /dataset - Paginated Dataset
-
-Retrieve filtered and paginated dataset with server-side processing.
-
-**Query Parameters**:
-- `page` (integer): Page number (default: 1)
-- `limit` (integer): Items per page (default: 20, max: 1000)
-- `search` (string): Search term (ElasticSearch or trigram fallback)
-- `sortBy` (string): Field to sort by (`EvOlf_ID`, `Receptor`, `Ligand`, `Species`, `Class`, `Mutation`)
-- `sortOrder` (string): `asc` or `desc` (default: `desc`)
-- `species` (string): Filter by species
-- `class` (string): Filter by GPCR class
-- `mutationType` (string): Filter by mutation status
-
-**Example Request**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset?page=1&limit=20&search=dopamine&species=Human&sortBy=Receptor&sortOrder=asc"
-```
-
-**Response (200 OK)**:
-```json
-{
-  "data": [
-    {
-      "id": "1",
-      "evolfId": "EvOlf0100001",
-      "receptor": "Dopamine D2 receptor",
-      "species": "Human",
-      "class_field": "1",
-      "ligand": "Dopamine",
-      "mutation": "Wild-type",
-      "chemblId": "CHEMBL228",
-      "uniprotId": "P14416",
-      "ensembleId": "ENSG00000149295"
-    }
-  ],
-  "pagination": {
-    "currentPage": 1,
-    "totalPages": 13,
-    "totalItems": 250,
-    "itemsPerPage": 20
-  },
-  "statistics": {
-    "totalRows": 250,
-    "uniqueClasses": ["0", "1"],
-    "uniqueSpecies": ["Human", "Mouse", "Rat"],
-    "uniqueMutationTypes": ["Wild type", "Mutant"]
-  },
-  "filterOptions": {
-    "uniqueClasses": ["0", "1"],
-    "uniqueSpecies": ["Human", "Mouse", "Rat"],
-    "uniqueMutationTypes": ["Wild type", "Mutant"]
-  },
-  "all_evolf_ids": ["EvOlf0100001", "EvOlf0100002", "..."]
-}
-```
-
----
-
-#### 2. GET /dataset/details/{evolfId} - Entry Details
-
-Fetch complete details for a specific EvOlf entry.
-
-**Path Parameters**:
-- `evolfId` (string, required): EvOlf identifier (e.g., `EvOlf0100001`)
-
-**Example Request**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001"
-```
-
-**Response (200 OK)**:
-```json
-{
-  "evolfId": "EvOlf0100001",
-  "receptor": "Dopamine D2 receptor",
-  "ligand": "Dopamine",
-  "species": "Human",
-  "class": "1",
-  "mutation": "Wild-type",
-  "mutationStatus": "Wild-type",
-  "uniprotId": "P14416",
-  "uniprotLink": "https://www.uniprot.org/uniprotkb/P14416",
-  "chemblId": "CHEMBL228",
-  "pubchemId": "681",
-  "pubchemLink": "https://pubchem.ncbi.nlm.nih.gov/compound/681",
-  "smiles": "NCCc1ccc(O)c(O)c1",
-  "inchi": "InChI=1S/C8H11NO2/c9-4-3-6-1-2-7(10)8(11)5-6/h1-2,5,10-11H,3-4,9H2",
-  "inchiKey": "VYFYYTLLBUKUHU-UHFFFAOYSA-N",
-  "sequence": "MDPLNLSWYDDDLERQNWSRPFNGSDGKADRPPYNYYATLLTLLIAVIVFGNVLVCMAVSREKALQTTTNYLIVSLAVADLLVATLVMPWVVYLEVVGEWKFSRIHCDIFVTLDVMMCTASILNLCAISIDRYTAVAMPMLYNT...",
-  "pdbData": "ATOM      1  N   MET A   1...",
-  "sdfData": "\\n  Mrv0541...",
-  "structure3d": "https://evolf.ahujalab.iiitd.edu.in/media/pdb_files/EvOlf0100001.pdb",
-  "expressionSystem": "HEK293",
-  "parameter": "Ki",
-  "value": "2.1",
-  "unit": "nM",
-  "comments": "High affinity binding",
-  "source": "12345678",
-  "sourceLinks": "https://pubmed.ncbi.nlm.nih.gov/12345678/"
-}
-```
-
-**Field Descriptions**:
-- **Identifiers**: `evolfId`, `uniprotId`, `chemblId`, `pubchemId`
-- **Sequences**: `sequence`, `smiles`, `inchi`, `inchiKey`
-- **Structures**: `pdbData` (full PDB), `sdfData` (full SDF), `structure3d` (URL)
-- **External Links**: `uniprotLink`, `pubchemLink`, `sourceLinks` (pipe-delimited)
-- **Experimental**: `parameter`, `value`, `unit`, `expressionSystem`, `comments`
-
----
-
-#### 3. POST /dataset/export - Export Multiple Entries
-
-Export dataset entries as ZIP file (CSV + metadata).
-
-**Request Body (Option A - by IDs)**:
-```json
-{
-  "evolfIds": ["EvOlf0100001", "EvOlf0100002"]
-}
-```
-
-**Request Body (Option B - by filters)**:
-```json
-{
-  "species": "Human",
-  "class": "1",
-  "search": "dopamine"
-}
-```
-
-**Example**:
-```bash
-curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
-  -H "Content-Type: application/json" \
-  -d '{"evolfIds": ["EvOlf0100001", "EvOlf0100002"]}' \
-  --output export.zip
-```
-
-**Response**: Binary ZIP file
-
----
-
-#### 4. GET /dataset/export/{evolfId} - Export Single Entry
-
-Export a single entry's files (PDB, SDF, PNG).
-
-**Example**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001" \
-  --output entry_files.zip
-```
-
----
-
-#### 5. GET /dataset/download - Download Complete Dataset
-
-Download entire database as cached ZIP.
-
-**Example**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download" \
-  --output complete_dataset.zip
-```
-
----
-
-### Search Endpoints
-
-#### GET /search/?q={query} - ElasticSearch Query
-
-Full-text search with ElasticSearch (PostgreSQL fallback).
-
-**Query Parameters**:
-- `q` (string, required): Search query
-
-**Example**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/search/?q=dopamine"
-```
-
-**Response (200 OK)**:
-```json
-{
-  "results": [
-    {
-      "EvOlf_ID": "EvOlf0100045",
-      "Receptor": "Dopamine D2 receptor",
-      "Ligand": "Dopamine",
-      "Species": "Human",
-      "Class": "1",
-      "Mutation": "Wild-type",
-      "score": 0.95
-    }
-  ]
-}
-```
-
-**Search Features**:
-- **Primary**: ElasticSearch wildcard matching (Receptor, Ligand, Species)
-- **Fallback**: PostgreSQL trigram similarity (similarity > 0.2)
-- **Case-insensitive**
-- **Relevance scoring**
-
----
-
-### Prediction Endpoints
-
-#### 1. POST /predict/smiles/ - Submit Prediction
-
-Submit SMILES for binding affinity prediction.
-
-**Request Body**:
-```json
-{
-  "smiles": "NCCc1c[nH]c2ccc(O)cc12",
-  "sequence": "MDVLSPGQGNNTTSPPAPFET...",
-  "temp_ligand_id": "serotonin",
-  "temp_rec_id": "5ht1a",
-  "id": "custom_job_id"
-}
-```
-
-**Required Fields**:
-- `smiles` (string): SMILES notation (no whitespace, valid SMILES characters)
-
-**Optional Fields**:
-- `sequence` / `mutated_sequence`: Receptor amino acid sequence (no FASTA headers)
-- `temp_ligand_id`: Ligand identifier
-- `temp_rec_id`: Receptor identifier
-- `id`: Custom job ID
-
-**Validation**:
-- SMILES: No whitespace, characters: `A-Za-z0-9@+-[]()=#/\%.:\*`
-- Sequence: No whitespace, no `>`, valid amino acids only
-- No file uploads
-- No arrays
-
-**Example**:
-```bash
-curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "smiles": "NCCc1c[nH]c2ccc(O)cc12",
-    "sequence": "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN"
-  }'
-```
-
-**Response (200 OK)**:
-```json
-{
-  "job_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "message": "Job submitted to pipeline asynchronously."
-}
-```
-
----
-
-#### 2. GET /predict/job/{job_id}/ - Get Job Status
-
-Check prediction job status.
-
-**Path Parameters**:
-- `job_id` (string, required): Job UUID
-
-**Query Parameters** (optional):
-- `download=output`: Download results as ZIP
-
-**Example**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
-```
-
-**Response (Processing)**:
-```json
-{
-  "status": "processing",
-  "message": "Job started but no output files yet"
-}
-```
-
-**Response (Finished)**:
-```json
-{
-  "job_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "status": "finished",
-  "output_files": [
-    "output/predictions.csv",
-    "output/visualization.png"
-  ]
-}
-```
-
----
-
-#### 3. GET /predict/download/{job_id}/ - Download Results
-
-Download job results as ZIP.
-
-**Example**:
-```bash
-curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
-  --output results.zip
-```
-
-**Response**: Binary ZIP with output files
-
----
-
-## Frontend Features
-
-### Pages
-
-#### 1. Home (`/`)
-- Hero section with EvOlf branding
-- Feature highlights
-- Quick navigation to database and prediction tools
-
-#### 2. Database Dashboard (`/dataset/dashboard`)
-- Paginated table with 20 items per page
-- Server-side filters: Species, Class, Mutation Type
-- Real-time search bar
-- Sort by: EvOlf ID, Receptor, Ligand, Species, Class
-- Bulk export with selection
-- Statistics panel
-
-#### 3. Dataset Detail Pages
-- **Interaction** (`/dataset/detail/:id`): Overview with experimental details
-- **Receptor** (`/dataset/receptor/:id`): Receptor info, sequence, 3D structure
-- **Ligand** (`/dataset/ligand/:id`): Ligand properties, SMILES, 2D/3D structures
-- **Structures** (`/dataset/structures/:id`): Combined 3D viewer
-
-#### 4. Prediction Dashboard (`/prediction/dashboard`)
-- SMILES input form
-- Optional receptor sequence input
-- Job submission
-- Recent jobs list
-
-#### 5. Prediction Results (`/prediction/result/:jobId`)
-- Job status polling
-- Results visualization
-- Download results ZIP
-- Error handling for expired/failed jobs
-
-### UI Components
-
-Built with **shadcn/ui** and **Radix UI**:
-
-- `<Button>`: Primary, secondary, outline variants
-- `<Card>`: Content containers with headers
-- `<Table>`: Sortable data tables with pagination
-- `<Select>`: Dropdown filters
-- `<Input>`: Text fields with validation
-- `<Textarea>`: Multi-line input
-- `<Dialog>`: Modal overlays
-- `<Toast>`: Notifications
-- `<Skeleton>`: Loading states
-- `<Tabs>`: Navigation between related content
-
-### State Management
-
-**TanStack Query** (React Query) for server state:
-
-```typescript
-// Fetch dataset with automatic caching
-const { data, isLoading } = useQuery({
-  queryKey: ['dataset', page, limit, filters],
-  queryFn: () => fetchDatasetPaginated(page, limit, search, sortBy, sortOrder, species, classFilter, mutationType)
-});
-
-// Submit prediction with mutation
-const mutation = useMutation({
-  mutationFn: submitPrediction,
-  onSuccess: (data) => {
-    navigate(`/prediction/result/${data.job_id}`);
-  }
-});
-```
+**Location**: `/dataset/dashboard`
 
 **Features**:
-- Automatic caching and invalidation
-- Background refetching
-- Optimistic updates
-- Error retry logic
+- Server-side pagination (20 items/page, configurable up to 1000)
+- Real-time search with debouncing (300ms)
+- Multi-column filtering (Species, Class, Mutation Status)
+- Sortable columns (click headers)
+- Bulk export (filtered or all data)
+- Responsive table with mobile optimization
+
+**Backend Endpoint**: `GET /api/dataset`
+
+**Query Parameters**:
+- `page`, `limit`: Pagination
+- `search`: Full-text search
+- `sortBy`, `sortOrder`: Sorting
+- `species`, `class`, `mutationType`: Filters
+
+### Detail Pages
+
+**Location**: `/dataset/detail?evolfid=EvOlf0100001`
+
+**Tabs**:
+1. **Overview**: Summary, identifiers, mutation info
+2. **Receptor**: Protein sequence, UniProt links, mutation impact
+3. **Ligand**: SMILES, InChI, 2D structure image
+4. **Interaction**: Experimental methods, binding values, source links
+5. **3D Structures**: Interactive PDB/SDF viewers
+
+**Architecture**:
+- **Single API call** via Context API when entering any tab
+- **Instant tab switching** with shared state
+- **No duplicate requests** when navigating between tabs
+
+**Implementation**:
+```typescript
+// DatasetDetailLayout wraps all tabs
+<DatasetDetailProvider>
+  <Outlet />  {/* Renders active tab */}
+</DatasetDetailProvider>
+
+// Each tab consumes shared context
+const { data, loading } = useDatasetDetail();
+```
+
+### Search Functionality
+
+**Primary**: ElasticSearch with wildcard matching
+**Fallback**: PostgreSQL trigram similarity (pg_trgm)
+
+**Search Fields**:
+- Receptor name
+- Ligand name
+- Species
+- EvOlf ID
+
+**Frontend Implementation**:
+```typescript
+const [searchTerm, setSearchTerm] = useState('');
+const debouncedSearch = useDebounce(searchTerm, 300);
+
+useEffect(() => {
+  if (debouncedSearch) {
+    fetchDatasetPaginated(1, 20, debouncedSearch);
+  }
+}, [debouncedSearch]);
+```
+
+### Prediction System
+
+**Location**: `/prediction`
+
+**Workflow**:
+1. Upload CSV with SMILES and sequences
+2. Backend creates job and returns job ID
+3. Frontend polls job status every 2 seconds
+4. Display results when complete
+5. Download results as ZIP
+
+**Backend**:
+- Async job processing with Docker container
+- Job status tracking in database
+- File storage in `JOB_DATA_DIR`
+
+---
+
+## Performance Optimizations
+
+### Backend
+
+1. **Database Indexing**:
+```python
+class EvOlf(models.Model):
+    EvOlf_ID = models.CharField(db_index=True)  # Indexed
+    Species = models.CharField(db_index=True)   # Indexed
+    Class = models.CharField(db_index=True)     # Indexed
+```
+
+2. **Query Optimization**:
+- Use `select_related()` for foreign keys
+- Use `prefetch_related()` for many-to-many
+- Limit query results with pagination
+
+3. **ElasticSearch**:
+- Fast full-text search (< 50ms typical)
+- Automatic fallback to PostgreSQL
+
+4. **Response Caching** (optional):
+```python
+from django.views.decorators.cache import cache_page
+
+@cache_page(60 * 15)  # 15 minutes
+def dataset_list(request):
+    # ...
+```
+
+### Frontend
+
+1. **Context API** (prevents duplicate API calls):
+```typescript
+// Fetch once, share across tabs
+const lastFetchedIdRef = useRef<string | null>(null);
+if (lastFetchedIdRef.current === evolfId && data) return;
+```
+
+2. **Code Splitting**:
+```typescript
+const DatasetOverview = lazy(() => import('./pages/dataset/DatasetOverview'));
+```
+
+3. **Memoization**:
+```typescript
+const processedData = useMemo(() => {
+  return data?.smiles?.split(',') || [];
+}, [data?.smiles]);
+```
+
+4. **Debounced Search**:
+```typescript
+const debouncedSearch = useDebounce(searchTerm, 300);
+```
+
+5. **Virtual Scrolling** (for large lists):
+- Consider `react-window` or `react-virtual` for 1000+ items
+
+---
+
+## API Documentation
+
+See `API_README.md` for complete API reference with examples in multiple languages.
+
+**Key Endpoints**:
+- `GET /api/dataset` - Paginated dataset
+- `GET /api/dataset/details/:id` - Entry details
+- `POST /api/dataset/export` - Bulk export
+- `GET /api/search/` - ElasticSearch
+- `POST /api/predict/smiles/` - Submit prediction
+- `GET /api/job-status/:id` - Check job status
 
 ---
 
 ## Database Schema
 
-### EvOlf Model
+**Main Table**: `core_evolf`
 
-**Table**: `core_evolf`
-
-**Fields**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | Integer (PK) | Auto-increment primary key |
-| `EvOlf_ID` | String (Unique) | EvOlf identifier (e.g., EvOlf0100001) |
-| `Receptor` | String | Receptor name |
-| `Species` | String | Species name |
-| `Class` | String | GPCR class (0, 1) |
-| `Ligand` | String | Ligand name |
-| `Mutation_Status` | String | Wild type or Mutant |
-| `Mutation` | String | Mutation description |
-| `ChEMBL_ID` | String | ChEMBL identifier |
-| `UniProt_ID` | String | UniProt identifier |
-| `CID` | String | PubChem CID |
-| `Ensemble_ID` | String | Ensembl gene ID |
-| `Gene_Symbol` | String | Gene symbol |
-| `Receptor_Subtype` | String | Receptor subtype |
-| `Expression_System` | String | Expression system used |
-| `Parameter` | String | Measurement parameter (e.g., Ki) |
-| `Value` | String | Parameter value |
-| `Unit` | String | Value unit |
-| `Comments` | Text | Additional notes |
-| `Source` | String | PubMed IDs (pipe-delimited) |
-| `Source_Links` | Text | Full PubMed URLs (pipe-delimited) |
-| `SMILES` | Text | SMILES notation |
-| `InChi` | Text | InChI string |
-| `InChiKey` | String | InChI key |
-| `IUPAC_Name` | String | IUPAC name |
-| `Sequence` | Text | Protein sequence |
-
-**Indexes**:
-- `EvOlf_ID` (unique)
-- `Receptor` (btree)
-- `Species` (btree)
-- `Class` (btree)
-- `Mutation_Status` (btree)
-
-**Relationships**:
-- One-to-many with file storage (PDB, SDF, images)
-
----
-
-## Search Functionality
-
-### ElasticSearch Configuration
-
-**Index**: `evolf`
-
-**Mapping**:
-```json
-{
-  "properties": {
-    "EvOlf_ID": { "type": "keyword" },
-    "Receptor": { "type": "text" },
-    "Ligand": { "type": "text" },
-    "Species": { "type": "text" },
-    "Class": { "type": "keyword" },
-    "Mutation": { "type": "text" }
-  }
-}
-```
-
-**Query Structure**:
-```python
-{
-  "query": {
-    "bool": {
-      "should": [
-        {"wildcard": {"Receptor": {"value": f"*{search}*", "case_insensitive": True}}},
-        {"wildcard": {"Ligand": {"value": f"*{search}*", "case_insensitive": True}}},
-        {"wildcard": {"Species": {"value": f"*{search}*", "case_insensitive": True}}}
-      ]
-    }
-  }
-}
-```
-
-### PostgreSQL Fallback
-
-**Trigram Similarity**:
-```python
-from django.contrib.postgres.search import TrigramSimilarity
-
-queryset = EvOlf.objects.annotate(
-    similarity=TrigramSimilarity('Receptor', search_term)
-).filter(similarity__gt=0.2).order_by('-similarity')
-```
-
-**Extension Required**:
+**Key Fields**:
 ```sql
-CREATE EXTENSION pg_trgm;
-```
+CREATE TABLE core_evolf (
+    id SERIAL PRIMARY KEY,
+    EvOlf_ID VARCHAR(100) UNIQUE NOT NULL,
+    Receptor VARCHAR(500),
+    Receptor_Name VARCHAR(500),
+    Species VARCHAR(200),
+    Class VARCHAR(100),
+    Ligand VARCHAR(500),
+    Ligand_Name VARCHAR(500),
+    Mutation TEXT,
+    Mutation_Status VARCHAR(100),
+    Mutation_Type VARCHAR(100),
+    Mutation_Impact TEXT,
+    ChEMBL_ID VARCHAR(100),
+    UniProt_ID VARCHAR(100),
+    CID VARCHAR(100),
+    Sequence TEXT,
+    SMILES TEXT,
+    InChI TEXT,
+    InChIKey VARCHAR(500),
+    IUPAC_Name TEXT,
+    PDB_Data TEXT,
+    SDF_Data TEXT,
+    Comments TEXT,
+    Source VARCHAR(500),
+    Source_Links TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
 
----
+-- Indexes
+CREATE INDEX idx_evolf_id ON core_evolf(EvOlf_ID);
+CREATE INDEX idx_species ON core_evolf(Species);
+CREATE INDEX idx_class ON core_evolf(Class);
+CREATE INDEX idx_mutation_status ON core_evolf(Mutation_Status);
 
-## File Structure
-
-```
-evolf-platform/
-├── backend/
-│   ├── core/
-│   │   ├── management/
-│   │   │   ├── commands/
-│   │   │   │   ├── elastic_search.py
-│   │   │   │   ├── import_evolf_data.py
-│   │   │   │   └── fetch_evolf_data.py
-│   │   │   └── evolf_data.csv
-│   │   ├── migrations/
-│   │   ├── views/
-│   │   │   ├── dataset_views.py
-│   │   │   ├── prediction_views.py
-│   │   │   ├── job_status_views.py
-│   │   │   ├── structure_views.py
-│   │   │   └── elastic_search_views.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── urls.py
-│   │   └── documents.py
-│   ├── evo_backend/
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   └── wsgi.py
-│   ├── media/
-│   │   ├── pdb_files/
-│   │   ├── sdf_files/
-│   │   └── smiles_2d/
-│   ├── manage.py
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/               # shadcn components
-│   │   │   ├── Header.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   └── Molecular3DViewer.tsx
-│   │   ├── pages/
-│   │   │   ├── Index.tsx
-│   │   │   ├── dataset/
-│   │   │   │   ├── DatabaseDashboard.tsx
-│   │   │   │   ├── DatasetInteraction.tsx
-│   │   │   │   ├── DatasetReceptor.tsx
-│   │   │   │   ├── DatasetLigand.tsx
-│   │   │   │   └── DatasetStructures.tsx
-│   │   │   ├── prediction/
-│   │   │   │   ├── PredictionDashboard.tsx
-│   │   │   │   └── PredictionResult.tsx
-│   │   │   └── ...
-│   │   ├── lib/
-│   │   │   ├── api.ts            # API client
-│   │   │   └── utils.ts
-│   │   ├── config/
-│   │   │   └── system.ts
-│   │   ├── hooks/
-│   │   ├── index.css             # Design system
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── public/
-│   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.ts
-│   ├── vite.config.ts
-│   └── tsconfig.json
-│
-├── docker-compose.yml
-├── API_README.md
-├── final_readme.md
-└── README.md
+-- Trigram index for fuzzy search
+CREATE INDEX idx_receptor_trgm ON core_evolf USING GIN (Receptor gin_trgm_ops);
+CREATE INDEX idx_ligand_trgm ON core_evolf USING GIN (Ligand gin_trgm_ops);
 ```
 
 ---
 
 ## Deployment
 
-### Production Checklist
+### Backend Deployment
 
-**Backend**:
-1. Set `DEBUG=False` in `.env`
+**Production Checklist**:
+1. Set `DEBUG=False`
 2. Configure `ALLOWED_HOSTS`
-3. Use production database (PostgreSQL)
-4. Set up static file serving
-5. Configure CORS properly
-6. Use environment variables for secrets
-7. Set up SSL/TLS
-8. Configure Gunicorn/uWSGI
-9. Set up Nginx reverse proxy
-10. Enable database backups
+3. Set strong `SECRET_KEY`
+4. Use environment variables
+5. Setup HTTPS/SSL
+6. Configure static file serving
+7. Setup logging
 
-**Frontend**:
-1. Build production bundle: `npm run build`
-2. Serve `dist/` directory with web server
-3. Configure API base URL
-4. Set up CDN for assets
-5. Enable compression (gzip/brotli)
-6. Configure caching headers
-7. Set up SSL/TLS
+**Gunicorn**:
+```bash
+gunicorn evo_backend.wsgi:application \
+  --bind 0.0.0.0:8001 \
+  --workers 4 \
+  --timeout 60 \
+  --access-logfile - \
+  --error-logfile -
+```
 
-### Nginx Configuration Example
-
+**Nginx** (reverse proxy):
 ```nginx
-# Backend API
 server {
     listen 80;
-    server_name api.evolf.com;
-    
-    location / {
-        proxy_pass http://127.0.0.1:3000;
+    server_name evolf.ahujalab.iiitd.edu.in;
+
+    location /api/ {
+        proxy_pass http://localhost:8001;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
-    
+
     location /media/ {
         alias /path/to/media/;
     }
 }
+```
 
-# Frontend
+### Frontend Deployment
+
+**Build**:
+```bash
+npm run build
+# Output: dist/
+```
+
+**Static Hosting**:
+- **Nginx**: Serve `dist/` directory
+- **Vercel**: `vercel deploy`
+- **Netlify**: Connect Git repo
+- **AWS S3**: Upload to bucket
+
+**Nginx Configuration**:
+```nginx
 server {
     listen 80;
-    server_name evolf.com;
-    root /path/to/frontend/dist;
-    
+    server_name evolf.ahujalab.iiitd.edu.in;
+    root /path/to/dist;
+
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -1096,111 +926,65 @@ server {
 
 ## Troubleshooting
 
-### Common Issues
+### Backend Issues
 
-#### 1. CORS Errors
-
-**Symptom**: `Access-Control-Allow-Origin` error in browser
-
-**Solution**:
-```python
-# backend/evo_backend/settings.py
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080"
-]
-```
-
-#### 2. ElasticSearch Connection Failed
-
-**Symptom**: Search falls back to PostgreSQL
-
-**Solution**:
+**Database Connection Error**:
 ```bash
-# Check ElasticSearch status
-curl http://localhost:9200
+# Check PostgreSQL is running
+sudo systemctl status postgresql
 
-# Verify credentials in .env
-ELASTIC_HOST=http://localhost:9200
-ELASTIC_USERNAME=elastic
-ELASTIC_PASSWORD=your_password
+# Test connection
+psql -U evolf_user -d evolf_db
 ```
 
-#### 3. Media Files Not Found
+**ElasticSearch Not Working**:
+- System automatically falls back to PostgreSQL
+- Check `ELASTIC_HOST` in `.env`
+- Verify ES is running: `curl http://localhost:9200`
 
-**Symptom**: 404 for PDB/SDF files
+**CORS Errors**:
+- Add frontend URL to `CORS_ALLOWED_ORIGINS` in `.env`
+- Verify `django-cors-headers` is installed
 
-**Solution**:
-```python
-# Check settings.py
-MEDIA_ROOT = '/correct/path/to/media'
-MEDIA_URL = '/media/'
+### Frontend Issues
 
-# Ensure files exist
-ls /path/to/media/pdb_files/
-```
+**API Connection Failed**:
+- Check `VITE_API_BASE_URL` in `.env`
+- Verify backend is running
+- Check browser console for CORS errors
 
-#### 4. API Timeout
-
-**Symptom**: Requests timeout after 30 seconds
-
-**Solution**:
-```typescript
-// Increase timeout in api.ts
-export const API_CONFIG = {
-  TIMEOUT: 60000  // 60 seconds
-};
-```
-
-#### 5. Prediction Jobs Stuck
-
-**Symptom**: Jobs remain in "processing" status
-
-**Solution**:
+**Build Errors**:
 ```bash
-# Check job directory
-ls /path/to/job/data/{job_id}/output/
+# Clear cache
+rm -rf node_modules package-lock.json
+npm install
 
-# Verify pipeline URL
-curl http://localhost:5000/health
+# Or with bun
+rm -rf node_modules bun.lockb
+bun install
 ```
+
+**Context Not Working**:
+- Ensure `DatasetDetailLayout` wraps all detail routes
+- Check `useDatasetDetail()` is called inside provider
+- Verify `evolfid` query parameter is present
+
+---
+
+## Additional Resources
+
+- **API Documentation**: See `API_README.md`
+- **Backend Code**: `backend/core/`
+- **Frontend Code**: `src/`
+- **Component Library**: shadcn/ui documentation
+- **Django REST Framework**: https://www.django-rest-framework.org/
 
 ---
 
 ## Contributing
 
-### Development Workflow
+For questions or contributions, contact the development team.
 
-1. Fork repository
-2. Create feature branch: `git checkout -b feature/new-feature`
-3. Make changes
-4. Run tests: `python manage.py test` (backend), `npm test` (frontend)
-5. Commit: `git commit -m "Add new feature"`
-6. Push: `git push origin feature/new-feature`
-7. Create Pull Request
+## License
 
-### Code Style
-
-**Backend**:
-- Follow PEP 8
-- Use type hints
-- Document functions with docstrings
-
-**Frontend**:
-- Follow TypeScript best practices
-- Use functional components with hooks
-- Document complex logic with comments
-
----
-
-## Support & Contact
-
-- **Documentation**: This README and `API_README.md`
-- **Issues**: GitHub Issues
-- **Email**: [Contact email]
-
----
-
-**Version**: 1.0  
-**Last Updated**: 2025  
-**License**: [License type]
+[Add license information]
