@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { fetchDatasetDetail } from '@/lib/api';
@@ -59,6 +59,7 @@ export function DatasetDetailProvider({ children }: { children: ReactNode }) {
   
   const [data, setData] = useState<DatasetDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const lastFetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!evolfId) {
@@ -66,9 +67,15 @@ export function DatasetDetailProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Prevent duplicate API calls for the same ID
+    if (lastFetchedIdRef.current === evolfId && data) {
+      return;
+    }
+
     const loadData = async () => {
       try {
         setLoading(true);
+        lastFetchedIdRef.current = evolfId;
         const response = await fetchDatasetDetail(evolfId);
         setData(response);
       } catch (error) {
@@ -85,7 +92,7 @@ export function DatasetDetailProvider({ children }: { children: ReactNode }) {
     };
 
     loadData();
-  }, [evolfId, navigate, toast]);
+  }, [evolfId, navigate, toast, data]);
 
   return (
     <DatasetDetailContext.Provider value={{ data, loading, evolfId }}>
