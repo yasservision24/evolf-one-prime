@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
@@ -7,58 +7,15 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
-
-interface DatasetDetail {
-  evolfId: string;
-  receptor?: string;
-  ligand?: string;
-  class?: string;
-  mutation?: string;
-  method?: string;
-  value?: number;
-  source?: string;
-  sourceLinks?: string;
-  comment?: string;
-  mutationStatus?: string;
-  species?:string;
-}
+import { downloadDatasetByEvolfId } from '@/lib/api';
+import { useDatasetDetail } from '@/contexts/DatasetDetailContext';
 
 export default function DatasetInteraction() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const evolfId = searchParams.get('evolfid');
+  const { data, loading, evolfId } = useDatasetDetail();
   
-  const [data, setData] = useState<DatasetDetail | null>(null);
-  const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
-
-  useEffect(() => {
-    if (!evolfId) {
-      navigate('/dataset/dashboard');
-      return;
-    }
-
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
-        setData(response);
-      } catch (error) {
-        console.error('Failed to fetch entry:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load entry details.',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [evolfId, navigate, toast]);
 
   const handleExport = async () => {
     if (!evolfId) return;

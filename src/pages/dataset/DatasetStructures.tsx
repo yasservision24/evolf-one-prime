@@ -1,93 +1,41 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Copy, Check, Download } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
+import { downloadDatasetByEvolfId } from '@/lib/api';
 import { Molecular3DViewer } from '@/components/Molecular3DViewer';
-
-interface DatasetDetail {
-  evolfId: string;
-  receptor?: string;
-  ligand?: string;
-  class?: string;
-  mutation?: string;
-  structure3d?: string;
-  method?: string;
-  receptorStructure?: string;
-  species?:string;
-  ligandStructure?: string;
-  receptorFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
-  ligandFormat?: 'pdb' | 'sdf' | 'mol2' | 'xyz';
-}
+import { useDatasetDetail } from '@/contexts/DatasetDetailContext';
 
 export default function DatasetStructures() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const evolfId = searchParams.get('evolfid');
+  const { data: rawData, loading, evolfId } = useDatasetDetail();
   
-  const [data, setData] = useState<DatasetDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    if (!evolfId) {
-      navigate('/dataset/dashboard');
-      return;
-    }
-
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
-        
-        // Map API response to component data structure
-        const structureData: DatasetDetail = {
-          evolfId: response.evolfId,
-          receptor: response.receptor,
-          ligand: response.ligand,
-          class: response.class,
-          mutation: response.mutation,
-          structure3d: response.structure3d,
-          species:response.species,
-        
-          receptorStructure: response.pdbData, // PDB data from API
-          ligandStructure: response.sdfData,   // SDF data from API
-          receptorFormat: 'pdb',
-          ligandFormat: 'sdf',
-        };
-        
-        setData(structureData);
-      } catch (error) {
-        console.error('Failed to fetch entry:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load structure data. Please try again.',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
-      }
+  // Map API response to component data structure
+  const data = useMemo(() => {
+    if (!rawData) return null;
+    return {
+      evolfId: rawData.evolfId,
+      receptor: rawData.receptor,
+      ligand: rawData.ligand,
+      class: rawData.class,
+      mutation: rawData.mutation,
+      structure3d: rawData.structure3d,
+      species: rawData.species,
+      receptorStructure: rawData.pdbData,
+      ligandStructure: rawData.sdfData,
+      receptorFormat: 'pdb' as const,
+      ligandFormat: 'sdf' as const,
     };
+  }, [rawData]);
 
-    loadData();
-  }, [evolfId, navigate, toast]);
-
-  const copyToClipboard = (text: string, fieldName: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast({
-      title: 'Copied!',
-      description: 'Copied to clipboard',
-    });
-  };
 
   const downloadReceptorStructure = () => {
     if (!data?.receptorStructure || data.receptorStructure === 'N/A') return;
@@ -159,42 +107,6 @@ export default function DatasetStructures() {
     }
   };
 
-  const InfoField = ({ 
-    label, 
-    value, 
-    copyable = false, 
-    fieldKey = '' 
-  }: { 
-    label: string; 
-    value: string | number; 
-    copyable?: boolean; 
-    fieldKey?: string;
-  }) => {
-    const displayValue = value?.toString() || 'N/A';
-    
-    return (
-      <div className="py-3">
-        <div className="text-sm text-muted-foreground mb-1">{label}</div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-foreground font-medium">{displayValue}</div>
-          {copyable && displayValue !== 'N/A' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => copyToClipboard(displayValue, fieldKey)}
-            >
-              {copiedField === fieldKey ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

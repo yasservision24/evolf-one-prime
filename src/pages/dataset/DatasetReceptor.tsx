@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Copy, Check, ExternalLink, Download, Star, Link as LinkIcon } from 'lucide-react';
@@ -7,37 +7,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { fetchDatasetDetail, downloadDatasetByEvolfId } from '@/lib/api';
-
-interface DatasetDetail {
-  evolfId: string;
-  receptor?: string;
-  ligand?: string;
-  class?: string;
-  species?: string;
-  mutationStatus?: string;
-  mutation?: string;
-  mutationImpact?: string;
-  sequence?: string;
-  receptorSubtype?: string;
-  uniprotId?: string;
-  uniprotLink?: string;
-  source?: string;
-  sourceLinks?: string;
-  receptorName?: string;
-  ligandName?: string;
-  pdbData?: string;
-  wildTypeEvolfId?: string;
-}
+import { downloadDatasetByEvolfId } from '@/lib/api';
+import { useDatasetDetail } from '@/contexts/DatasetDetailContext';
 
 export default function DatasetReceptor() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const evolfId = searchParams.get('evolfid');
+  const { data, loading, evolfId } = useDatasetDetail();
   
-  const [data, setData] = useState<DatasetDetail | null>(null);
-  const [loading, setLoading] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
 
@@ -45,32 +22,6 @@ export default function DatasetReceptor() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  useEffect(() => {
-    if (!evolfId) {
-      navigate('/dataset/dashboard');
-      return;
-    }
-
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchDatasetDetail(evolfId);
-        setData(response);
-      } catch (error) {
-        console.error('Failed to fetch entry:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load entry details.',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [evolfId, navigate, toast]);
 
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);

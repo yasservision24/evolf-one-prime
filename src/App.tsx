@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DatabaseDashboard from "./pages/dataset/DatabaseDashboard";
+import DatasetDetailLayout from "./pages/dataset/DatasetDetailLayout";
 import DatasetOverview from "./pages/dataset/DatasetOverview";
 import DatasetReceptor from "./pages/dataset/DatasetReceptor";
 import DatasetLigand from "./pages/dataset/DatasetLigand";
@@ -37,11 +38,13 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/dataset/dashboard" element={<DatabaseDashboard />} />
-        <Route path="/dataset/detail" element={<DatasetOverview />} />
-        <Route path="/dataset/receptor" element={<DatasetReceptor />} />
-        <Route path="/dataset/ligand" element={<DatasetLigand />} />
-        <Route path="/dataset/interaction" element={<DatasetInteraction />} />
-        <Route path="/dataset/structures" element={<DatasetStructures />} />
+        <Route element={<DatasetDetailLayout />}>
+          <Route path="/dataset/detail" element={<DatasetOverview />} />
+          <Route path="/dataset/receptor" element={<DatasetReceptor />} />
+          <Route path="/dataset/ligand" element={<DatasetLigand />} />
+          <Route path="/dataset/interaction" element={<DatasetInteraction />} />
+          <Route path="/dataset/structures" element={<DatasetStructures />} />
+        </Route>
         <Route path="/prediction" element={<PredictionDashboard />} />
         <Route path="/prediction-result" element={<PredictionResult />} />
 
