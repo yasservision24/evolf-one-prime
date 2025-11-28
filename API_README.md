@@ -7,24 +7,19 @@ Complete REST API reference for the EvOlf platform with detailed examples in mul
 ## Table of Contents
 
 1. [Base Configuration](#base-configuration)
-2. [Architecture Overview](#architecture-overview)
-   - [Backend Architecture](#backend-architecture)
-   - [Frontend Architecture](#frontend-architecture)
-3. [Dataset Endpoints](#dataset-endpoints)
+2. [Dataset Endpoints](#dataset-endpoints)
    - [Get Paginated Dataset](#1-get-paginated-dataset)
    - [Get Dataset Details](#2-get-dataset-details)
    - [Export Multiple Entries](#3-export-multiple-entries)
    - [Export Single Entry](#4-export-single-entry)
    - [Download Complete Dataset](#5-download-complete-dataset)
-4. [Search Endpoints](#search-endpoints)
+3. [Search Endpoints](#search-endpoints)
    - [ElasticSearch Query](#elasticsearch-query)
-5. [Prediction Endpoints](#prediction-endpoints)
+4. [Prediction Endpoints](#prediction-endpoints)
    - [Submit SMILES Prediction](#1-submit-smiles-prediction)
    - [Get Job Status](#2-get-job-status)
    - [Download Job Results](#3-download-job-results)
-6. [Frontend Integration](#frontend-integration)
-7. [Performance Optimizations](#performance-optimizations)
-8. [Error Handling](#error-handling)
+5. [Error Handling](#error-handling)
 
 ---
 
@@ -40,119 +35,6 @@ Complete REST API reference for the EvOlf platform with detailed examples in mul
 ```
 
 **Request Timeout**: 30 seconds
-
----
-
-## Architecture Overview
-
-### Backend Architecture
-
-**Technology Stack**:
-- **Framework**: Django 4.x with Django REST Framework
-- **Database**: PostgreSQL 14+ with pg_trgm extension for fuzzy search
-- **Search Engine**: ElasticSearch 8.x (optional, with PostgreSQL fallback)
-- **File Storage**: Django MEDIA_ROOT for PDB/SDF files
-- **Job Queue**: Async task processing for predictions
-
-**Key Components**:
-```
-backend/
-├── core/
-│   ├── models.py          # EvOlf database model
-│   ├── serializers.py     # DRF serializers
-│   ├── views/
-│   │   ├── dataset_views.py      # Dataset CRUD operations
-│   │   ├── elastic_search_views.py  # Search functionality
-│   │   ├── prediction_views.py    # SMILES prediction endpoints
-│   │   └── job_status_views.py    # Job status polling
-│   ├── services/
-│   │   └── job_scheduler.py    # Background job management
-│   └── management/commands/
-│       ├── import_evolf_data.py   # Data import utility
-│       └── elastic_search.py      # ES indexing
-└── evo_backend/
-    ├── settings.py        # Django configuration
-    └── urls.py            # API routing
-```
-
-**Database Model** (`core/models.py`):
-```python
-class EvOlf(models.Model):
-    EvOlf_ID = models.CharField(max_length=100, unique=True)
-    Receptor = models.CharField(max_length=500)
-    Species = models.CharField(max_length=200)
-    Class = models.CharField(max_length=100)
-    Ligand = models.CharField(max_length=500)
-    Mutation = models.TextField(blank=True)
-    Mutation_Status = models.CharField(max_length=100)
-    ChEMBL_ID = models.CharField(max_length=100)
-    UniProt_ID = models.CharField(max_length=100)
-    CID = models.CharField(max_length=100)
-    # ... additional fields for sequences, structures, etc.
-```
-
-**API Views**:
-- `DatasetListAPIView`: Paginated dataset with filters
-- `FetchDatasetDetails`: Single entry details
-- `DatasetExportView`: Bulk export (CSV/ZIP)
-- `ElasticSearchView`: Full-text search
-- `SmilesPredictionAPIView`: Submit predictions
-- `JobStatusAPIView`: Check job status
-
-### Frontend Architecture
-
-**Technology Stack**:
-- **Framework**: React 18.3.1 with TypeScript
-- **Build Tool**: Vite
-- **Routing**: React Router 6.30.1
-- **State Management**: React Context API + TanStack Query
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **3D Visualization**: Custom molecular viewer component
-
-**Key Components**:
-```
-src/
-├── components/
-│   ├── Header.tsx              # Main navigation
-│   ├── Footer.tsx              # Footer links
-│   ├── Molecular3DViewer.tsx   # 3D structure viewer
-│   └── ui/                     # shadcn/ui components
-├── contexts/
-│   └── DatasetDetailContext.tsx  # Shared data context
-├── pages/
-│   ├── Index.tsx               # Home page
-│   ├── dataset/
-│   │   ├── DatabaseDashboard.tsx      # Main database browser
-│   │   ├── DatasetDetailLayout.tsx    # Context provider wrapper
-│   │   ├── DatasetOverview.tsx        # Entry overview tab
-│   │   ├── DatasetReceptor.tsx        # Receptor details tab
-│   │   ├── DatasetLigand.tsx          # Ligand details tab
-│   │   ├── DatasetInteraction.tsx     # Interaction data tab
-│   │   └── DatasetStructures.tsx      # 3D structures tab
-│   └── prediction/
-│       ├── PredictionDashboard.tsx    # Submit predictions
-│       └── PredictionResult.tsx       # View results
-├── lib/
-│   ├── api.ts              # API client functions
-│   └── utils.ts            # Utility functions
-└── hooks/
-    ├── use-toast.ts        # Toast notifications
-    └── use-mobile.tsx      # Mobile detection
-```
-
-**State Management Pattern**:
-- **Context API**: Shared dataset details across tabs (prevents duplicate API calls)
-- **TanStack Query**: Server state caching and synchronization
-- **Local State**: Component-specific UI state
-
-**Data Flow**:
-```
-User Action → Component → API Client (lib/api.ts) → Backend API → Database/ElasticSearch
-                    ↓
-          Context Provider (shared state)
-                    ↓
-      All Tab Components (consume shared data)
-```
 
 ---
 
@@ -203,7 +85,7 @@ const response = await fetch('https://evolf.ahujalab.iiitd.edu.in/api/dataset?pa
 const data = await response.json();
 console.log(data);
 
-// Using the API client (frontend)
+// Using the API client
 import { fetchDatasetPaginated } from '@/lib/api';
 const result = await fetchDatasetPaginated(
   1,           // page
@@ -304,13 +186,23 @@ print(data$data)
 }
 ```
 
+**Field Descriptions**:
+- `data`: Array of dataset entries matching filters
+- `pagination`: Pagination metadata (currentPage, totalPages, totalItems, itemsPerPage)
+- `statistics`: Overall dataset statistics reflecting current filters
+- `filterOptions`: Available filter values for dropdown menus
+- `all_evolf_ids`: All EvOlf IDs matching current filters (useful for bulk exports)
+
+**Search Implementation**:
+- Primary: ElasticSearch with wildcard matching on Receptor, Ligand, Species
+- Fallback: PostgreSQL trigram similarity search (similarity > 0.2)
+- Results maintain relevance ordering from ElasticSearch
+
 ---
 
 ### 2. Get Dataset Details
 
 Fetch complete details for a specific EvOlf entry including sequences, structures, and experimental data.
-
-**IMPORTANT**: This endpoint is called **once per entry** via the Context API on the frontend, and the data is shared across all detail tabs (Overview, Receptor, Ligand, Interaction, 3D Structures).
 
 #### Endpoint
 ```
@@ -330,24 +222,20 @@ GET /dataset/details/{evolfId}
 curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001"
 ```
 
-**JavaScript/TypeScript (Frontend Integration)**:
+**JavaScript/TypeScript**:
 ```javascript
-// Using API client with Context
-import { useDatasetDetail } from '@/contexts/DatasetDetailContext';
+// Using fetch
+const response = await fetch('https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001', {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' }
+});
+const details = await response.json();
 
-function DatasetComponent() {
-  const { data, loading, evolfId } = useDatasetDetail();
-  
-  if (loading) return <div>Loading...</div>;
-  
-  return (
-    <div>
-      <h1>{data?.receptorName} - {data?.ligandName}</h1>
-      <p>Species: {data?.species}</p>
-      <p>SMILES: {data?.smiles}</p>
-    </div>
-  );
-}
+// Using API client
+import { fetchDatasetDetail } from '@/lib/api';
+const details = await fetchDatasetDetail('EvOlf0100001');
+console.log('Receptor:', details.receptor);
+console.log('Sequence:', details.sequence);
 ```
 
 **Python**:
@@ -363,6 +251,20 @@ print(f"Receptor: {details['receptor']}")
 print(f"Ligand: {details['ligand']}")
 print(f"Species: {details['species']}")
 print(f"SMILES: {details['smiles']}")
+```
+
+**R**:
+```r
+library(httr)
+library(jsonlite)
+
+response <- GET(
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001",
+  add_headers("Content-Type" = "application/json")
+)
+details <- fromJSON(content(response, "text"))
+cat("Receptor:", details$receptor, "\n")
+cat("Ligand:", details$ligand, "\n")
 ```
 
 #### Response Format
@@ -383,11 +285,11 @@ print(f"SMILES: {details['smiles']}")
   "mutationImpact": "",
   "receptorSubtype": "Dopamine D2",
   "uniprotId": "P14416",
-  "uniprotLink": "https://www.uniprot.org/uniprotkb/P14416",
+  "uniprotLink": "httpss://www.uniprot.org/uniprotkb/P14416",
   "chemblId": "CHEMBL228",
   "cid": "681",
   "pubchemId": "681",
-  "pubchemLink": "https://pubchem.ncbi.nlm.nih.gov/compound/681",
+  "pubchemLink": "httpss://pubchem.ncbi.nlm.nih.gov/compound/681",
   "smiles": "NCCc1ccc(O)c(O)c1",
   "inchi": "InChI=1S/C8H11NO2/c9-4-3-6-1-2-7(10)8(11)5-6/h1-2,5,10-11H,3-4,9H2",
   "inchiKey": "VYFYYTLLBUKUHU-UHFFFAOYSA-N",
@@ -395,8 +297,8 @@ print(f"SMILES: {details['smiles']}")
   "sequence": "MDPLNLSWYDDDLERQNWSRPFNGSDGKADRPPYNYYATLLTLLIAVIVFGNVLVCMAVSREKALQTTTNYLIVSLAVADLLVATLVMPWVVYLEVVGEWKFSRIHCDIFVTLDVMMCTASILNLCAISIDRYTAVAMPMLYNT...",
   "pdbData": "ATOM      1  N   MET A   1     -12.345   8.901  23.456...",
   "sdfData": "\n  Mrv0541...",
-  "structure2d": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
-  "image": "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
+  "structure2d": "httpss://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
+  "image": "httpss://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?cid=681&width=300&height=300",
   "structure3d": "https://evolf.ahujalab.iiitd.edu.in/media/pdb_files/EvOlf0100001.pdb",
   "expressionSystem": "HEK293",
   "parameter": "Ki",
@@ -405,104 +307,28 @@ print(f"SMILES: {details['smiles']}")
   "comments": "High affinity binding measured at 25°C",
   "geneSymbol": "DRD2",
   "source": "12345678",
-  "sourceLinks": "https://pubmed.ncbi.nlm.nih.gov/12345678/"
+  "sourceLinks": "httpss://pubmed.ncbi.nlm.nih.gov/12345678/"
 }
 ```
 
----
+**Field Descriptions**:
+- **Identifiers**: `evolfId`, `uniprotId`, `chemblId`, `cid`, `pubchemId`
+- **Names**: `receptor`, `ligand`, `receptorSubtype`, `geneSymbol`
+- **Taxonomy**: `species`, `class`
+- **Mutation**: `mutation`, `mutationStatus`, `mutationType`, `mutationImpact`
+- **Sequences**: `sequence` (protein sequence), `smiles`, `inchi`, `inchiKey`, `iupacName`
+- **Structures**: `pdbData` (3D protein structure), `sdfData` (3D ligand structure), `structure2d`, `structure3d`
+- **External Links**: `uniprotLink`, `pubchemLink`, `sourceLinks` (pipe-delimited PubMed URLs)
+- **Experimental**: `expressionSystem`, `parameter`, `value`, `unit`, `comments`
+- **References**: `source` (PubMed IDs), `sourceLinks` (full URLs)
 
-## Frontend Integration
+**Notes**:
+- Empty strings or `"nan"` indicate missing data
+- `sourceLinks` supports multiple pipe-delimited URLs: `"url1 | url2 | url3"`
+- `structure3d` points to PDB file for 3D molecular visualization
+- `pdbData` and `sdfData` contain complete file contents for offline use
 
-### Context-Based State Management
-
-The frontend uses React Context API to **prevent duplicate API calls** when navigating between detail tabs:
-
-**DatasetDetailContext.tsx**:
-```typescript
-export function DatasetDetailProvider({ children }: { children: ReactNode }) {
-  const [searchParams] = useSearchParams();
-  const evolfId = searchParams.get('evolfid');
-  const [data, setData] = useState<DatasetDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const lastFetchedIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // Only fetch if evolfId changed
-    if (lastFetchedIdRef.current === evolfId && data) return;
-    
-    const loadData = async () => {
-      lastFetchedIdRef.current = evolfId;
-      const response = await fetchDatasetDetail(evolfId!);
-      setData(response);
-    };
-    
-    loadData();
-  }, [evolfId]);
-
-  return (
-    <DatasetDetailContext.Provider value={{ data, loading, evolfId }}>
-      {children}
-    </DatasetDetailContext.Provider>
-  );
-}
-```
-
-**Router Configuration** (App.tsx):
-```typescript
-<Route element={<DatasetDetailLayout />}>
-  <Route path="/dataset/detail" element={<DatasetOverview />} />
-  <Route path="/dataset/receptor" element={<DatasetReceptor />} />
-  <Route path="/dataset/ligand" element={<DatasetLigand />} />
-  <Route path="/dataset/interaction" element={<DatasetInteraction />} />
-  <Route path="/dataset/structures" element={<DatasetStructures />} />
-</Route>
-```
-
-**Benefits**:
-- **Single API call per entry**: Data fetched once when entering any detail tab
-- **Instant tab switching**: No loading delay when switching between tabs
-- **Reduced server load**: Fewer HTTP requests
-- **Better UX**: Seamless navigation experience
-
----
-
-## Performance Optimizations
-
-### Backend Optimizations
-
-1. **Pagination**: Server-side pagination limits response size
-2. **Query Optimization**: Django ORM with `select_related` and `prefetch_related`
-3. **ElasticSearch**: Fast full-text search with fallback to PostgreSQL trigram
-4. **Indexing**: Database indexes on frequently queried fields
-5. **Caching**: Response caching for static data (optional)
-
-### Frontend Optimizations
-
-1. **Context API**: Single data fetch shared across tabs
-2. **Code Splitting**: Route-based lazy loading with React.lazy()
-3. **Memoization**: useMemo for expensive computations
-4. **Virtual Scrolling**: Large lists use virtualization
-5. **Debounced Search**: Search input debounced to reduce API calls
-
-**Example - Debounced Search**:
-```typescript
-const [searchTerm, setSearchTerm] = useState('');
-const debouncedSearch = useDebounce(searchTerm, 300);
-
-useEffect(() => {
-  if (debouncedSearch) {
-    fetchDatasetPaginated(1, 20, debouncedSearch);
-  }
-}, [debouncedSearch]);
-```
-
----
-
-## Error Handling
-
-### Standard Error Responses
-
-**404 Not Found**:
+**Error (404 Not Found)**:
 ```json
 {
   "error": "Entry not found",
@@ -510,45 +336,933 @@ useEffect(() => {
 }
 ```
 
-**400 Bad Request**:
+---
+
+### 3. Export Multiple Entries
+
+Export multiple dataset entries as a ZIP file containing CSV data and metadata.
+
+#### Endpoint
+```
+POST /dataset/export
+```
+
+#### Request Body
+
+**Option A - Export by IDs**:
 ```json
 {
-  "error": "Invalid parameters",
-  "message": "Page number must be greater than 0"
+  "evolfIds": ["EvOlf0100001", "EvOlf0100002", "EvOlf0100003"]
 }
 ```
 
-**500 Internal Server Error**:
+**Option B - Export by Filters**:
 ```json
 {
-  "error": "Server error",
-  "message": "An unexpected error occurred"
+  "search": "dopamine",
+  "species": "Human",
+  "class": "1",
+  "mutationType": "Wild type",
+  "sortBy": "Receptor",
+  "sortOrder": "asc"
 }
 ```
 
-### Frontend Error Handling
+#### Examples
 
-```typescript
-try {
-  const data = await fetchDatasetDetail(evolfId);
-  setData(data);
-} catch (error) {
-  console.error('Failed to fetch entry:', error);
-  toast({
-    title: 'Error',
-    description: 'Failed to load entry details. Please try again.',
-    variant: 'destructive',
-  });
+**cURL**:
+```bash
+# Export by IDs
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
+  -H "Content-Type: application/json" \
+  -d '{"evolfIds": ["EvOlf0100001", "EvOlf0100002"]}' \
+  --output dataset_export.zip
+
+# Export by filters
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
+  -H "Content-Type: application/json" \
+  -d '{"species": "Human", "class": "1"}' \
+  --output filtered_export.zip
+```
+
+**JavaScript/TypeScript**:
+```javascript
+// Export by IDs
+import { downloadDatasetByIds } from '@/lib/api';
+const blob = await downloadDatasetByIds(['EvOlf0100001', 'EvOlf0100002']);
+
+// Create download link
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'dataset_export.zip';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+window.URL.revokeObjectURL(url);
+```
+
+**Python**:
+```python
+import requests
+
+# Export by IDs
+response = requests.post(
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
+    json={'evolfIds': ['EvOlf0100001', 'EvOlf0100002']},
+    headers={'Content-Type': 'application/json'}
+)
+
+with open('dataset_export.zip', 'wb') as f:
+    f.write(response.content)
+
+# Export by filters
+response = requests.post(
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
+    json={
+        'species': 'Human',
+        'class': '1',
+        'mutationType': 'Wild type'
+    },
+    headers={'Content-Type': 'application/json'}
+)
+
+with open('filtered_export.zip', 'wb') as f:
+    f.write(response.content)
+```
+
+**R**:
+```r
+library(httr)
+
+# Export by IDs
+response <- POST(
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export",
+  body = list(evolfIds = c("EvOlf0100001", "EvOlf0100002")),
+  encode = "json",
+  add_headers("Content-Type" = "application/json")
+)
+
+writeBin(content(response, "raw"), "dataset_export.zip")
+```
+
+#### Response
+
+**Success (200 OK)**:
+- Content-Type: `application/zip`
+- Content-Disposition: `attachment; filename=evolf_filtered_export.zip`
+- Body: Binary ZIP file
+
+**ZIP Contents**:
+- `data.csv`: CSV file with columns: EvOlf_ID, Receptor, Species, Class, Ligand, Mutation_Status, Mutation, ChEMBL_ID, UniProt_ID, CID
+- `metadata.json`: Export metadata (exportDate, totalRecords, format, version)
+- `README.txt`: Description of export contents
+
+**Error (404 Not Found)**:
+```json
+{
+  "error": "No records found for given filters or IDs"
 }
 ```
 
 ---
 
-## Additional Resources
+### 4. Export Single Entry
 
-- **Backend Code**: `backend/core/views/`
-- **Frontend Code**: `src/lib/api.ts`, `src/contexts/`
-- **API Tests**: `backend/core/tests.py`
-- **Deployment Guide**: See `final_readme.md`
+Export a single dataset entry as a ZIP file.
 
-For more detailed setup instructions and architecture diagrams, refer to `final_readme.md`.
+#### Endpoint
+```
+GET /dataset/export/{evolfId}
+```
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `evolfId` | string | Yes | EvOlf identifier |
+
+#### Examples
+
+**cURL**:
+```bash
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001" \
+  --output single_entry.zip
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { downloadDatasetByEvolfId } from '@/lib/api';
+
+const blob = await downloadDatasetByEvolfId('EvOlf0100001');
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'EvOlf0100001.zip';
+a.click();
+window.URL.revokeObjectURL(url);
+```
+
+**Python**:
+```python
+import requests
+
+response = requests.get(
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export/EvOlf0100001',
+    headers={'Content-Type': 'application/json'}
+)
+
+with open('EvOlf0100001.zip', 'wb') as f:
+    f.write(response.content)
+```
+
+#### Response
+
+**Success (200 OK)**:
+- Content-Type: `application/zip`
+- Content-Disposition: `attachment; filename=EvOlf0100001_files.zip`
+- Body: Binary ZIP file containing PDB, SDF, PNG files (if available)
+
+**Error (404 Not Found)**:
+```json
+{
+  "error": "No files found for this EvOlf ID"
+}
+```
+
+---
+
+### 5. Download Complete Dataset
+
+Download the entire EvOlf database as a cached ZIP file.
+
+#### Endpoint
+```
+GET /dataset/download
+```
+
+#### Examples
+
+**cURL**:
+```bash
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download" \
+  --output evolf_complete_dataset.zip
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { downloadCompleteDataset } from '@/lib/api';
+
+const blob = await downloadCompleteDataset();
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'evolf_complete_dataset.zip';
+a.click();
+window.URL.revokeObjectURL(url);
+```
+
+**Python**:
+```python
+import requests
+
+response = requests.get(
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/download',
+    headers={'Content-Type': 'application/json'}
+)
+
+with open('evolf_complete_dataset.zip', 'wb') as f:
+    f.write(response.content)
+
+print(f"Downloaded {len(response.content)} bytes")
+```
+
+**R**:
+```r
+library(httr)
+
+response <- GET(
+  "https://evolf.ahujalab.iiitd.edu.in/api/dataset/download",
+  add_headers("Content-Type" = "application/json")
+)
+
+writeBin(content(response, "raw"), "evolf_complete_dataset.zip")
+```
+
+#### Response
+
+**Success (200 OK)**:
+- Content-Type: `application/zip`
+- Content-Disposition: `attachment; filename=evolf_complete_dataset.zip`
+- Body: Binary ZIP file (may be 100MB+)
+
+**ZIP Contents**:
+- `evolf_complete_data.csv`: Complete dataset
+- `metadata.json`: Export information
+- `README.txt`: Dataset description
+
+**Performance Note**: 
+- First request generates and caches the ZIP file
+- Subsequent requests serve the cached file for fast download
+- Cache updates when database is modified
+
+---
+
+## Search Endpoints
+
+### ElasticSearch Query
+
+Perform full-text search across all dataset fields using ElasticSearch with PostgreSQL fallback.
+
+#### Endpoint
+```
+GET /search/?q={query}
+```
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `q` | string | Yes | Search query string |
+
+#### Examples
+
+**cURL**:
+```bash
+curl "https://evolf.ahujalab.iiitd.edu.in/api/search/?q=dopamine"
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { searchDataset } from '@/lib/api';
+
+const results = await searchDataset('dopamine');
+console.log(results.results);
+```
+
+**Python**:
+```python
+import requests
+
+response = requests.get(
+    'https://evolf.ahujalab.iiitd.edu.in/api/search/',
+    params={'q': 'dopamine'},
+    headers={'Content-Type': 'application/json'}
+)
+
+results = response.json()
+for item in results['results']:
+    print(f"{item['EvOlf_ID']}: {item['Receptor']} - {item['Ligand']}")
+```
+
+**R**:
+```r
+library(httr)
+library(jsonlite)
+
+response <- GET(
+  "https://evolf.ahujalab.iiitd.edu.in/api/search/",
+  query = list(q = "dopamine"),
+  add_headers("Content-Type" = "application/json")
+)
+
+results <- fromJSON(content(response, "text"))
+print(results$results)
+```
+
+#### Response Format
+
+**Success (200 OK)**:
+```json
+{
+  "results": [
+    {
+      "EvOlf_ID": "EvOlf0100045",
+      "Receptor": "Dopamine D2 receptor",
+      "Ligand": "Dopamine",
+      "Species": "Human",
+      "Class": "1",
+      "Mutation": "Wild-type",
+      "score": 0.95
+    },
+    {
+      "EvOlf_ID": "EvOlf0100046",
+      "Receptor": "Dopamine D1 receptor",
+      "Ligand": "Dopamine",
+      "Species": "Human",
+      "Class": "1",
+      "Mutation": "Wild-type",
+      "score": 0.92
+    }
+  ]
+}
+```
+
+**Search Features**:
+- **Primary Engine**: ElasticSearch with wildcard matching
+  - Searches: Receptor, Ligand, Species fields
+  - Case-insensitive matching
+  - Relevance scoring
+- **Fallback**: PostgreSQL trigram similarity (if ElasticSearch unavailable)
+  - Minimum similarity threshold: 0.2
+  - Searches Receptor field primarily
+- **Performance**: Results limited to top matches by relevance
+
+---
+
+## Prediction Endpoints
+
+### 1. Submit SMILES Prediction
+
+Submit a ligand SMILES string for binding affinity prediction.
+
+#### Endpoint
+```
+POST /predict/smiles/
+```
+
+#### Request Body
+
+```json
+{
+  "smiles": "NCCc1c[nH]c2ccc(O)cc12",
+  "sequence": "MDVLSPGQGNNTTSPPAPFET...",
+  "temp_ligand_id": "ligand_001",
+  "temp_rec_id": "receptor_001",
+  "id": "custom_job_id"
+}
+```
+
+**Field Descriptions**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `smiles` | string | **Yes** | SMILES notation of ligand (no whitespace, valid SMILES characters) |
+| `sequence` | string | No | Receptor protein sequence (amino acid single-letter codes, no FASTA header) |
+| `mutated_sequence` | string | No | Alternative field name for receptor sequence |
+| `temp_ligand_id` | string | No | Temporary ligand identifier (default: auto-generated) |
+| `temp_rec_id` | string | No | Temporary receptor identifier (default: auto-generated) |
+| `id` | string | No | Custom job ID (default: auto-generated) |
+
+**Validation Rules**:
+- SMILES: No whitespace, valid characters: `A-Za-z0-9@+-[]()=#/\%.:\*`
+- Sequence: No whitespace, no FASTA headers (no `>`), valid amino acids only
+- No file uploads allowed (JSON/form fields only)
+- No array values allowed
+
+#### Examples
+
+**cURL**:
+```bash
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "smiles": "NCCc1c[nH]c2ccc(O)cc12",
+    "sequence": "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN",
+    "temp_ligand_id": "serotonin",
+    "temp_rec_id": "5ht1a"
+  }'
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { submitPrediction } from '@/lib/api';
+
+const result = await submitPrediction({
+  smiles: 'NCCc1c[nH]c2ccc(O)cc12',
+  sequence: 'MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN',
+  temp_ligand_id: 'serotonin',
+  temp_rec_id: '5ht1a'
+});
+
+console.log('Job ID:', result.job_id);
+```
+
+**Python**:
+```python
+import requests
+
+response = requests.post(
+    'https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/',
+    json={
+        'smiles': 'NCCc1c[nH]c2ccc(O)cc12',
+        'sequence': 'MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN',
+        'temp_ligand_id': 'serotonin',
+        'temp_rec_id': '5ht1a'
+    },
+    headers={'Content-Type': 'application/json'}
+)
+
+result = response.json()
+print(f"Job ID: {result['job_id']}")
+print(f"Message: {result['message']}")
+```
+
+**R**:
+```r
+library(httr)
+library(jsonlite)
+
+response <- POST(
+  "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/",
+  body = list(
+    smiles = "NCCc1c[nH]c2ccc(O)cc12",
+    sequence = "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN",
+    temp_ligand_id = "serotonin",
+    temp_rec_id = "5ht1a"
+  ),
+  encode = "json",
+  add_headers("Content-Type" = "application/json")
+)
+
+result <- fromJSON(content(response, "text"))
+cat("Job ID:", result$job_id, "\n")
+```
+
+#### Response Format
+
+**Success (200 OK)**:
+```json
+{
+  "job_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "message": "Job submitted to pipeline asynchronously."
+}
+```
+
+**Error Responses**:
+
+**400 Bad Request** - Invalid SMILES:
+```json
+{
+  "error": "'smiles' is required."
+}
+```
+
+**400 Bad Request** - SMILES with whitespace:
+```json
+{
+  "error": "SMILES contains whitespace."
+}
+```
+
+**400 Bad Request** - Invalid sequence:
+```json
+{
+  "error": "Invalid amino-acid letters in sequence."
+}
+```
+
+**400 Bad Request** - File upload attempted:
+```json
+{
+  "error": "File uploads are not allowed. Send JSON or form fields (no files)."
+}
+```
+
+**Implementation Details**:
+- Job ID is a UUID v4
+- CSV file created with columns: `ID`, `Temp_Ligand_ID`, `SMILES`, `Mutated_Sequence`, `TempRecID`
+- Saved to: `{JOB_DATA_DIR}/{job_id}/{job_id}.csv`
+- Submitted asynchronously to prediction pipeline
+- Pipeline URL: `{PREDICT_DOCKER_URL}/pipeline/run`
+
+---
+
+### 2. Get Job Status
+
+Check the status of a submitted prediction job.
+
+#### Endpoint
+```
+GET /predict/job/{job_id}/
+```
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `job_id` | string | Yes | Job UUID returned from submission |
+
+#### Query Parameters (Optional)
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `download` | string | Set to `"output"` to download results as ZIP |
+
+#### Examples
+
+**cURL**:
+```bash
+# Check status
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/"
+
+# Download results
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
+  --output results.zip
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { getPredictionJobStatus } from '@/lib/api';
+
+// Check status
+const status = await getPredictionJobStatus('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
+console.log('Status:', status.status);
+
+if (status.status === 'completed') {
+  console.log('Output files:', status.output_files);
+}
+```
+
+**Python**:
+```python
+import requests
+import time
+
+job_id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+
+# Poll for status
+while True:
+    response = requests.get(
+        f'https://evolf.ahujalab.iiitd.edu.in/api/predict/job/{job_id}/',
+        headers={'Content-Type': 'application/json'}
+    )
+    
+    status = response.json()
+    print(f"Status: {status['status']}")
+    
+    if status['status'] == 'finished':
+        print(f"Output files: {status['output_files']}")
+        break
+    elif status['status'] == 'processing':
+        print("Job still running, waiting 10 seconds...")
+        time.sleep(10)
+    else:
+        break
+```
+
+**R**:
+```r
+library(httr)
+library(jsonlite)
+
+job_id <- "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+response <- GET(
+  paste0("https://evolf.ahujalab.iiitd.edu.in/api/predict/job/", job_id, "/"),
+  add_headers("Content-Type" = "application/json")
+)
+
+status <- fromJSON(content(response, "text"))
+cat("Status:", status$status, "\n")
+```
+
+#### Response Formats
+
+**Job Running (200 OK)**:
+```json
+{
+  "status": "processing",
+  "message": "Job started but no output files yet"
+}
+```
+
+**Job Completed (200 OK)**:
+```json
+{
+  "job_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "status": "finished",
+  "output_files": [
+    "output/predictions.csv",
+    "output/visualization.png",
+    "output/summary.json"
+  ]
+}
+```
+
+**Job Not Found (404 Not Found)**:
+```json
+{
+  "error": "Job not not found"
+}
+```
+
+**Status Values**:
+- `processing`: Job submitted but no output files yet
+- `finished`: Job completed with output files available
+
+---
+
+### 3. Download Job Results
+
+Download prediction results as a ZIP file.
+
+#### Endpoint
+```
+GET /predict/job/{job_id}/?download=output
+```
+
+Or alternative endpoint:
+```
+GET /predict/download/{job_id}/
+```
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `job_id` | string | Yes | Job UUID |
+
+#### Examples
+
+**cURL**:
+```bash
+# Method 1
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/a1b2c3d4-e5f6-7890-abcd-ef1234567890/?download=output" \
+  --output prediction_results.zip
+
+# Method 2
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/download/a1b2c3d4-e5f6-7890-abcd-ef1234567890/" \
+  --output prediction_results.zip
+```
+
+**JavaScript/TypeScript**:
+```javascript
+import { downloadPredictionResults } from '@/lib/api';
+
+const blob = await downloadPredictionResults('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
+
+// Create download link
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'prediction_results.zip';
+a.click();
+window.URL.revokeObjectURL(url);
+```
+
+**Python**:
+```python
+import requests
+
+job_id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+
+# Method 1: Using query parameter
+response = requests.get(
+    f'https://evolf.ahujalab.iiitd.edu.in/api/predict/job/{job_id}/',
+    params={'download': 'output'}
+)
+
+with open('prediction_results.zip', 'wb') as f:
+    f.write(response.content)
+
+# Method 2: Using dedicated download endpoint
+response = requests.get(
+    f'https://evolf.ahujalab.iiitd.edu.in/api/predict/download/{job_id}/'
+)
+
+with open('prediction_results.zip', 'wb') as f:
+    f.write(response.content)
+```
+
+**R**:
+```r
+library(httr)
+
+job_id <- "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+response <- GET(
+  paste0("https://evolf.ahujalab.iiitd.edu.in/api/predict/job/", job_id, "/"),
+  query = list(download = "output")
+)
+
+writeBin(content(response, "raw"), "prediction_results.zip")
+```
+
+#### Response
+
+**Success (200 OK)**:
+- Content-Type: `application/zip`
+- Content-Disposition: `attachment; filename={job_id}_output.zip`
+- Body: Binary ZIP file containing all output files
+
+**ZIP Contents** (typical):
+- `output/predictions.csv`: Prediction results
+- `output/visualization.png`: Result visualizations
+- `output/summary.json`: Summary statistics
+- Additional files depending on pipeline configuration
+
+**Error (404 Not Found)**:
+```json
+{
+  "error": "Output not found for job"
+}
+```
+
+---
+
+## Error Handling
+
+All API endpoints follow consistent error response formats.
+
+### Error Response Structure
+
+```json
+{
+  "error": "Brief error description",
+  "message": "Detailed error message (optional)",
+  "status": 400
+}
+```
+
+### https Status Codes
+
+| Code | Meaning | Common Causes |
+|------|---------|---------------|
+| 200 | OK | Request successful |
+| 400 | Bad Request | Invalid parameters, malformed data |
+| 404 | Not Found | Resource doesn't exist (EvOlf ID, job ID) |
+| 500 | Internal Server Error | Server-side errors, database issues |
+
+### Common Error Scenarios
+
+#### 1. Invalid EvOlf ID
+```bash
+curl "https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/InvalidID"
+```
+**Response (404)**:
+```json
+{
+  "error": "Entry not found",
+  "message": "No record with EvOlf ID: InvalidID"
+}
+```
+
+#### 2. Invalid SMILES Format
+```bash
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/predict/smiles/" \
+  -H "Content-Type: application/json" \
+  -d '{"smiles": "invalid smiles"}'
+```
+**Response (400)**:
+```json
+{
+  "error": "SMILES contains whitespace."
+}
+```
+
+#### 3. Job Not Found
+```bash
+curl "https://evolf.ahujalab.iiitd.edu.in/api/predict/job/nonexistent-job-id/"
+```
+**Response (404)**:
+```json
+{
+  "error": "Job not not found"
+}
+```
+
+#### 4. No Records Match Filters
+```bash
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
+  -H "Content-Type: application/json" \
+  -d '{"species": "NonexistentSpecies"}'
+```
+**Response (404)**:
+```json
+{
+  "error": "No records found for given filters or IDs"
+}
+```
+
+### Error Handling Best Practices
+
+**JavaScript/TypeScript**:
+```javascript
+try {
+  const data = await fetchDatasetDetail('EvOlf0100001');
+  console.log(data);
+} catch (error) {
+  if (error.status === 404) {
+    console.error('Entry not found');
+  } else if (error.status === 500) {
+    console.error('Server error:', error.message);
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+```
+
+**Python**:
+```python
+import requests
+
+try:
+    response = requests.get('https://evolf.ahujalab.iiitd.edu.in/api/dataset/details/EvOlf0100001')
+    response.raise_for_status()
+    data = response.json()
+except requests.exceptions.httpsError as e:
+    if e.response.status_code == 404:
+        print("Entry not found")
+    elif e.response.status_code == 500:
+        print(f"Server error: {e.response.json().get('message')}")
+except requests.exceptions.RequestException as e:
+    print(f"Request failed: {e}")
+```
+
+---
+
+## API Client Libraries
+
+### JavaScript/TypeScript
+
+Full API client available at `src/lib/api.ts`:
+
+```typescript
+import {
+  fetchDatasetPaginated,
+  fetchDatasetDetail,
+  downloadDatasetByIds,
+  downloadDatasetByEvolfId,
+  downloadCompleteDataset,
+  submitPrediction,
+  getPredictionJobStatus,
+  downloadPredictionResults,
+  searchDataset
+} from '@/lib/api';
+```
+
+### Rate Limiting
+
+Currently no rate limiting is enforced. For production use, implement:
+- Request throttling on client side
+- Caching for repeated requests
+- Batch requests where possible
+
+### Timeout Configuration
+
+Default timeout: 30 seconds
+
+To modify (JavaScript):
+```javascript
+export const API_CONFIG = {
+  BASE_URL: 'https://evolf.ahujalab.iiitd.edu.in/api',
+  TIMEOUT: 60000, // 60 seconds
+  HEADERS: { 'Content-Type': 'application/json' }
+};
+```
+
+---
+
+## Support
+
+For API issues or questions:
+- **Documentation**: See `final_readme.md` for complete platform documentation
+- **GitHub**: [Repository URL]
+- **Email**: [Contact email]
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025  
+**Base URL**: Configurable via `VITE_API_BASE_URL` environment variable

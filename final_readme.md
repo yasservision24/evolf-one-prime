@@ -987,4 +987,4 @@ For questions or contributions, contact the development team.
 
 ## License
 
-[Add license information]
+MIT License
