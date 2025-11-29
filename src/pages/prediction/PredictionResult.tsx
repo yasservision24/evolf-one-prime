@@ -12,13 +12,15 @@ import { useToast } from '@/hooks/use-toast';
 
 type JobStatus = 'running' | 'completed' | 'expired';
 
-const POLL_INTERVAL_MS = 10000; // 🔥 increased to 10 sec
+const INITIAL_POLL_INTERVAL = 60000; // Start with 1 minute
+const MAX_POLL_INTERVAL = 300000;    // Max 5 minutes
+const BACKOFF_MULTIPLIER = 1.5;      // Increase by 1.5x each time
 
 const PredictionResult = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const jobId = searchParams.get('job-id') || searchParams.get('jobId'); // support both
+  const jobId = searchParams.get('job-id') || searchParams.get('jobId');
 
   const [status, setStatus] = useState<JobStatus>('running');
   const [loading, setLoading] = useState(true);
@@ -26,10 +28,30 @@ const PredictionResult = () => {
   const [jobData, setJobData] = useState<any>(null);
   const [urlCopied, setUrlCopied] = useState(false);
   const [pollHandle, setPollHandle] = useState<number | null>(null);
+  const [currentPollInterval, setCurrentPollInterval] = useState(INITIAL_POLL_INTERVAL);
 
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
     else if (page === 'model') navigate('/prediction');
+  };
+
+  const calculateNextInterval = (currentInterval: number): number => {
+    const nextInterval = Math.floor(currentInterval * BACKOFF_MULTIPLIER);
+    return Math.min(nextInterval, MAX_POLL_INTERVAL);
+  };
+
+  const scheduleNextPoll = (currentInterval: number) => {
+    if (pollHandle) {
+      clearTimeout(pollHandle);
+    }
+
+    const nextInterval = calculateNextInterval(currentInterval);
+    const h = window.setTimeout(() => {
+      fetchJobStatus();
+    }, nextInterval);
+
+    setPollHandle(h);
+    setCurrentPollInterval(nextInterval);
   };
 
   const fetchJobStatus = async () => {
@@ -38,7 +60,6 @@ const PredictionResult = () => {
       const data = await getPredictionJobStatus(jobId);
       setJobData(data);
 
-      // backend "finished" normalized by api -> "completed"
       const s = (data.status || 'running') as JobStatus | string;
       if (s === 'completed' || s === 'running' || s === 'expired') {
         setStatus(s as JobStatus);
@@ -50,18 +71,22 @@ const PredictionResult = () => {
 
       setLoading(false);
 
-      // 🔥 ALWAYS set up next poll regardless of status (except expired)
-      if (status !== 'expired') {
-        const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
-        setPollHandle(h);
+      // Schedule next poll only if still running
+      if (status === 'running') {
+        scheduleNextPoll(currentPollInterval);
+      } else if (status === 'completed' || status === 'expired') {
+        // Stop polling when job is done
+        if (pollHandle) {
+          clearTimeout(pollHandle);
+          setPollHandle(null);
+        }
       }
     } catch (err: any) {
-      // 404 → expired (NO TOAST as requested)
+      // 404 → expired
       if (err && err.code === 404) {
         setStatus('expired');
         setLoading(false);
         setJobData(null);
-        // 🔥 Stop polling when expired
         if (pollHandle) {
           clearTimeout(pollHandle);
           setPollHandle(null);
@@ -76,10 +101,9 @@ const PredictionResult = () => {
       });
       setLoading(false);
       
-      // 🔥 Continue polling even on error (unless expired)
-      if (status !== 'expired') {
-        const h = window.setTimeout(fetchJobStatus, POLL_INTERVAL_MS);
-        setPollHandle(h);
+      // Continue polling even on error (unless expired)
+      if (status === 'running') {
+        scheduleNextPoll(currentPollInterval);
       }
     }
   };
@@ -102,19 +126,6 @@ const PredictionResult = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
-
-  // 🔥 NEW: Hard refresh every 10 seconds regardless of status
-  useEffect(() => {
-    const hardRefreshInterval = setInterval(() => {
-      if (status !== 'expired') {
-        fetchJobStatus();
-      }
-    }, POLL_INTERVAL_MS);
-
-    return () => {
-      clearInterval(hardRefreshInterval);
-    };
-  }, [status]); // Re-run when status changes
 
   const handleDownload = async () => {
     if (!jobId) return;
@@ -180,9 +191,9 @@ const PredictionResult = () => {
   const getStatusBadge = () => {
     switch (status) {
       case 'running':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20">Running</Badge>;
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20">Processing</Badge>;
       case 'completed':
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">Completed</Badge>;
+        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">Ready</Badge>;
       case 'expired':
         return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">Expired</Badge>;
     }
@@ -211,7 +222,7 @@ const PredictionResult = () => {
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" /> Copy Result URL For Future Use
+                  <Copy className="h-4 w-4" /> Copy Result URL
                 </>
               )}
             </Button>
@@ -230,11 +241,11 @@ const PredictionResult = () => {
                   <div className="flex items-center gap-3">
                     {getStatusIcon()}
                     <div>
-                      <h2 className="text-2xl font-semibold">Job Status</h2>
+                      <h2 className="text-2xl font-semibold">Prediction Status</h2>
                       <p className="text-sm text-muted-foreground mt-1">
                         {status === 'running' && 'Your prediction is being processed'}
-                        {status === 'completed' && 'Your prediction is ready'}
-                        {status === 'expired' && 'This job has expired'}
+                        {status === 'completed' && 'Your prediction results are ready'}
+                        {status === 'expired' && 'This prediction has expired'}
                       </p>
                     </div>
                   </div>
@@ -246,9 +257,7 @@ const PredictionResult = () => {
                   <Alert>
                     <Clock className="h-4 w-4" />
                     <AlertDescription>
-                      Your prediction is being processed. This page will auto-update when results are ready.
-                      <br />
-                      <span className="text-xs mt-1 block">Auto-refreshing every 10 seconds...</span>
+                      Results will be available when processing is complete. This page will update automatically.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -260,8 +269,6 @@ const PredictionResult = () => {
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-600">
                         Your prediction has completed successfully!
-                        <br />
-                        
                       </AlertDescription>
                     </Alert>
 
@@ -313,8 +320,7 @@ const PredictionResult = () => {
                   <div className="pt-4 border-t">
                     <p className="text-sm text-muted-foreground text-center">
                       <Clock className="h-4 w-4 inline mr-1" />
-                      This page will be available until {new Date(jobData.expiresAt).toLocaleDateString()}
-                      <span className="block mt-1 text-xs">Results are kept for 15 days • Auto-refresh every 10 seconds</span>
+                      Available until {new Date(jobData.expiresAt).toLocaleDateString()}
                     </p>
                   </div>
                 )}
@@ -322,17 +328,18 @@ const PredictionResult = () => {
             )}
           </Card>
 
-          {/* Actions */}
+          {/* Actions - Only show for running or expired status */}
           <div className="text-center space-y-4">
-
-            {/* 🔥 Manual Refresh Button */}
-            <Button variant="secondary" onClick={fetchJobStatus} className="gap-2">
-              <Clock className="h-4 w-4" /> Refresh Now
-            </Button>
-
-            <Button variant="outline" onClick={() => navigate('/prediction')}>
-              Submit New Prediction
-            </Button>
+            {status === 'running' && (
+              <Button variant="outline" onClick={() => navigate('/prediction')}>
+                Submit New Prediction
+              </Button>
+            )}
+            {status === 'expired' && (
+              <Button variant="outline" onClick={() => navigate('/prediction')}>
+                Submit New Prediction
+              </Button>
+            )}
           </div>
 
         </div>
