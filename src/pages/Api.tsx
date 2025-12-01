@@ -64,7 +64,7 @@ const Api = () => {
   "sequence": "MDVLSPGQGNNTTSPPAPFET...",
   "temp_ligand_id": "ligand_001",
   "temp_rec_id": "receptor_001",
-  "id": "custom_job_id"
+  "id": "ligand_receptor_pair_id"
 }`}</pre>
                     </div>
 
@@ -75,7 +75,7 @@ const Api = () => {
                         <li><strong>sequence</strong> (optional) - Receptor protein sequence</li>
                         <li><strong>temp_ligand_id</strong> (optional) - Temporary ligand identifier</li>
                         <li><strong>temp_rec_id</strong> (optional) - Temporary receptor identifier</li>
-                        <li><strong>id</strong> (optional) - Custom job ID</li>
+                        <li><strong>id</strong> (optional) - Ligand-Receptor Pair identifier</li>
                       </ul>
                     </div>
 
