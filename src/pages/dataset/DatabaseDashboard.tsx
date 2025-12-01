@@ -82,7 +82,7 @@ export interface DatasetQueryParams {
 }
 
 // Sorting options
-type SortField = 'receptor' | 'ligand' | 'evolfId' | 'species' | 'class';
+type SortField = 'receptor' | 'ligand' | 'evolfId' | 'species' | 'class' | 'relevance';
 type SortOrder = 'asc' | 'desc';
 
 const DatabaseDashboard = () => {
@@ -219,6 +219,13 @@ const DatabaseDashboard = () => {
    */
   const handleSort = (field: SortField) => {
     console.log('Sorting by field:', field);
+    // Relevance sort doesn't toggle - just set it
+    if (field === 'relevance') {
+      setSortBy('relevance');
+      setCurrentPage(1);
+      return;
+    }
+    
     if (sortBy === field) {
       // Toggle sort order if same field
       const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
@@ -424,6 +431,11 @@ const DatabaseDashboard = () => {
       clearTimeout(searchDebounceRef.current);
     }
     
+    // Auto-switch to relevance sort when searching
+    if (searchInput.trim()) {
+      setSortBy('relevance');
+    }
+    
     // Update search query from input (this triggers the useEffect)
     setSearchQuery(searchInput);
   };
@@ -447,6 +459,8 @@ const DatabaseDashboard = () => {
     setSelectedMutation('');
     setSearchInput('');
     setSearchQuery('');
+    setSortBy('evolfId'); // Reset sort to default when clearing search
+    setSortOrder('asc');
     setCurrentPage(1);
   };
 
@@ -460,6 +474,11 @@ const DatabaseDashboard = () => {
     else if (type === 'search') {
       setSearchInput('');
       setSearchQuery('');
+      // Reset sort to default when clearing search
+      if (sortBy === 'relevance') {
+        setSortBy('evolfId');
+        setSortOrder('asc');
+      }
     }
     setCurrentPage(1);
   };
@@ -631,12 +650,17 @@ const DatabaseDashboard = () => {
                   >
                     <div className="flex items-center gap-2">
                       <ArrowUpDown className="w-4 h-4" />
-                      <span className="capitalize">{sortBy === 'evolfId' ? 'EvOlf ID' : sortBy}</span>
+                      <span className="capitalize">{sortBy === 'evolfId' ? 'EvOlf ID' : sortBy === 'relevance' ? 'Relevance' : sortBy}</span>
                     </div>
                     <ChevronDown className="w-4 h-4 ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-[200px] bg-background border-border z-[10000]">
+                  {searchQuery && (
+                    <DropdownMenuItem onClick={() => handleSort('relevance')} className="cursor-pointer">
+                      Relevance {sortBy === 'relevance' && '✓'}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => handleSort('evolfId')} className="cursor-pointer">
                     EvOlf ID {sortBy === 'evolfId' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </DropdownMenuItem>

@@ -245,7 +245,8 @@ export async function fetchDatasetPaginated(
     'ligand': 'Ligand',
     'species': 'Species',
     'class': 'Class',
-    'mutation': 'Mutation'
+    'mutation': 'Mutation',
+    'relevance': 'relevance'
   };
   
   const backendSortBy = fieldMapping[sortBy] || sortBy;
