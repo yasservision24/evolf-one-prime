@@ -119,11 +119,9 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setReceptorSequence(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Only amino acid sequences allowed. FASTA headers (&gt;) are not accepted.
+                      Only plain amino acid sequences allowed (20 standard amino acids).FASTA headers (&gt;) are not accepted.Sequence length must be less than 1024..
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      And the number of amino acids need to be less than 1024.
-                    </p>
+                   
                   </div>
 
                   {/* SMILES */}
@@ -136,12 +134,10 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setLigandSmiles(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      For best results, convert your SMILES into canonical format using OpenBabel.
+                     SMILES strings must be fewer than 512 characters.For best results, convert SMILES to canonical format using OpenBabel.
                       
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      The characters of SMILES have to be less than 512.
-                    </p>
+                  
                   </div>
                 </div>
 
@@ -171,11 +167,11 @@ const PredictionDashboard: React.FC = () => {
               <Card className="p-6 border-border">
                 <h3 className="text-lg text-foreground mb-3">Quick Tips</h3>
                 <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-2">
-                  <li>Only plain receptor sequences allowed.</li>
-                  <li>The number of amino acids need to be less than 1024.</li>
-                  <li>For best results, convert your SMILES into canonical format using OpenBabel.</li>
-                  <li>The characters of SMILES have to be less than 512.</li>
-                  <li>One ligand per prediction.</li>
+                  <li>Only plain receptor sequences are allowed, FASTA headers (&gt;) are not accepted. </li>
+                  <li>Sequences must contain only the 20 standard amino acids (A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y).</li>
+                  <li>The receptor sequence must be less than 1024 amino acids.</li>
+                  <li> Ligand SMILES strings must be fewer than 512 characters.</li>
+                  <li>(Optional) For best results, convert SMILES to canonical format using OpenBabel.</li>
                   
                 </ul>
               </Card>
