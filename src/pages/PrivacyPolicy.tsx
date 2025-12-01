@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-muted-foreground text-sm mb-8">Last updated: January 2025</p>
+          <p className="text-muted-foreground text-sm mb-8">Last updated: November 2025</p>
 
           <div className="prose prose-invert max-w-none space-y-6">
             <section>
