@@ -19,7 +19,7 @@ const License = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">License</h1>
           <p className="text-muted-foreground text-lg mb-8">
-            evolf software licensing information
+            EvOlf software licensing information
           </p>
 
           <div className="space-y-6">
@@ -27,12 +27,12 @@ const License = () => {
               <h2 className="text-2xl font-semibold mb-4">Software License</h2>
               <h3 className="text-lg font-semibold mb-2">MIT License</h3>
               <p className="text-muted-foreground mb-4">
-                The evolf software, including all source code, is licensed under the MIT License.
+                The EvOlf software, including all source code, is licensed under the MIT License.
               </p>
               <div className="bg-secondary p-4 rounded-lg text-sm font-mono">
                 <p className="text-muted-foreground mb-4">
                   MIT License<br /><br />
-                  Copyright (c) 2025 evolf Team<br /><br />
+                  Copyright (c) 2025 EvOlf Team<br /><br />
                   Permission is hereby granted, free of charge, to any person obtaining a copy<br />
                   of this software and associated documentation files (the "Software"), to deal<br />
                   in the Software without restriction, including without limitation the rights<br />
