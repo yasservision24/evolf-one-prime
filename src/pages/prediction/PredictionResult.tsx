@@ -12,8 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 
 type JobStatus = 'running' | 'completed' | 'expired';
 
-const INITIAL_POLL_INTERVAL = 50000; // Start with 50seconds
-const MAX_POLL_INTERVAL = 300000;    // Max 5 minutes
+const INITIAL_POLL_INTERVAL = 40000; // Start with 40seconds
+const MAX_POLL_INTERVAL = 900000;    // Max 15 minutes
 const BACKOFF_MULTIPLIER = 1.5;      // Increase by 1.5x each time
 
 const PredictionResult = () => {
