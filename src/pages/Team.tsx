@@ -24,7 +24,7 @@ const Team = () => {
     },
     {
       name: "Aayushi Mittal",
-      role: "PhD Scholor",
+      role: "PhD Scholar",
       description: "Data Curation, Core Model Architecture & Development",
       image: "/team/aayushi-mittal.jpg",
       website: "",
@@ -37,6 +37,14 @@ const Team = () => {
       image: "/team/saveena-solanki.jpg",
       website: "",
       github: "https://github.com/SaveenaSolanki"
+    },
+    {
+      name: "Mudit Gupta",
+      role: "B.Tech Student",
+      description: "Building and designing the core Deep Learning Architecture",
+      image: "/team/mudit-gupta.jpg",
+      website: "",
+      github: "https://github.com/MaddyG-05"
     },
     {
       name: "Adnan Raza",
@@ -72,7 +80,7 @@ const Team = () => {
           {/* Header Section */}
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent mx-auto">
-            Meet Developers
+              Meet Developers
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               The dedicated researchers and developers driving innovation in the EvOlf project
@@ -157,8 +165,8 @@ const Team = () => {
               </p>
             </div>
             
-            {/* Grid with perfect alignment for 5 members */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
+            {/* Grid layout for 6 team members */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {teamMembers.slice(1).map((member, index) => (
                 <Card 
                   key={index} 
@@ -198,7 +206,7 @@ const Team = () => {
                         <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
                           member.role.includes('PhD') 
                             ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                            : member.role.includes('M.Tech') || member.role.includes('B.Tech')
+                            : member.role.includes('M.Tech') || member.role.includes('B.Tech') || member.role.includes('Intern')
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                         }`}>
