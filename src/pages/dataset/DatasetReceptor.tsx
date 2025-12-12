@@ -398,18 +398,19 @@ export default function DatasetReceptor() {
                   copyable 
                   fieldKey="receptor-uniprot"
                 />
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => data?.uniprotLink && data.uniprotLink !== 'N/A' && window.open(data.uniprotLink, '_blank')}
-                    disabled={!data?.uniprotLink || data.uniprotLink === 'N/A'}
-                    className="gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    View in UniProt
-                  </Button>
-                </div>
+                {data?.uniprotLink && data.uniprotLink !== 'N/A' && data.uniprotLink.toLowerCase() !== 'nan' && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(data.uniprotLink, '_blank')}
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View in UniProt
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
