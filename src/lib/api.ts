@@ -394,17 +394,32 @@ export async function fetchDatasetDetail(evolfId: string) {
  * @returns Blob (ZIP file) for download
  */
 export async function downloadDatasetByIds(evolfIds: string[]) {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/export`, {
-    method: 'POST',
-    headers: API_CONFIG.HEADERS,
-    body: JSON.stringify({ evolfIds }),
-  });
+  // Use longer timeout for large exports (5 minutes)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
 
-  if (!response.ok) {
-    throw new ApiError(`Failed to export dataset: ${response.statusText}`, response.status);
+  try {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/export`, {
+      method: 'POST',
+      headers: API_CONFIG.HEADERS,
+      body: JSON.stringify({ evolfIds }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new ApiError(`Failed to export dataset: ${response.statusText}`, response.status);
+    }
+
+    return await response.blob();
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new ApiError('Export timed out. Try exporting fewer items by applying filters.');
+    }
+    throw error;
   }
-
-  return await response.blob();
 }
 
 /**
@@ -432,16 +447,31 @@ export async function downloadDatasetByEvolfId(evolfId: string) {
  * @returns Blob (ZIP file) for download
  */
 export async function downloadCompleteDataset() {
-  const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download`, {
-    method: 'GET',
-    headers: API_CONFIG.HEADERS,
-  });
+  // Use longer timeout for complete dataset (10 minutes for 100MB+ files)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minute timeout
 
-  if (!response.ok) {
-    throw new ApiError(`Failed to download complete dataset: ${response.statusText}`, response.status);
+  try {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/download`, {
+      method: 'GET',
+      headers: API_CONFIG.HEADERS,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new ApiError(`Failed to download complete dataset: ${response.statusText}`, response.status);
+    }
+
+    return await response.blob();
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new ApiError('Download timed out. The dataset is very large, please try again or contact support.');
+    }
+    throw error;
   }
-
-  return await response.blob();
 }
 
 /**
