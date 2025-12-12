@@ -110,7 +110,7 @@ const Documentation = () => {
                   rel="noopener noreferrer"
                   className="text-accent hover:underline font-semibold"
                 >
-                  EvOlf
+                  EvOlf Source Code: EvOlf
                 </a>
               </div>
               
