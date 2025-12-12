@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
 import { Database, Download, Search, FileText, Filter, RefreshCw, Loader2, ChevronRight, AlertCircle, Dna, FlaskConical, Globe, ChevronDown, ArrowUpDown, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { fetchDatasetPaginated, downloadDatasetByIds, downloadCompleteDataset, searchDataset } from '@/lib/api';
+import { fetchDatasetPaginated, downloadDatasetByFilters, downloadCompleteDataset, searchDataset } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -256,32 +256,41 @@ const DatabaseDashboard = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   /**
-   * Download filtered dataset by evolf IDs (ZIP)
+   * Download filtered dataset using filter parameters (ZIP)
+   * Sends filters to backend instead of IDs to avoid large request payloads
    */
   const downloadDataset = async () => {
-    // Guard against empty IDs array
-    if (!allEvolfIds || allEvolfIds.length === 0) {
-      toast({
-        title: 'No Data to Export',
-        description: 'Please wait for data to load or apply filters first.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
     setIsExporting(true);
     toast({
       title: 'Preparing Export',
-      description: `Generating ZIP file with ${allEvolfIds.length} items. This may take a moment for large datasets...`,
+      description: `Generating ZIP file with ${totalItems} items. This may take a moment for large datasets...`,
     });
     
     try {
-      const blob = await downloadDatasetByIds(allEvolfIds);
+      // Map frontend sortBy to backend field names
+      const fieldMapping: Record<string, string> = {
+        'evolfId': 'EvOlf_ID',
+        'receptor': 'Receptor',
+        'ligand': 'Ligand',
+        'species': 'Species',
+        'class': 'Class',
+        'mutation': 'Mutation',
+        'relevance': 'relevance'
+      };
+      
+      const blob = await downloadDatasetByFilters({
+        search: searchQuery || undefined,
+        species: selectedSpecies || undefined,
+        classFilter: selectedClass || undefined,
+        mutationType: selectedMutation || undefined,
+        sortBy: fieldMapping[sortBy] || sortBy,
+        sortOrder: sortOrder,
+      });
       
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `evolf-dataset-${allEvolfIds.length}-items.zip`;
+      a.download = `evolf-dataset-${totalItems}-items.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -289,13 +298,13 @@ const DatabaseDashboard = () => {
 
       toast({
         title: 'Export Complete',
-        description: `Successfully exported ${allEvolfIds.length} items as ZIP file.`,
+        description: `Successfully exported ${totalItems} items as ZIP file.`,
       });
     } catch (error) {
       console.error('Error exporting dataset:', error);
       toast({
         title: 'Export Failed',
-        description: 'Could not export dataset. The file may be too large. Try applying filters to reduce the data size.',
+        description: 'Could not export dataset. Please try again or contact support.',
         variant: 'destructive',
       });
     } finally {
