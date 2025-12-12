@@ -110,20 +110,10 @@ const Documentation = () => {
                   rel="noopener noreferrer"
                   className="text-accent hover:underline font-semibold"
                 >
-                  EvOlf Web Server Source Code: EvOlf
+                  EvOlf
                 </a>
               </div>
-              <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
-                <Github className="h-5 w-5 text-accent" />
-                <a 
-                  href="https://github.com/the-ahuja-lab/evolf-pipeline-source" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline font-semibold"
-                >
-                  Evolf Source Code: evolf-pipeline-source
-                </a>
-              </div>
+              
               <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
                 <Github className="h-5 w-5 text-accent" />
                 <a 
