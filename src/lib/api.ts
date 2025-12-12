@@ -388,12 +388,24 @@ export async function fetchDatasetDetail(evolfId: string) {
 }
 
 /**
- * Download dataset by evolf IDs (returns ZIP)
+ * Export filter parameters interface
+ */
+export interface ExportFilterParams {
+  search?: string;
+  species?: string;
+  classFilter?: string;
+  mutationType?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Download dataset by filter parameters (returns ZIP)
  * Endpoint: POST /dataset/export
- * @param evolfIds - Array of evolf IDs to export
+ * @param filters - Filter parameters to re-run the query on backend
  * @returns Blob (ZIP file) for download
  */
-export async function downloadDatasetByIds(evolfIds: string[]) {
+export async function downloadDatasetByFilters(filters: ExportFilterParams) {
   // Use longer timeout for large exports (5 minutes)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
@@ -402,7 +414,14 @@ export async function downloadDatasetByIds(evolfIds: string[]) {
     const response = await fetch(`${API_CONFIG.BASE_URL}/dataset/export`, {
       method: 'POST',
       headers: API_CONFIG.HEADERS,
-      body: JSON.stringify({ evolfIds }),
+      body: JSON.stringify({
+        search: filters.search || '',
+        species: filters.species || null,
+        class: filters.classFilter || null,
+        mutationType: filters.mutationType || null,
+        sortBy: filters.sortBy || 'EvOlf_ID',
+        sortOrder: filters.sortOrder || 'desc',
+      }),
       signal: controller.signal,
     });
 
