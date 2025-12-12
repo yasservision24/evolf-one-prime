@@ -252,6 +252,9 @@ const DatabaseDashboard = () => {
       <ChevronDown className="w-4 h-4 rotate-180" />;
   };
 
+  // Export loading state
+  const [isExporting, setIsExporting] = useState(false);
+
   /**
    * Download filtered dataset by evolf IDs (ZIP)
    */
@@ -266,6 +269,12 @@ const DatabaseDashboard = () => {
       return;
     }
     
+    setIsExporting(true);
+    toast({
+      title: 'Preparing Export',
+      description: `Generating ZIP file with ${allEvolfIds.length} items. This may take a moment for large datasets...`,
+    });
+    
     try {
       const blob = await downloadDatasetByIds(allEvolfIds);
       
@@ -279,16 +288,18 @@ const DatabaseDashboard = () => {
       document.body.removeChild(a);
 
       toast({
-        title: 'Export Started',
-        description: `Exporting ${allEvolfIds.length} items as ZIP file.`,
+        title: 'Export Complete',
+        description: `Successfully exported ${allEvolfIds.length} items as ZIP file.`,
       });
     } catch (error) {
       console.error('Error exporting dataset:', error);
       toast({
         title: 'Export Failed',
-        description: 'Could not export dataset. Please try again.',
+        description: 'Could not export dataset. The file may be too large. Try applying filters to reduce the data size.',
         variant: 'destructive',
       });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -732,10 +743,19 @@ const DatabaseDashboard = () => {
               <Button 
                 className="w-full sm:w-auto bg-[hsl(var(--brand-teal))] text-foreground hover:bg-[hsl(var(--brand-teal))]/90 hover:scale-105 hover:shadow-[0_0_20px_-5px_hsl(var(--brand-teal))] transition-all duration-300 group"
                 onClick={downloadDataset}
-                disabled={allEvolfIds.length === 0}
+                disabled={allEvolfIds.length === 0 || isExporting}
               >
-                <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                Export
+                {isExporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                    Export ZIP
+                  </>
+                )}
               </Button>
             </div>
 
