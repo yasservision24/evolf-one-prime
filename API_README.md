@@ -338,9 +338,9 @@ cat("Ligand:", details$ligand, "\n")
 
 ---
 
-### 3. Export Multiple Entries
+### 3. Export Dataset by Filters
 
-Export multiple dataset entries as a ZIP file containing CSV data and metadata.
+Export filtered dataset entries as a ZIP file containing CSV data and metadata. This endpoint re-runs the filtered query on the server to avoid sending large lists of IDs (which can exceed 100MB with 100,000+ records).
 
 #### Endpoint
 ```
@@ -349,14 +349,16 @@ POST /dataset/export
 
 #### Request Body
 
-**Option A - Export by IDs**:
-```json
-{
-  "evolfIds": ["EvOlf0100001", "EvOlf0100002", "EvOlf0100003"]
-}
-```
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `search` | string | No | Search term to filter results |
+| `species` | string | No | Filter by species (e.g., 'Human', 'Mouse') |
+| `class` | string | No | Filter by GPCR class (e.g., '0', '1') |
+| `mutationType` | string | No | Filter by mutation status (e.g., 'Wild type', 'Mutant') |
+| `sortBy` | string | No | Field to sort by: `EvOlf_ID`, `Receptor`, `Ligand`, `Species`, `Class`, `Mutation` |
+| `sortOrder` | string | No | Sort direction: `asc` or `desc` |
 
-**Option B - Export by Filters**:
+**Example Request Body**:
 ```json
 {
   "search": "dopamine",
@@ -372,24 +374,39 @@ POST /dataset/export
 
 **cURL**:
 ```bash
-# Export by IDs
-curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
-  -H "Content-Type: application/json" \
-  -d '{"evolfIds": ["EvOlf0100001", "EvOlf0100002"]}' \
-  --output dataset_export.zip
-
-# Export by filters
+# Export all Human entries with class 1
 curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
   -H "Content-Type: application/json" \
   -d '{"species": "Human", "class": "1"}' \
   --output filtered_export.zip
+
+# Export with search term
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
+  -H "Content-Type: application/json" \
+  -d '{"search": "dopamine", "sortBy": "Receptor", "sortOrder": "asc"}' \
+  --output dopamine_export.zip
+
+# Export entire dataset (no filters)
+curl -X POST "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export" \
+  -H "Content-Type: application/json" \
+  -d '{}' \
+  --output complete_export.zip
 ```
 
 **JavaScript/TypeScript**:
 ```javascript
-// Export by IDs
-import { downloadDatasetByIds } from '@/lib/api';
-const blob = await downloadDatasetByIds(['EvOlf0100001', 'EvOlf0100002']);
+// Using the API client
+import { downloadDatasetByFilters } from '@/lib/api';
+
+// Export with filters
+const blob = await downloadDatasetByFilters({
+  search: 'dopamine',
+  species: 'Human',
+  classFilter: '1',
+  mutationType: 'Wild type',
+  sortBy: 'Receptor',
+  sortOrder: 'asc'
+});
 
 // Create download link
 const url = window.URL.createObjectURL(blob);
@@ -400,34 +417,52 @@ document.body.appendChild(a);
 a.click();
 document.body.removeChild(a);
 window.URL.revokeObjectURL(url);
+
+// Using fetch directly
+const response = await fetch('https://evolf.ahujalab.iiitd.edu.in/api/dataset/export', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    species: 'Human',
+    class: '1'
+  })
+});
+const blob = await response.blob();
 ```
 
 **Python**:
 ```python
 import requests
 
-# Export by IDs
-response = requests.post(
-    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
-    json={'evolfIds': ['EvOlf0100001', 'EvOlf0100002']},
-    headers={'Content-Type': 'application/json'}
-)
-
-with open('dataset_export.zip', 'wb') as f:
-    f.write(response.content)
-
-# Export by filters
+# Export with filters
 response = requests.post(
     'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
     json={
+        'search': 'dopamine',
         'species': 'Human',
         'class': '1',
-        'mutationType': 'Wild type'
+        'mutationType': 'Wild type',
+        'sortBy': 'Receptor',
+        'sortOrder': 'asc'
     },
-    headers={'Content-Type': 'application/json'}
+    headers={'Content-Type': 'application/json'},
+    timeout=300  # 5 minute timeout for large exports
 )
 
 with open('filtered_export.zip', 'wb') as f:
+    f.write(response.content)
+
+print(f"Downloaded {len(response.content)} bytes")
+
+# Export entire dataset
+response = requests.post(
+    'https://evolf.ahujalab.iiitd.edu.in/api/dataset/export',
+    json={},
+    headers={'Content-Type': 'application/json'},
+    timeout=600  # 10 minute timeout for complete dataset
+)
+
+with open('complete_dataset.zip', 'wb') as f:
     f.write(response.content)
 ```
 
@@ -435,15 +470,20 @@ with open('filtered_export.zip', 'wb') as f:
 ```r
 library(httr)
 
-# Export by IDs
+# Export with filters
 response <- POST(
   "https://evolf.ahujalab.iiitd.edu.in/api/dataset/export",
-  body = list(evolfIds = c("EvOlf0100001", "EvOlf0100002")),
+  body = list(
+    species = "Human",
+    class = "1",
+    mutationType = "Wild type"
+  ),
   encode = "json",
-  add_headers("Content-Type" = "application/json")
+  add_headers("Content-Type" = "application/json"),
+  timeout(300)  # 5 minute timeout
 )
 
-writeBin(content(response, "raw"), "dataset_export.zip")
+writeBin(content(response, "raw"), "filtered_export.zip")
 ```
 
 #### Response
@@ -455,13 +495,18 @@ writeBin(content(response, "raw"), "dataset_export.zip")
 
 **ZIP Contents**:
 - `data.csv`: CSV file with columns: EvOlf_ID, Receptor, Species, Class, Ligand, Mutation_Status, Mutation, ChEMBL_ID, UniProt_ID, CID
-- `metadata.json`: Export metadata (exportDate, totalRecords, format, version)
+- `metadata.json`: Export metadata (exportDate, totalRecords, filters, format, version)
 - `README.txt`: Description of export contents
+
+**Important Notes**:
+- For large exports (100,000+ records), set a timeout of at least 5 minutes
+- The server re-runs the filtered query, so results match what you see in the UI with the same filters
+- Empty filter object `{}` exports the entire dataset
 
 **Error (404 Not Found)**:
 ```json
 {
-  "error": "No records found for given filters or IDs"
+  "error": "No records found for given filters"
 }
 ```
 
