@@ -239,19 +239,18 @@ export default function DatasetLigand() {
                   copyable 
                   fieldKey="ligand-pubchem"
                 />
-                {data?.pubchemLink && data.pubchemLink !== 'N/A' && (
-                  <div className="pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(data.pubchemLink, '_blank')}
-                      className="gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View in PubChem
-                    </Button>
-                  </div>
-                )}
+                <div className="pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => data?.pubchemLink && data.pubchemLink !== 'N/A' && window.open(data.pubchemLink, '_blank')}
+                    disabled={!data?.pubchemLink || data.pubchemLink === 'N/A'}
+                    className="gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View in PubChem
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
