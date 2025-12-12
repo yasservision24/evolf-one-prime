@@ -149,7 +149,8 @@ export default function DatasetOverview() {
 
   const isMutant = data?.mutationStatus === 'Mutant';
   const isWildType = data?.mutationStatus === 'Wild type';
-  const hasUniProtLink = !!data?.uniprotLink;
+  const hasUniProtLink = !!data?.uniprotLink && data.uniprotLink !== 'N/A' && data.uniprotLink.toLowerCase() !== 'nan';
+  const hasPubChemLink = !!data?.pubchemLink && data.pubchemLink !== 'N/A' && data.pubchemLink.toLowerCase() !== 'nan';
 
   const InfoField = ({
     label, 
@@ -355,27 +356,29 @@ export default function DatasetOverview() {
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">{exporting ? 'Exporting...' : 'Export'}</span>
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-1 md:gap-2" 
-                disabled={loading || !hasUniProtLink}
-                onClick={() => data?.uniprotLink && window.open(data.uniprotLink, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">UniProt</span>
-                {isMutant && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-1 md:gap-2" 
-                disabled={loading || !data?.pubchemId}
-                onClick={() => data?.pubchemId && window.open(`https://pubchem.ncbi.nlm.nih.gov/compound/${data.pubchemId}`, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">PubChem</span>
-              </Button>
+              {hasUniProtLink && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-1 md:gap-2" 
+                  onClick={() => window.open(data.uniprotLink, '_blank')}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span className="hidden sm:inline">UniProt</span>
+                  {isMutant && <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />}
+                </Button>
+              )}
+              {hasPubChemLink && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-1 md:gap-2" 
+                  onClick={() => window.open(data.pubchemLink, '_blank')}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span className="hidden sm:inline">PubChem</span>
+                </Button>
+              )}
             </div>
           </div>
           
