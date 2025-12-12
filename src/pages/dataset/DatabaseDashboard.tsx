@@ -256,6 +256,16 @@ const DatabaseDashboard = () => {
    * Download filtered dataset by evolf IDs (ZIP)
    */
   const downloadDataset = async () => {
+    // Guard against empty IDs array
+    if (!allEvolfIds || allEvolfIds.length === 0) {
+      toast({
+        title: 'No Data to Export',
+        description: 'Please wait for data to load or apply filters first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     try {
       const blob = await downloadDatasetByIds(allEvolfIds);
       
