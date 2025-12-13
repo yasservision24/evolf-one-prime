@@ -228,12 +228,71 @@ export default function DatasetReceptor() {
     const displayValue = value || 'N/A';
     const isLongMutation = displayValue.length > 30;
     
+    // Check if the value contains URL pattern
+    const containsUrl = displayValue.toLowerCase().includes('http://') || 
+                       displayValue.toLowerCase().includes('https://') ||
+                       displayValue.toLowerCase().includes('www.');
+    
+    // Check if it's a "More Info" style format with pipe separator
+    const isMoreInfoFormat = displayValue.includes('|') && containsUrl;
+    
+    // Check if it's a simple mutation format (like D167G or D167G/I240T)
+    const isMutationFormat = /^[A-Z]\d+[A-Z](\/[A-Z]\d+[A-Z])*$/.test(displayValue);
+    
     return (
       <div className="py-3 border-b border-border/50 last:border-0">
         <div className="text-sm text-muted-foreground mb-2">{label}</div>
         <div className="text-foreground font-medium break-words whitespace-normal leading-relaxed">
-          {isLongMutation ? (
-            // Display as individual mutation badges for long mutation strings
+          {isMoreInfoFormat ? (
+            // Handle "More Info: M2OR | https://m2or.chemsensim.fr/" format
+            <div className="flex flex-wrap items-center gap-2">
+              {displayValue.split('|').map((part, index) => {
+                const trimmedPart = part.trim();
+                const isUrl = trimmedPart.toLowerCase().startsWith('http://') || 
+                             trimmedPart.toLowerCase().startsWith('https://') ||
+                             trimmedPart.toLowerCase().startsWith('www.');
+                
+                if (isUrl) {
+                  const url = trimmedPart.toLowerCase().startsWith('www.') ? `https://${trimmedPart}` : trimmedPart;
+                  return (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1"
+                      onClick={() => window.open(url, '_blank')}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span className="truncate max-w-[150px]">Link</span>
+                    </Button>
+                  );
+                } else {
+                  return (
+                    <span key={index} className="text-foreground">
+                      {trimmedPart}
+                    </span>
+                  );
+                }
+              })}
+            </div>
+          ) : containsUrl && !isMoreInfoFormat ? (
+            // Handle standalone URLs
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1 inline-flex"
+              onClick={() => {
+                const url = displayValue.toLowerCase().startsWith('www.') 
+                  ? `https://${displayValue}` 
+                  : displayValue;
+                window.open(url, '_blank');
+              }}
+            >
+              <ExternalLink className="h-3 w-3" />
+              <span className="truncate max-w-[200px]">{displayValue}</span>
+            </Button>
+          ) : isMutationFormat && displayValue.includes('/') ? (
+            // Display as individual mutation badges for mutation strings with /
             <div className="flex flex-wrap gap-1">
               {displayValue.split('/').map((mutation, index) => (
                 <span 
@@ -245,7 +304,7 @@ export default function DatasetReceptor() {
               ))}
             </div>
           ) : (
-            // Display as normal text for shorter mutations
+            // Display as normal text for other cases
             displayValue
           )}
         </div>
