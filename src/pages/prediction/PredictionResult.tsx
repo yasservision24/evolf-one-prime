@@ -41,6 +41,7 @@ const PredictionResult = () => {
   const [pollHandle, setPollHandle] = useState<number | null>(null);
   const [currentPollInterval, setCurrentPollInterval] = useState(INITIAL_POLL_INTERVAL);
   const [expandedSequences, setExpandedSequences] = useState<Set<string>>(new Set());
+  const [expandedSmiles, setExpandedSmiles] = useState<Set<string>>(new Set());
 
   const handleNavigate = (page: 'home' | 'model') => {
     if (page === 'home') navigate('/');
@@ -199,6 +200,16 @@ const PredictionResult = () => {
     setExpandedSequences(newSet);
   };
 
+  const toggleSmilesExpansion = (id: string) => {
+    const newSet = new Set(expandedSmiles);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setExpandedSmiles(newSet);
+  };
+
   const formatSequenceForDisplay = (sequence: string, id: string, maxChars: number = 80) => {
     if (!sequence) return 'N/A';
     
@@ -235,25 +246,74 @@ const PredictionResult = () => {
     );
   };
 
-  const formatSmilesForDisplay = (smiles: string, maxChars: number = 60) => {
+  const formatSmilesForDisplay = (smiles: string, id: string, maxChars: number = 60) => {
     if (!smiles) return 'N/A';
     
-    if (smiles.length <= maxChars) {
-      return (
-        <div className="font-mono text-xs whitespace-pre-wrap break-all">
-          {smiles}
-        </div>
-      );
-    }
+    const isExpanded = expandedSmiles.has(id);
+    const displaySmiles = isExpanded ? smiles : smiles.length > maxChars ? smiles.substring(0, maxChars) + '...' : smiles;
     
     return (
       <div className="font-mono text-xs">
-        <div className="whitespace-pre-wrap break-all" title={smiles}>
-          {smiles.substring(0, maxChars)}...
+        <div className="whitespace-pre-wrap break-all">
+          {displaySmiles}
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          {smiles.length} characters
-        </p>
+        {smiles.length > maxChars && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 mt-1 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSmilesExpansion(id);
+            }}
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-3 w-3 mr-1" /> Show Less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3 mr-1" /> Show More ({smiles.length} chars)
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  const formatSmilesForMobile = (smiles: string, id: string, maxChars: number = 40) => {
+    if (!smiles) return 'N/A';
+    
+    const isExpanded = expandedSmiles.has(id);
+    const displaySmiles = isExpanded ? smiles : smiles.length > maxChars ? smiles.substring(0, maxChars) + '...' : smiles;
+    
+    return (
+      <div className="font-mono text-xs">
+        <div className="whitespace-pre-wrap break-all">
+          {displaySmiles}
+        </div>
+        {smiles.length > maxChars && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 mt-1 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSmilesExpansion(id);
+            }}
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-3 w-3 mr-1" /> Show Less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3 mr-1" /> Show More
+              </>
+            )}
+          </Button>
+        )}
       </div>
     );
   };
@@ -403,7 +463,7 @@ const PredictionResult = () => {
                     {/* Predictions Table - Mobile Optimized */}
                     {predictions.length > 0 && (
                       <div className="mt-4 md:mt-6">
-                        <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Binding Affinity Predictions</h3>
+                        <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Binding Interaction Predictions</h3>
                         <div className="rounded-lg border">
                           <ScrollArea className="h-[400px] md:h-[500px]">
                             <div className="hidden md:block">
@@ -423,7 +483,7 @@ const PredictionResult = () => {
                                     <TableRow key={row.id} className="hover:bg-muted/50">
                                       <TableCell className="font-mono font-medium">{row.id}</TableCell>
                                       <TableCell className="p-3">
-                                        {formatSmilesForDisplay(row.smiles)}
+                                        {formatSmilesForDisplay(row.smiles, row.id)}
                                       </TableCell>
                                       <TableCell className="p-3">
                                         {formatSequenceForDisplay(row.mutated_sequence, row.id)}
@@ -460,7 +520,7 @@ const PredictionResult = () => {
                                     <div className="font-mono">{row.id}</div>
                                     
                                     <div className="font-medium">Ligand:</div>
-                                    <div>{formatSmilesForDisplay(row.smiles, 40)}</div>
+                                    <div>{formatSmilesForMobile(row.smiles, row.id)}</div>
                                     
                                     <div className="font-medium">Sequence:</div>
                                     <div>{formatSequenceForDisplay(row.mutated_sequence, row.id, 40)}</div>
@@ -484,9 +544,7 @@ const PredictionResult = () => {
                             </div>
                           </ScrollArea>
                         </div>
-                        <div className="mt-3 md:mt-4 text-xs md:text-sm text-muted-foreground">
-                          <p>Showing {predictions.length} prediction(s). Agonists activate receptors, Non-Agonists do not.</p>
-                        </div>
+                        
                       </div>
                     )}
 
