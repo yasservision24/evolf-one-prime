@@ -203,15 +203,15 @@ const PredictionDashboard: React.FC = () => {
                   <h3 className="text-lg text-foreground">Batch Processing</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Have multiple ligand-receptor pairs to analyze? Use our command-line tool for high-throughput predictions.
+                  Have multiple ligand-receptor pairs to analyze? Use our Local EvOlf Pipeline for high-throughput predictions.
                 </p>
                 <a
                   href="https://github.com/the-ahuja-lab/evolf-pipeline"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
-                  <span>EvOlf Pipeline on GitHub</span>
+                  <span>EvOlf Local Pipeline on GitHub</span>
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               </Card>
