@@ -6,9 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Download, Clock, CheckCircle, AlertCircle, Copy, Check } from 'lucide-react';
 import { getPredictionJobStatus, downloadPredictionResults } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+
+interface PredictionRow {
+  id: string;
+  smiles: string;
+  mutated_sequence: string;
+  predicted_label: string;
+  p1: string;
+}
 
 type JobStatus = 'running' | 'completed' | 'expired';
 
@@ -26,6 +36,7 @@ const PredictionResult = () => {
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [jobData, setJobData] = useState<any>(null);
+  const [predictions, setPredictions] = useState<PredictionRow[]>([]);
   const [urlCopied, setUrlCopied] = useState(false);
   const [pollHandle, setPollHandle] = useState<number | null>(null);
   const [currentPollInterval, setCurrentPollInterval] = useState(INITIAL_POLL_INTERVAL);
@@ -59,6 +70,11 @@ const PredictionResult = () => {
     try {
       const data = await getPredictionJobStatus(jobId);
       setJobData(data);
+      
+      // Set predictions if available
+      if (data.predictions && Array.isArray(data.predictions)) {
+        setPredictions(data.predictions);
+      }
 
       const s = (data.status || 'running') as JobStatus | string;
       if (s === 'completed' || s === 'running' || s === 'expired') {
@@ -288,6 +304,47 @@ const PredictionResult = () => {
                         </>
                       )}
                     </Button>
+
+                    {/* Predictions Table */}
+                    {predictions.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="font-semibold mb-3">Prediction Results</h3>
+                        <ScrollArea className="h-[400px] rounded-lg border">
+                          <Table>
+                            <TableHeader className="sticky top-0 bg-background">
+                              <TableRow>
+                                <TableHead className="w-16">ID</TableHead>
+                                <TableHead className="min-w-[200px]">SMILES</TableHead>
+                                <TableHead className="min-w-[300px]">Mutated Sequence</TableHead>
+                                <TableHead className="w-32">Predicted Label</TableHead>
+                                <TableHead className="w-32">P1 Score</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {predictions.map((row) => (
+                                <TableRow key={row.id}>
+                                  <TableCell className="font-mono">{row.id}</TableCell>
+                                  <TableCell className="font-mono text-xs max-w-[200px] truncate" title={row.smiles}>
+                                    {row.smiles}
+                                  </TableCell>
+                                  <TableCell className="font-mono text-xs max-w-[300px] truncate" title={row.mutated_sequence}>
+                                    {row.mutated_sequence}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant={row.predicted_label === '1' ? 'default' : 'secondary'}>
+                                      {row.predicted_label === '1' ? 'Positive' : 'Negative'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="font-mono">
+                                    {parseFloat(row.p1).toFixed(4)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </ScrollArea>
+                      </div>
+                    )}
 
                     {jobData?.output_files && (
                       <div className="mt-6 p-4 bg-muted rounded-lg">
