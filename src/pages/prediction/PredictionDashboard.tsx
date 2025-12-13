@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Sparkles, Info } from 'lucide-react';
+import { Brain, Sparkles, Info, ExternalLink } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -119,9 +119,8 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setReceptorSequence(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Only plain amino acid sequences allowed (20 standard amino acids).FASTA headers (&gt;) are not accepted.Sequence length must be less than 1024..
+                      Only plain amino acid sequences allowed (20 standard amino acids). FASTA headers (&gt;) are not accepted. Sequence length must be less than 1024.
                     </p>
-                   
                   </div>
 
                   {/* SMILES */}
@@ -134,10 +133,32 @@ const PredictionDashboard: React.FC = () => {
                       onChange={(e) => setLigandSmiles(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                     SMILES strings must be fewer than 512 characters.For best results, convert SMILES to canonical format using OpenBabel.
-                      
+                      SMILES strings must be fewer than 512 characters. For best results, convert SMILES to canonical format using OpenBabel.
                     </p>
-                  
+                  </div>
+
+                  {/* Batch Processing Note */}
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-1">
+                          Need to process multiple SMILES/Sequence pairs?
+                        </h4>
+                        <p className="text-sm text-blue-700 dark:text-blue-400 mb-2">
+                          For batch processing of multiple ligand-receptor pairs, please use our command-line pipeline available on GitHub.
+                        </p>
+                        <a
+                          href="https://github.com/the-ahuja-lab/evolf-pipeline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                        >
+                          <span>Visit EvOlf Pipeline Repository</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -160,20 +181,39 @@ const PredictionDashboard: React.FC = () => {
                   <h3 className="text-lg text-foreground">Model Information</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Deep-Learning Architectures-trained on GPCR-ligand interaction datasets.
+                  Deep-Learning Architectures trained on GPCR-ligand interaction datasets.
                 </p>
               </Card>
 
               <Card className="p-6 border-border">
                 <h3 className="text-lg text-foreground mb-3">Quick Tips</h3>
                 <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-2">
-                  <li>Only plain receptor sequences are allowed, FASTA headers (&gt;) are not accepted. </li>
+                  <li>Only plain receptor sequences are allowed, FASTA headers (&gt;) are not accepted.</li>
                   <li>Sequences must contain only the 20 standard amino acids (A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y).</li>
                   <li>The receptor sequence must be less than 1024 amino acids.</li>
-                  <li> Ligand SMILES strings must be fewer than 512 characters.</li>
+                  <li>Ligand SMILES strings must be fewer than 512 characters.</li>
                   <li>(Optional) For best results, convert SMILES to canonical format using OpenBabel.</li>
-                  
                 </ul>
+              </Card>
+
+              {/* Batch Processing Card in Sidebar */}
+              <Card className="p-6 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-background dark:from-blue-900/10 dark:to-background">
+                <div className="flex items-center gap-2 mb-3">
+                  <ExternalLink className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="text-lg text-foreground">Batch Processing</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Have multiple ligand-receptor pairs to analyze? Use our command-line tool for high-throughput predictions.
+                </p>
+                <a
+                  href="https://github.com/the-ahuja-lab/evolf-pipeline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                >
+                  <span>EvOlf Pipeline on GitHub</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
               </Card>
 
             </div>
