@@ -67,17 +67,16 @@ const FAQ = () => {
                   <AccordionTrigger className="text-left">How can I run high-throughput predictions?</AccordionTrigger>
                   <AccordionContent className="text-justify">
                     For high-throughput predictions on large numbers of ligand-GPCR interactions, we strongly 
-                    recommend using our local Nextflow pipeline. This allows you to run predictions on single 
-                    or multiple files with a single command on your own machine. Check out our{' '}
+                    recommend using our local Nextflow pipeline. Check out our{' '}
                     <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
+                      href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
-                      EvOlf Local Pipeline
+                      EvOlf Local Pipeline Source Code
                     </a>{' '}
-                    for more details.
+                    for complete instructions on running the pipeline locally.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -89,7 +88,7 @@ const FAQ = () => {
                     contribute, and adapt the pipeline to their specific needs. Visit our{' '}
                     <a 
                       href="/links" 
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
                       Useful Links page
                     </a>{' '}
@@ -132,7 +131,7 @@ const FAQ = () => {
                     to one ligand-GPCR interaction per request. Access the API documentation at:{' '}
                     <a 
                       href="/api-docs" 
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
                       API Documentation
                     </a>
@@ -160,42 +159,59 @@ const FAQ = () => {
                 <AccordionItem value="item-13">
                   <AccordionTrigger className="text-left">Where can I find the source code?</AccordionTrigger>
                   <AccordionContent className="text-justify">
-                    The source code is available in three GitHub repositories:{' '}
-                    
-                    <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-accent hover:underline"
-                    >
-                       Evolf Local Pipeline 
-                    </a>
-                    , and{' '}
+                    All source code is available in our GitHub Repository:{' '}
                     <a 
                       href="https://github.com/the-ahuja-lab/EvOlf" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
-                      EvOlf Source Code 
+                      EvOlf
+                    </a>{' '}
+                    and{' '}
+                    <a 
+                      href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-accent hover:underline font-medium"
+                    >
+                      Pipeline Source Code
                     </a>
-                    . All are maintained by The Ahuja Lab.
+                    . Both are maintained by The Ahuja Lab.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-14">
                   <AccordionTrigger className="text-left">Are Docker images available?</AccordionTrigger>
                   <AccordionContent className="text-justify">
-                    Yes, Docker images are available on{' '}
-                    <a 
-                      href="https://hub.docker.com/repositories/ahujalab" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-accent hover:underline"
-                    >
-                      Docker Hub under the ahujalab repository
-                    </a>
-                    . This makes it easier to deploy and run the EvOlf pipeline in containerized environments.
+                    <p className="mb-3">
+                      Yes, multiple specialized Docker images are available on{' '}
+                      <a
+                        href="https://hub.docker.com/repositories/ahujalab"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:underline font-medium"
+                      >
+                        Docker Hub under the ahujalab repository
+                      </a>
+                      .
+                    </p>
+                    <p className="mb-3">
+                      The images provide containerized environments for different stages and techniques in the EvOlf pipeline.
+                    </p>
+                    <ul className="space-y-2 mb-3 text-sm">
+                      <li><a href="https://hub.docker.com/r/ahujalab/evolfdl_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">evolfdl_env</a> - EvOlf Deep Learning Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/signaturizer_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">signaturizer_env</a> - EvOlf Signaturizer Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/mol2vec_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">mol2vec_env</a> - EvOlf Mol2Vec Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/mathfeaturizer_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">mathfeaturizer_env</a> - EvOlf MathFeaturizer Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/evolfprediction_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">evolfprediction_env</a> - EvOlf Prediction Model Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/evolfr_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">evolfr_env</a> - EvOlf R Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/graph2vec_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">graph2vec_env</a> - EvOlf Graph2Vec Image</li>
+                      <li><a href="https://hub.docker.com/r/ahujalab/mordred_env" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">mordred_env</a> - EvOlf Mordred Image</li>
+                    </ul>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Please refer to the main <a href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">pipeline documentation</a> for guidance on using these images.
+                    </p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -204,10 +220,12 @@ const FAQ = () => {
                   <AccordionContent className="text-justify">
                     You can contribute by exploring our{' '}
                     <a 
-                      href="/links" 
-                      className="text-accent hover:underline"
+                      href="https://github.com/the-ahuja-lab/EvOlf" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-accent hover:underline font-medium"
                     >
-                      Source Codes
+                      GitHub Repository
                     </a>
                     , submitting issues, creating pull requests, or suggesting improvements. We welcome community 
                     contributions to enhance EvOlf's capabilities and expand its features.
@@ -219,21 +237,74 @@ const FAQ = () => {
                   <AccordionContent className="text-justify">
                     For sensitive or confidential data, we recommend running EvOlf locally using our{' '}
                     <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
+                      href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
                       EvOlf Local Pipeline
                     </a>
                     . This ensures your data never leaves your infrastructure. See our{' '}
                     <a 
                       href="/privacy-policy" 
-                      className="text-accent hover:underline"
+                      className="text-accent hover:underline font-medium"
                     >
                       Privacy Policy
                     </a>{' '}
                     for more details on data handling.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-17">
+                  <AccordionTrigger className="text-left">What are the system requirements for running EvOlf locally?</AccordionTrigger>
+                  <AccordionContent className="text-justify">
+                    For optimal performance, we recommend: 16GB+ RAM, 4+ CPU cores, 50GB+ free disk space, 
+                    and a GPU with 8GB+ VRAM for faster training/inference. Docker and Nextflow are required 
+                    for running the pipeline. Check the{' '}
+                    <a 
+                      href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-accent hover:underline font-medium"
+                    >
+                      pipeline documentation
+                    </a>{' '}
+                    for detailed requirements.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-18">
+                  <AccordionTrigger className="text-left">What file formats are supported for input?</AccordionTrigger>
+                  <AccordionContent className="text-justify">
+                    For the web interface: SMILES strings for ligands and plain amino acid sequences for receptors 
+                    (no FASTA headers). For local pipeline: CSV files with specific column formats as described in 
+                    the pipeline documentation. The sequence must only contain standard 20 amino acids.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-19">
+                  <AccordionTrigger className="text-left">How accurate are EvOlf's predictions?</AccordionTrigger>
+                  <AccordionContent className="text-justify">
+                    EvOlf achieves high accuracy across its five architectures, with performance validated through 
+                    rigorous cross-validation and testing on diverse datasets. Specific accuracy metrics are 
+                    available in our research publications and documentation.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-20">
+                  <AccordionTrigger className="text-left">Who maintains EvOlf?</AccordionTrigger>
+                  <AccordionContent className="text-justify">
+                    EvOlf is developed and maintained by{' '}
+                    <a 
+                      href="https://www.ahuja-lab.in/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-accent hover:underline font-medium"
+                    >
+                      The Ahuja Lab
+                    </a>{' '}
+                    at Indraprastha Institute of Information Technology Delhi (IIIT-Delhi). We welcome collaborations 
+                    and contributions from the research community.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

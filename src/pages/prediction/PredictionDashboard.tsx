@@ -149,12 +149,12 @@ const PredictionDashboard: React.FC = () => {
                           For batch processing of multiple ligand-receptor pairs, please use our local EvOlf pipeline available on GitHub.
                         </p>
                         <a
-                          href="https://github.com/the-ahuja-lab/evolf-pipeline"
+                          href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                         >
-                          <span>Visit EvOlf  Local Pipeline Repository</span>
+                          <span>Visit EvOlf  Local Pipeline</span>
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                       </div>
@@ -199,19 +199,19 @@ const PredictionDashboard: React.FC = () => {
               {/* Batch Processing Card in Sidebar */}
               <Card className="p-6 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-background dark:from-blue-900/10 dark:to-background">
                 <div className="flex items-center gap-2 mb-3">
-                  <ExternalLink className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          
                   <h3 className="text-lg text-foreground">Batch Processing</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Have multiple ligand-receptor pairs to analyze? Use our Local EvOlf Pipeline for high-throughput predictions.
+                  Have multiple ligand-receptor pairs to analyze? Use our Local EvOlf Pipeline for  predictions.
                 </p>
                 <a
-                  href="https://github.com/the-ahuja-lab/evolf-pipeline"
+                  href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
-                  <span>EvOlf Local Pipeline on GitHub</span>
+                  <span>EvOlf Local Pipeline</span>
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               </Card>

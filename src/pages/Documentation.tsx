@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { ExternalLink, Github, Package } from 'lucide-react';
+import { ExternalLink, Github, Package, Box } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Documentation = () => {
@@ -71,26 +71,147 @@ const Documentation = () => {
             </div>
           </section>
 
-          {/* Local Run Section */}
+          {/* Local Pipeline Section */}
           <section className="mb-12">
-            <h2 className="text-3xl font-bold mb-6">Local Run (High-Throughput)</h2>
+            <h2 className="text-3xl font-bold mb-6">Local Pipeline</h2>
             <p className="text-muted-foreground mb-4">
               If you need to run the EvOlf prediction model on a large number of ligand-GPCR interactions, we strongly recommend using our local pipeline.
             </p>
             <p className="mb-6">
               We have built a robust Nextflow pipeline that allows you to run predictions on single or multiple files with a single command on your own machine.
             </p>
-            
-            <div className="flex items-center gap-2 p-4 bg-blue-100 rounded-lg">
-              <Package className="h-5 w-5 text-blue-600" />
-              <a 
-                href="https://hub.docker.com/repositories/ahujalab" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline font-semibold"
-              >
-                Docker Hub: ahujalab
-              </a>
+
+            {/* Pipeline Source Code */}
+            <div className="mb-6">
+              <h3 className="text-2xl font-semibold mb-4">Local Pipeline</h3>
+              <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg mb-4">
+                <Github className="h-5 w-5 text-accent" />
+                <a 
+                  href="https://github.com/the-ahuja-lab/EvOlf/tree/main/evolf-pipeline-source" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline font-semibold"
+                >
+                  EvOlf Local Pipeline 
+                </a>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">
+                The pipeline includes complete configuration files and instructions for running EvOlf locally.
+              </p>
+            </div>
+
+            {/* Docker Images */}
+            <div className="mb-4">
+              <h3 className="text-2xl font-semibold mb-4">Docker Images</h3>
+              <p className="mb-4">
+                We provide pre-built Docker images for all components of the EvOlf pipeline. You can pull these images from Docker Hub:
+              </p>
+              
+              <div className="flex items-center gap-2 p-4 bg-blue-100 rounded-lg mb-4">
+                <Package className="h-5 w-5 text-blue-600" />
+                <a 
+                  href="https://hub.docker.com/repositories/ahujalab" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline font-semibold"
+                >
+                  Docker Hub: ahujalab
+                </a>
+              </div>
+
+              <div className="space-y-3 mt-4">
+                <h4 className="text-lg font-semibold">Available Docker Images:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/evolfdl_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      evolfdl_env - EvOlf Deep Learning
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/signaturizer_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      signaturizer_env - Signaturizer
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/mol2vec_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      mol2vec_env - Mol2Vec
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/mathfeaturizer_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      mathfeaturizer_env - MathFeaturizer
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/evolfprediction_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      evolfprediction_env - Prediction Model
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/evolfr_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      evolfr_env - EvOlf R Environment
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/graph2vec_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      graph2vec_env - Graph2Vec
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Box className="h-4 w-4 text-blue-500" />
+                    <a 
+                      href="https://hub.docker.com/r/ahujalab/mordred_env" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      mordred_env - Mordred Descriptors
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -113,18 +234,6 @@ const Documentation = () => {
                   EvOlf Source Code: EvOlf
                 </a>
               </div>
-              
-              <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
-                <Github className="h-5 w-5 text-accent" />
-                <a 
-                  href="https://github.com/the-ahuja-lab/evolf-pipeline" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline font-semibold"
-                >
-                  EvOlf Local Pipeline: evolf-pipeline
-                </a>
-              </div>
             </div>
           </section>
 
@@ -135,12 +244,11 @@ const Documentation = () => {
                 href="https://www.ahuja-lab.in/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm mt-4 font-semibold"
+                className="text-sm mt-4 font-semibold text-accent hover:underline"
               >
                 The Ahuja Lab
               </a>
             </p>
-
           </div>
         </div>
       </main>

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Download, Clock, CheckCircle, AlertCircle, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { getPredictionJobStatus, downloadPredictionResults } from '@/lib/api';
@@ -210,22 +209,22 @@ const PredictionResult = () => {
     setExpandedSmiles(newSet);
   };
 
-  const formatSequenceForDisplay = (sequence: string, id: string, maxChars: number = 80) => {
-    if (!sequence) return 'N/A';
+  const formatSequenceForDisplay = (sequence: string, id: string, maxChars: number = 40) => {
+    if (!sequence) return <span className="text-muted-foreground text-xs">N/A</span>;
     
     const isExpanded = expandedSequences.has(id);
     const displaySequence = isExpanded ? sequence : sequence.length > maxChars ? sequence.substring(0, maxChars) + '...' : sequence;
     
     return (
       <div className="font-mono text-xs">
-        <div className="whitespace-pre-wrap break-all">
+        <div className="whitespace-pre-wrap break-all bg-muted/10 p-1.5 rounded">
           {displaySequence}
         </div>
         {sequence.length > maxChars && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 mt-1 text-xs"
+            className="h-5 px-1.5 mt-0.5 text-[10px] hover:bg-transparent"
             onClick={(e) => {
               e.stopPropagation();
               toggleSequenceExpansion(id);
@@ -233,11 +232,11 @@ const PredictionResult = () => {
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Show Less
+                <ChevronUp className="h-2.5 w-2.5 mr-0.5" /> Less
               </>
             ) : (
               <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Show More ({sequence.length} aa)
+                <ChevronDown className="h-2.5 w-2.5 mr-0.5" /> More
               </>
             )}
           </Button>
@@ -246,22 +245,22 @@ const PredictionResult = () => {
     );
   };
 
-  const formatSmilesForDisplay = (smiles: string, id: string, maxChars: number = 60) => {
-    if (!smiles) return 'N/A';
+  const formatSmilesForDisplay = (smiles: string, id: string, maxChars: number = 25) => {
+    if (!smiles) return <span className="text-muted-foreground text-xs">N/A</span>;
     
     const isExpanded = expandedSmiles.has(id);
     const displaySmiles = isExpanded ? smiles : smiles.length > maxChars ? smiles.substring(0, maxChars) + '...' : smiles;
     
     return (
       <div className="font-mono text-xs">
-        <div className="whitespace-pre-wrap break-all">
+        <div className="whitespace-pre-wrap break-all bg-muted/10 p-1.5 rounded">
           {displaySmiles}
         </div>
         {smiles.length > maxChars && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 mt-1 text-xs"
+            className="h-5 px-1.5 mt-0.5 text-[10px] hover:bg-transparent"
             onClick={(e) => {
               e.stopPropagation();
               toggleSmilesExpansion(id);
@@ -269,47 +268,11 @@ const PredictionResult = () => {
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Show Less
+                <ChevronUp className="h-2.5 w-2.5 mr-0.5" /> Less
               </>
             ) : (
               <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Show More ({smiles.length} chars)
-              </>
-            )}
-          </Button>
-        )}
-      </div>
-    );
-  };
-
-  const formatSmilesForMobile = (smiles: string, id: string, maxChars: number = 40) => {
-    if (!smiles) return 'N/A';
-    
-    const isExpanded = expandedSmiles.has(id);
-    const displaySmiles = isExpanded ? smiles : smiles.length > maxChars ? smiles.substring(0, maxChars) + '...' : smiles;
-    
-    return (
-      <div className="font-mono text-xs">
-        <div className="whitespace-pre-wrap break-all">
-          {displaySmiles}
-        </div>
-        {smiles.length > maxChars && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 mt-1 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSmilesExpansion(id);
-            }}
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Show Less
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Show More
+                <ChevronDown className="h-2.5 w-2.5 mr-0.5" /> More
               </>
             )}
           </Button>
@@ -321,242 +284,263 @@ const PredictionResult = () => {
   const getStatusIcon = () => {
     switch (status) {
       case 'running':
-        return <Loader2 className="h-6 w-6 animate-spin text-blue-500" />;
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
       case 'completed':
-        return <CheckCircle className="h-6 w-6 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'expired':
-        return <AlertCircle className="h-6 w-6 text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
     }
   };
 
   const getStatusBadge = () => {
     switch (status) {
       case 'running':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20">Processing</Badge>;
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[10px] py-0.5 px-1.5">Processing</Badge>;
       case 'completed':
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">Ready</Badge>;
+        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 text-[10px] py-0.5 px-1.5">Ready</Badge>;
       case 'expired':
-        return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">Expired</Badge>;
+        return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20 text-[10px] py-0.5 px-1.5">Expired</Badge>;
     }
   };
 
   const formatScore = (p1: string) => {
-    if (!p1 || p1.trim() === '') return 'N/A';
+    if (!p1 || p1.trim() === '') return <span className="text-muted-foreground text-xs">N/A</span>;
     const score = parseFloat(p1);
-    return isNaN(score) ? 'N/A' : score.toFixed(4);
+    return isNaN(score) ? <span className="text-muted-foreground text-xs">N/A</span> : score.toFixed(4);
   };
 
   const getBindingStatusBadge = (label: string) => {
     if (label === 'Agonist (1)') {
-      return <Badge variant="default" className="bg-green-500/20 text-green-600 border-green-500/30">Agonist</Badge>;
+      return <Badge className="bg-green-500/20 text-green-600 border-green-500/30 text-xs py-0.5 px-2">Agonist ( 1 )</Badge>;
     } else if (label === 'Non-Agonist (0)') {
-      return <Badge variant="outline" className="bg-gray-500/10 text-gray-600 border-gray-500/20">Non-Agonist</Badge>;
+      return <Badge className="bg-gray-500/20 text-gray-600 border-gray-500/30 text-xs py-0.5 px-2">Non-Agonist ( 0 )</Badge>;
     } else {
-      return <Badge variant="secondary">{label}</Badge>;
+      return <Badge variant="outline" className="text-xs py-0.5 px-2">{label}</Badge>;
     }
+  };
+
+  const getScoreColor = (p1: string) => {
+    const score = parseFloat(p1 || '0');
+    if (score > 0.7) return 'bg-green-500/10 text-green-700';
+    if (score > 0.4) return 'bg-yellow-500/10 text-yellow-700';
+    return 'bg-red-500/10 text-red-700';
   };
 
   return (
     <>
       <Header currentPage="model" onNavigate={handleNavigate} />
-      <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-6 md:py-12">
-        <div className="container mx-auto px-3 md:px-4 max-w-6xl">
+      <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-4 md:py-6">
+        <div className="container mx-auto px-3 md:px-6 max-w-7xl">
 
-          {/* Header - Mobile Optimized */}
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-4xl text-foreground mb-3 md:mb-4">Prediction Results</h1>
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 max-w-full">
-              <p className="text-sm md:text-xl text-muted-foreground">Job ID:</p>
-              <code className="text-xs md:text-sm bg-muted px-2 py-1 rounded break-all max-w-full">
+          {/* Header */}
+          <div className="text-center mb-4 md:mb-6">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground mb-2">Prediction Results</h1>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs text-muted-foreground">Job ID:</span>
+              <code className="text-xs bg-muted/50 px-3 py-1 rounded-md border font-medium">
                 {jobId}
               </code>
             </div>
           </div>
 
           {/* Copy URL Button */}
-          <div className="mb-4 md:mb-6 text-center">
-            <Button variant="outline" onClick={copyUrl} className="gap-2 w-full md:w-auto">
+          <div className="mb-4 text-center">
+            <Button 
+              variant="outline" 
+              onClick={copyUrl} 
+              size="sm"
+              className="gap-2 h-8 text-xs"
+            >
               {urlCopied ? (
                 <>
-                  <Check className="h-4 w-4" /> URL Copied!
+                  <Check className="h-3.5 w-3.5" /> URL Copied
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" /> Copy Result URL
+                  <Copy className="h-3.5 w-3.5" /> Copy Results URL
                 </>
               )}
             </Button>
           </div>
 
-          {/* Status Card */}
-          <Card className="p-4 md:p-8 mb-6">
+          {/* Main Card */}
+          <Card className="p-4 md:p-6 mb-4">
             {loading ? (
-              <div className="flex items-center justify-center py-8 md:py-12">
-                <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-muted-foreground" />
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
+                <span className="text-sm">Loading results...</span>
               </div>
             ) : (
-              <div className="space-y-4 md:space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="space-y-4">
+                {/* Status Header */}
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {getStatusIcon()}
                     <div>
-                      <h2 className="text-lg md:text-2xl font-semibold">Prediction Status</h2>
-                      <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                        {status === 'running' && 'Your prediction is being processed'}
-                        {status === 'completed' && 'Your prediction results are ready'}
-                        {status === 'expired' && 'This prediction has expired'}
+                      <h2 className="text-lg font-semibold">Prediction Status</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {status === 'running' && 'Your job is being processed'}
+                        {status === 'completed' && 'Results are ready for download'}
+                        {status === 'expired' && 'This job has expired'}
                       </p>
                     </div>
                   </div>
-                  <div className="md:self-start">
+                  <div>
                     {getStatusBadge()}
                   </div>
                 </div>
 
-                {/* Running */}
+                {/* Running Status */}
                 {status === 'running' && (
-                  <Alert>
-                    <Clock className="h-4 w-4" />
+                  <Alert className="border-blue-500/20 bg-blue-500/5">
+                    <Clock className="h-4 w-4 text-blue-500" />
                     <AlertDescription className="text-sm">
-                      Results will be available when processing is complete. This page will update automatically.
+                      Your prediction is being processed. This page will refresh automatically when complete.
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {/* Completed */}
+                {/* Completed Status */}
                 {status === 'completed' && (
-                  <div className="space-y-4 md:space-y-6">
-                    <Alert className="bg-green-500/10 border-green-500/20">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-600 text-sm">
+                  <div className="space-y-4">
+                    <Alert className="border-green-500/20 bg-green-500/5">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <AlertDescription className="text-sm">
                         Your prediction has completed successfully!
                       </AlertDescription>
                     </Alert>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <Button 
                         onClick={handleDownload} 
                         disabled={downloading}
-                        size="lg"
-                        className="w-full"
+                        className="flex-1 h-10"
                       >
                         {downloading ? (
                           <>
-                            <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Downloading...
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Downloading...
                           </>
                         ) : (
                           <>
-                            <Download className="h-5 w-5 mr-2" /> Download Full Results (ZIP)
+                            <Download className="h-4 w-4 mr-2" /> Download Full Results (ZIP)
                           </>
                         )}
                       </Button>
                       <Button 
                         variant="outline" 
                         onClick={() => navigate('/prediction')}
-                        size="lg"
-                        className="w-full"
+                        className="flex-1 h-10"
                       >
                         Submit New Prediction
                       </Button>
                     </div>
 
-                    {/* Predictions Table - Mobile Optimized */}
+                    {/* Results Table Section */}
                     {predictions.length > 0 && (
-                      <div className="mt-4 md:mt-6">
-                        <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Binding Interaction Predictions</h3>
-                        <div className="rounded-lg border">
-                          <ScrollArea className="h-[400px] md:h-[500px]">
-                            <div className="hidden md:block">
-                              {/* Desktop Table */}
-                              <Table>
-                                <TableHeader className="sticky top-0 bg-background">
-                                  <TableRow>
-                                    <TableHead className="w-16">ID</TableHead>
-                                    <TableHead className="min-w-[200px] max-w-[250px]">Ligand (SMILES)</TableHead>
-                                    <TableHead className="min-w-[250px] max-w-[350px]">Receptor Sequence</TableHead>
-                                    <TableHead className="w-32">Score</TableHead>
-                                    <TableHead className="w-40">Binding Status</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                      <div className="mt-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold">Binding Interaction Predictions</h3>
+                          
+                        </div>
+
+                        {/* Desktop Table - Clean and Compact */}
+                        <div className="hidden md:block">
+                          <div className="border rounded-lg overflow-hidden">
+                            <div className="overflow-x-auto">
+                              <table className="w-full">
+                                <thead className="bg-muted/30 border-b">
+                                  <tr className="text-xs font-medium text-muted-foreground">
+                                    <th className="py-2 px-3 text-left w-12">ID</th>
+                                    <th className="py-2 px-3 text-left min-w-[150px]">Ligand (SMILES)</th>
+                                    <th className="py-2 px-3 text-left min-w-[200px]">Receptor Sequence</th>
+                                    <th className="py-2 px-3 text-left w-24">Score</th>
+                                    <th className="py-2 px-3 text-left w-28">Binding Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y">
                                   {predictions.map((row) => (
-                                    <TableRow key={row.id} className="hover:bg-muted/50">
-                                      <TableCell className="font-mono font-medium">{row.id}</TableCell>
-                                      <TableCell className="p-3">
+                                    <tr key={row.id} className="hover:bg-muted/10 transition-colors">
+                                      <td className="py-2 px-3">
+                                        <div className="font-mono text-xs font-medium">{row.id}</div>
+                                      </td>
+                                      <td className="py-2 px-3">
                                         {formatSmilesForDisplay(row.smiles, row.id)}
-                                      </TableCell>
-                                      <TableCell className="p-3">
+                                      </td>
+                                      <td className="py-2 px-3">
                                         {formatSequenceForDisplay(row.mutated_sequence, row.id)}
-                                      </TableCell>
-                                      <TableCell className="font-mono font-medium">
-                                        <div className="flex flex-col">
-                                          <span className={
-                                            parseFloat(row.p1 || '0') > 0.7 ? 'text-green-600' : 
-                                            parseFloat(row.p1 || '0') > 0.4 ? 'text-yellow-600' : 
-                                            'text-red-600'
-                                          }>
+                                      </td>
+                                      <td className="py-2 px-3">
+                                        <div className="flex flex-col items-start">
+                                          <span className={`font-mono text-sm font-bold ${getScoreColor(row.p1)}`}>
                                             {formatScore(row.p1)}
                                           </span>
-                                          <span className="text-xs text-muted-foreground">
-                                            P1 score
-                                          </span>
+                                          <span className="text-[10px] text-muted-foreground">P1 score</span>
                                         </div>
-                                      </TableCell>
-                                      <TableCell>
+                                      </td>
+                                      <td className="py-2 px-3">
                                         {getBindingStatusBadge(row.predicted_label)}
-                                      </TableCell>
-                                    </TableRow>
+                                      </td>
+                                    </tr>
                                   ))}
-                                </TableBody>
-                              </Table>
+                                </tbody>
+                              </table>
                             </div>
-
-                            {/* Mobile Cards */}
-                            <div className="md:hidden p-2 space-y-3">
-                              {predictions.map((row) => (
-                                <Card key={row.id} className="p-3">
-                                  <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div className="font-medium">ID:</div>
-                                    <div className="font-mono">{row.id}</div>
-                                    
-                                    <div className="font-medium">Ligand:</div>
-                                    <div>{formatSmilesForMobile(row.smiles, row.id)}</div>
-                                    
-                                    <div className="font-medium">Sequence:</div>
-                                    <div>{formatSequenceForDisplay(row.mutated_sequence, row.id, 40)}</div>
-                                    
-                                    <div className="font-medium">Score:</div>
-                                    <div className="font-mono font-medium">
-                                      <span className={
-                                        parseFloat(row.p1 || '0') > 0.7 ? 'text-green-600' : 
-                                        parseFloat(row.p1 || '0') > 0.4 ? 'text-yellow-600' : 
-                                        'text-red-600'
-                                      }>
-                                        {formatScore(row.p1)}
-                                      </span>
-                                    </div>
-                                    
-                                    <div className="font-medium">Status:</div>
-                                    <div>{getBindingStatusBadge(row.predicted_label)}</div>
-                                  </div>
-                                </Card>
-                              ))}
-                            </div>
-                          </ScrollArea>
+                          </div>
                         </div>
+
+                        {/* Mobile Cards */}
+                        <div className="md:hidden space-y-3">
+                          {predictions.map((row) => (
+                            <Card key={row.id} className="p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-muted-foreground">ID:</span>
+                                    <span className="font-mono text-sm font-medium">{row.id}</span>
+                                  </div>
+                                  {getBindingStatusBadge(row.predicted_label)}
+                                </div>
+                                
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1">Score</div>
+                                  <div className={`font-mono text-sm font-bold px-3 py-1 rounded-full ${getScoreColor(row.p1)} inline-block`}>
+                                    {formatScore(row.p1)} (P1)
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1">Ligand (SMILES)</div>
+                                  {formatSmilesForDisplay(row.smiles, row.id, 20)}
+                                </div>
+
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1">Receptor Sequence</div>
+                                  {formatSequenceForDisplay(row.mutated_sequence, row.id, 30)}
+                                </div>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+
+                        {/* Legend - Fixed with proper escaping */}
                         
                       </div>
                     )}
 
-                    {jobData?.output_files && (
-                      <div className="mt-4 md:mt-6 p-3 md:p-4 bg-muted rounded-lg">
-                        <h3 className="font-semibold mb-2 md:mb-3 text-sm md:text-base">Files included in download</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {/* Files List */}
+                    {jobData?.output_files && jobData.output_files.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium mb-2">Files included in download:</h4>
+                        <div className="flex flex-wrap gap-2">
                           {jobData.output_files.map((f: string) => (
-                            <div key={f} className="flex items-center justify-between p-2 bg-background rounded text-xs md:text-sm">
-                              <code className="truncate">{f}</code>
-                              <Badge variant="outline" className="ml-2 shrink-0 text-xs">CSV</Badge>
-                            </div>
+                            <Badge 
+                              key={f} 
+                              variant="outline" 
+                              className="text-xs"
+                            >
+                              {f}
+                            </Badge>
                           ))}
                         </div>
                       </div>
@@ -564,20 +548,18 @@ const PredictionResult = () => {
                   </div>
                 )}
 
-                {/* Expired */}
+                {/* Expired Status */}
                 {status === 'expired' && (
                   <div className="space-y-4">
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-sm">
+                      <AlertDescription>
                         This prediction job has expired or was not found.
                       </AlertDescription>
                     </Alert>
                     <Button 
-                      variant="outline" 
                       onClick={() => navigate('/prediction')}
-                      className="w-full"
-                      size="lg"
+                      className="w-full h-10"
                     >
                       Submit New Prediction
                     </Button>
@@ -586,11 +568,11 @@ const PredictionResult = () => {
 
                 {/* Expiry Notice */}
                 {(status === 'running' || status === 'completed') && jobData?.expiresAt && (
-                  <div className="pt-3 md:pt-4 border-t">
-                    <p className="text-xs md:text-sm text-muted-foreground text-center">
-                      <Clock className="h-3 w-3 md:h-4 md:w-4 inline mr-1" />
-                      Available until {new Date(jobData.expiresAt).toLocaleDateString()}
-                    </p>
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span>Results available until {new Date(jobData.expiresAt).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 )}
               </div>
