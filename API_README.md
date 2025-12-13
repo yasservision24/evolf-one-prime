@@ -1018,9 +1018,21 @@ cat("Status:", status$status, "\n")
   "job_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "status": "finished",
   "output_files": [
-    "output/predictions.csv",
-    "output/visualization.png",
-    "output/summary.json"
+    "output/Receptor_Embeddings.csv",
+    "output/Prediction_Output.csv",
+    "output/LR_Pair_Embeddings.csv",
+    "output/Ligand_Embeddings.csv"
+  ],
+  "predictions": [
+    {
+      "id": "1",
+      "temp_ligand_id": "serotonin",
+      "smiles": "NCCc1c[nH]c2ccc(O)cc12",
+      "mutated_sequence": "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN",
+      "temp_rec_id": "5ht1a",
+      "predicted_label": "Agonist (1)",
+      "p1": "0.85"
+    }
   ]
 }
 ```

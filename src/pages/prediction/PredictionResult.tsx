@@ -215,11 +215,43 @@ const PredictionResult = () => {
     }
   };
 
+  // Format score for display
+  const formatScore = (p1: string) => {
+    if (!p1 || p1.trim() === '') return 'N/A';
+    const score = parseFloat(p1);
+    return isNaN(score) ? 'N/A' : score.toFixed(4);
+  };
+
+  // Get badge for binding status
+  const getBindingStatusBadge = (label: string) => {
+    if (label === 'Agonist (1)') {
+      return <Badge variant="default" className="bg-green-500/20 text-green-600 border-green-500/30">Agonist</Badge>;
+    } else if (label === 'Non-Agonist (0)') {
+      return <Badge variant="outline" className="bg-gray-500/10 text-gray-600 border-gray-500/20">Non-Agonist</Badge>;
+    } else {
+      return <Badge variant="secondary">{label}</Badge>;
+    }
+  };
+
+  // Truncate sequence for display
+  const truncateSequence = (sequence: string, maxLength: number = 50) => {
+    if (!sequence) return '';
+    if (sequence.length <= maxLength) return sequence;
+    return `${sequence.substring(0, maxLength)}...`;
+  };
+
+  // Truncate SMILES for display
+  const truncateSmiles = (smiles: string, maxLength: number = 40) => {
+    if (!smiles) return '';
+    if (smiles.length <= maxLength) return smiles;
+    return `${smiles.substring(0, maxLength)}...`;
+  };
+
   return (
     <>
       <Header currentPage="model" onNavigate={handleNavigate} />
       <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-6xl">
 
           {/* Header */}
           <div className="text-center mb-8">
@@ -280,7 +312,7 @@ const PredictionResult = () => {
 
                 {/* Completed */}
                 {status === 'completed' && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <Alert className="bg-green-500/10 border-green-500/20">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-600">
@@ -288,75 +320,117 @@ const PredictionResult = () => {
                       </AlertDescription>
                     </Alert>
 
-                    <Button 
-                      onClick={handleDownload} 
-                      disabled={downloading}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {downloading ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Downloading...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="h-5 w-5 mr-2" /> Download Results (ZIP)
-                        </>
-                      )}
-                    </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button 
+                        onClick={handleDownload} 
+                        disabled={downloading}
+                        size="lg"
+                        className="w-full"
+                      >
+                        {downloading ? (
+                          <>
+                            <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Downloading...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="h-5 w-5 mr-2" /> Download Full Results (ZIP)
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => navigate('/prediction')}
+                        size="lg"
+                        className="w-full"
+                      >
+                        Submit New Prediction
+                      </Button>
+                    </div>
 
                     {/* Predictions Table */}
                     {predictions.length > 0 && (
                       <div className="mt-6">
-                        <h3 className="font-semibold mb-3">Prediction Results</h3>
-                        <ScrollArea className="h-[400px] rounded-lg border">
-                          <Table>
-                            <TableHeader className="sticky top-0 bg-background">
-                              <TableRow>
-                                <TableHead className="w-16">ID</TableHead>
-                                <TableHead className="min-w-[200px]">SMILES</TableHead>
-                                <TableHead className="min-w-[300px]">Mutated Sequence</TableHead>
-                                <TableHead className="w-32">Predicted Label</TableHead>
-                                <TableHead className="w-32">P1 Score</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {predictions.map((row) => (
-                                <TableRow key={row.id}>
-                                  <TableCell className="font-mono">{row.id}</TableCell>
-                                  <TableCell className="font-mono text-xs max-w-[200px] truncate" title={row.smiles}>
-                                    {row.smiles}
-                                  </TableCell>
-                                  <TableCell className="font-mono text-xs max-w-[300px] truncate" title={row.mutated_sequence}>
-                                    {row.mutated_sequence}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant={row.predicted_label === '1' ? 'default' : 'secondary'}>
-                                      {row.predicted_label === '1' ? 'Positive' : 'Negative'}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="font-mono">
-                                    {parseFloat(row.p1).toFixed(4)}
-                                  </TableCell>
+                        <h3 className="text-xl font-semibold mb-4">Binding Affinity Predictions</h3>
+                        <div className="rounded-lg border">
+                          <ScrollArea className="h-[500px]">
+                            <Table>
+                              <TableHeader className="sticky top-0 bg-background">
+                                <TableRow>
+                                  <TableHead className="w-16">ID</TableHead>
+                                  <TableHead className="min-w-[250px]">Ligand (SMILES)</TableHead>
+                                  <TableHead className="min-w-[350px]">Receptor Sequence</TableHead>
+                                  <TableHead className="w-32">Score</TableHead>
+                                  <TableHead className="w-40">Binding Status</TableHead>
                                 </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </ScrollArea>
+                              </TableHeader>
+                              <TableBody>
+                                {predictions.map((row) => (
+                                  <TableRow key={row.id} className="hover:bg-muted/50">
+                                    <TableCell className="font-mono font-medium">{row.id}</TableCell>
+                                    <TableCell className="font-mono text-xs">
+                                      <div className="max-w-[250px]">
+                                        <div className="truncate" title={row.smiles}>
+                                          {truncateSmiles(row.smiles)}
+                                        </div>
+                                        {row.smiles && row.smiles.length > 40 && (
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            {row.smiles.length} chars
+                                          </p>
+                                        )}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs">
+                                      <div className="max-w-[350px]">
+                                        <div className="truncate" title={row.mutated_sequence}>
+                                          {truncateSequence(row.mutated_sequence)}
+                                        </div>
+                                        {row.mutated_sequence && row.mutated_sequence.length > 50 && (
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            {row.mutated_sequence.length} amino acids
+                                          </p>
+                                        )}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="font-mono font-medium">
+                                      <div className="flex flex-col">
+                                        <span className={parseFloat(row.p1 || '0') > 0.7 ? 'text-green-600' : 
+                                                         parseFloat(row.p1 || '0') > 0.4 ? 'text-yellow-600' : 
+                                                         'text-red-600'}>
+                                          {formatScore(row.p1)}
+                                        </span>
+                                        {row.p1 && (
+                                          <span className="text-xs text-muted-foreground">
+                                            P1 score
+                                          </span>
+                                        )}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      {getBindingStatusBadge(row.predicted_label)}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </ScrollArea>
+                        </div>
+                        <div className="mt-4 text-sm text-muted-foreground">
+                          <p>Showing {predictions.length} prediction(s). Agonists are ligands that activate receptors, while Non-Agonists do not activate receptors.</p>
+                        </div>
                       </div>
                     )}
 
                     {jobData?.output_files && (
                       <div className="mt-6 p-4 bg-muted rounded-lg">
-                        <h3 className="font-semibold mb-3">Output files</h3>
-                        <ul className="text-sm space-y-1">
+                        <h3 className="font-semibold mb-3">Files included in download</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {jobData.output_files.map((f: string) => (
-                            <li key={f} className="flex justify-between">
-                              <span className="truncate max-w-lg">{f}</span>
-                              <span className="text-muted-foreground text-xs">file</span>
-                            </li>
+                            <div key={f} className="flex items-center justify-between p-2 bg-background rounded">
+                              <code className="text-sm truncate">{f}</code>
+                              <Badge variant="outline" className="ml-2 shrink-0">CSV</Badge>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -364,12 +438,22 @@ const PredictionResult = () => {
 
                 {/* Expired */}
                 {status === 'expired' && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      This prediction job has expired or was not found.
-                    </AlertDescription>
-                  </Alert>
+                  <div className="space-y-4">
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        This prediction job has expired or was not found.
+                      </AlertDescription>
+                    </Alert>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/prediction')}
+                      className="w-full"
+                      size="lg"
+                    >
+                      Submit New Prediction
+                    </Button>
+                  </div>
                 )}
 
                 {/* Expiry Notice */}
@@ -384,20 +468,6 @@ const PredictionResult = () => {
               </div>
             )}
           </Card>
-
-          {/* Actions - Only show for running or expired status */}
-          <div className="text-center space-y-4">
-            {status === 'running' && (
-              <Button variant="outline" onClick={() => navigate('/prediction')}>
-                Submit New Prediction
-              </Button>
-            )}
-            {status === 'expired' && (
-              <Button variant="outline" onClick={() => navigate('/prediction')}>
-                Submit New Prediction
-              </Button>
-            )}
-          </div>
 
         </div>
       </div>

@@ -96,6 +96,17 @@ const Api = () => {
     "output/Prediction_Output.csv",
     "output/LR_Pair_Embeddings.csv",
     "output/Ligand_Embeddings.csv"
+  ],
+  "predictions": [
+    {
+      "id": "1",
+      "temp_ligand_id": "serotonin",
+      "smiles": "NCCc1c[nH]c2ccc(O)cc12",
+      "mutated_sequence": "MDVLSPGQGNNTTSPPAPFETGGNTTGISDVTFSYQVITSLLLGTLIFCAVLGN",
+      "temp_rec_id": "5ht1a",
+      "predicted_label": "Agonist (1)",
+      "p1": "0.85"
+    }
   ]
 }`,
     errorFormat: `{
@@ -127,15 +138,15 @@ const Api = () => {
                   <Code className="h-10 w-10 text-accent mb-4 mx-auto" />
                   <h2 className="text-2xl font-bold mb-4">Base Configuration</h2>
                   <div className="text-muted-foreground space-y-2 max-w-2xl mx-auto">
-                    <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
-                      <code className="text-sm flex-1 mr-2">https://evolf.ahujalab.iiitd.edu.in/api</code>
+                    <div className="flex items-center gap-2">
+                      <code className="text-sm flex-1 bg-gray-100 px-3 py-2 rounded truncate">https://evolf.ahujalab.iiitd.edu.in/api</code>
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={() => handleCopy(apiExamples.baseUrl, 'baseUrl')}
-                        className="h-6 px-2 shrink-0"
+                        className="h-8 px-2 shrink-0"
                       >
-                        <Copy className="h-3 w-3 mr-1" />
+                        <Copy className="h-4 w-4 mr-1" />
                         {copiedStates.baseUrl ? 'Copied!' : 'Copy'}
                       </Button>
                     </div>
@@ -182,15 +193,15 @@ const Api = () => {
                   <div className="text-left space-y-4 max-w-2xl mx-auto">
                     <div>
                       <h3 className="font-semibold mb-2">Endpoint</h3>
-                      <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
-                        <code className="text-sm flex-1 mr-2">POST /predict/smiles/</code>
+                      <div className="flex items-center gap-2">
+                        <code className="text-sm flex-1 bg-gray-100 px-3 py-2 rounded truncate">POST /predict/smiles/</code>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleCopy('POST /predict/smiles/', 'submitEndpoint')}
-                          className="h-6 px-2 shrink-0"
+                          className="h-8 px-2 shrink-0"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-4 w-4 mr-1" />
                           {copiedStates.submitEndpoint ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
@@ -199,16 +210,16 @@ const Api = () => {
                     <div>
                       <h3 className="font-semibold mb-2">Request Body</h3>
                       <div className="relative bg-gray-100 p-4 rounded">
-                        <pre className="text-sm overflow-x-auto">
+                        <pre className="text-sm overflow-x-auto pr-10">
                           {apiExamples.requestBody}
                         </pre>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleCopy(apiExamples.requestBody, 'requestBody')}
-                          className="absolute top-2 right-2 h-6 px-2"
+                          className="absolute top-2 right-2 h-8 px-2"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-4 w-4 mr-1" />
                           {copiedStates.requestBody ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
@@ -254,16 +265,16 @@ const Api = () => {
                         </div>
                         
                         <div className="relative bg-gray-100 p-4 rounded">
-                          <pre className="text-sm overflow-x-auto">
+                          <pre className="text-sm overflow-x-auto pr-10">
                             {apiExamples.submitRequest[activeFormat]}
                           </pre>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy(apiExamples.submitRequest[activeFormat], 'submitRequest')}
-                            className="absolute top-2 right-2 h-6 px-2"
+                            className="absolute top-2 right-2 h-8 px-2"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.submitRequest ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -273,16 +284,16 @@ const Api = () => {
                     <div>
                       <h3 className="font-semibold mb-2">Response</h3>
                       <div className="relative bg-gray-100 p-4 rounded">
-                        <pre className="text-sm overflow-x-auto">
+                        <pre className="text-sm overflow-x-auto pr-10">
                           {apiExamples.submitResponse}
                         </pre>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleCopy(apiExamples.submitResponse, 'submitResponse')}
-                          className="absolute top-2 right-2 h-6 px-2"
+                          className="absolute top-2 right-2 h-8 px-2"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-4 w-4 mr-1" />
                           {copiedStates.submitResponse ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
@@ -303,15 +314,15 @@ const Api = () => {
                   <div className="text-left space-y-4 max-w-2xl mx-auto">
                     <div>
                       <h3 className="font-semibold mb-2">Endpoint</h3>
-                      <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
-                        <code className="text-sm flex-1 mr-2">GET /predict/job/&#123;job_id&#125;/</code>
+                      <div className="flex items-center gap-2">
+                        <code className="text-sm flex-1 bg-gray-100 px-3 py-2 rounded truncate">GET /predict/job/&#123;job_id&#125;/</code>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleCopy('GET /predict/job/{job_id}/', 'statusEndpoint')}
-                          className="h-6 px-2 shrink-0"
+                          className="h-8 px-2 shrink-0"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-4 w-4 mr-1" />
                           {copiedStates.statusEndpoint ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
@@ -352,16 +363,16 @@ const Api = () => {
                         </div>
                         
                         <div className="relative bg-gray-100 p-4 rounded">
-                          <pre className="text-sm overflow-x-auto">
+                          <pre className="text-sm overflow-x-auto pr-10">
                             {apiExamples.statusRequest[activeFormat]}
                           </pre>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy(apiExamples.statusRequest[activeFormat], 'statusRequest')}
-                            className="absolute top-2 right-2 h-6 px-2"
+                            className="absolute top-2 right-2 h-8 px-2"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.statusRequest ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -374,16 +385,16 @@ const Api = () => {
                       <div className="mb-4">
                         <p className="text-sm font-medium mb-1">Job Running:</p>
                         <div className="relative bg-gray-100 p-4 rounded">
-                          <pre className="text-sm overflow-x-auto">
+                          <pre className="text-sm overflow-x-auto pr-10">
                             {apiExamples.statusResponseRunning}
                           </pre>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy(apiExamples.statusResponseRunning, 'statusResponseRunning')}
-                            className="absolute top-2 right-2 h-6 px-2"
+                            className="absolute top-2 right-2 h-8 px-2"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.statusResponseRunning ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -392,16 +403,16 @@ const Api = () => {
                       <div>
                         <p className="text-sm font-medium mb-1">Job Completed:</p>
                         <div className="relative bg-gray-100 p-4 rounded">
-                          <pre className="text-sm overflow-x-auto">
+                          <pre className="text-sm overflow-x-auto pr-10">
                             {apiExamples.statusResponseComplete}
                           </pre>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy(apiExamples.statusResponseComplete, 'statusResponseComplete')}
-                            className="absolute top-2 right-2 h-6 px-2"
+                            className="absolute top-2 right-2 h-8 px-2"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.statusResponseComplete ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -424,27 +435,27 @@ const Api = () => {
                     <div>
                       <h3 className="font-semibold mb-2">Endpoints</h3>
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
-                          <code className="text-sm flex-1 mr-2">GET /predict/job/&#123;job_id&#125;/?download=output</code>
+                        <div className="flex items-center gap-2">
+                          <code className="text-sm flex-1 bg-gray-100 px-3 py-2 rounded truncate">GET /predict/job/&#123;job_id&#125;/?download=output</code>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy('GET /predict/job/{job_id}/?download=output', 'downloadEndpoint1')}
-                            className="h-6 px-2 shrink-0"
+                            className="h-8 px-2 shrink-0"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.downloadEndpoint1 ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
-                        <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
-                          <code className="text-sm flex-1 mr-2">GET /predict/download/&#123;job_id&#125;/</code>
+                        <div className="flex items-center gap-2">
+                          <code className="text-sm flex-1 bg-gray-100 px-3 py-2 rounded truncate">GET /predict/download/&#123;job_id&#125;/</code>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy('GET /predict/download/{job_id}/', 'downloadEndpoint2')}
-                            className="h-6 px-2 shrink-0"
+                            className="h-8 px-2 shrink-0"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.downloadEndpoint2 ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -479,16 +490,16 @@ const Api = () => {
                         </div>
                         
                         <div className="relative bg-gray-100 p-4 rounded">
-                          <pre className="text-sm overflow-x-auto">
+                          <pre className="text-sm overflow-x-auto pr-10">
                             {apiExamples.downloadRequest[activeFormat]}
                           </pre>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleCopy(apiExamples.downloadRequest[activeFormat], 'downloadRequest')}
-                            className="absolute top-2 right-2 h-6 px-2"
+                            className="absolute top-2 right-2 h-8 px-2"
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-4 w-4 mr-1" />
                             {copiedStates.downloadRequest ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
@@ -527,16 +538,16 @@ const Api = () => {
                     <div>
                       <h3 className="font-semibold mb-2">Error Response Format</h3>
                       <div className="relative bg-gray-100 p-4 rounded">
-                        <pre className="text-sm overflow-x-auto">
+                        <pre className="text-sm overflow-x-auto pr-10">
                           {apiExamples.errorFormat}
                         </pre>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleCopy(apiExamples.errorFormat, 'errorFormat')}
-                          className="absolute top-2 right-2 h-6 px-2"
+                          className="absolute top-2 right-2 h-8 px-2"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-4 w-4 mr-1" />
                           {copiedStates.errorFormat ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
@@ -595,6 +606,7 @@ const Api = () => {
                     <p><strong>Job Processing:</strong> Predictions are processed asynchronously - use the job status endpoint to monitor progress</p>
                     <p><strong>File Downloads:</strong> Results are available as ZIP files containing CSV files only (no JSON or image files)</p>
                     <p><strong>Output Format:</strong> All CSV files use comma as delimiter and include headers. Predictions include columns for ligand ID, receptor ID, predicted binding affinity, and confidence scores.</p>
+                    <p><strong>Prediction Results:</strong> When a job is completed, the API returns detailed predictions including ID, SMILES, receptor sequence, predicted label (Agonist (1) or Non-Agonist (0)), and confidence score (P1).</p>
                     <p><strong>Receptor Validation:</strong> Only plain amino acid sequences allowed. FASTA headers (&gt;) are NOT accepted. Sequences must contain only the 20 standard amino acids and be less than 1024 characters.</p>
                     <p><strong>SMILES Validation:</strong> For best results, convert your SMILES into canonical format using OpenBabel. SMILES strings must be fewer than 512 characters.</p>
                     <p><strong>Output Files:</strong> All output files are in CSV format and include Receptor_Embeddings.csv, Prediction_Output.csv, LR_Pair_Embeddings.csv, and Ligand_Embeddings.csv</p>
