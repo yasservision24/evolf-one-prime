@@ -161,17 +161,9 @@ const FAQ = () => {
                   <AccordionTrigger className="text-left">Where can I find the source code?</AccordionTrigger>
                   <AccordionContent className="text-justify">
                     The source code is available in three GitHub repositories:{' '}
+                    
                     <a 
-                      href="https://github.com/the-ahuja-lab/EvOlf/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-accent hover:underline"
-                    >
-                      EvOlf Web Server Source Code
-                    </a>
-                    ,{' '}
-                    <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline-source" 
+                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-accent hover:underline"
@@ -180,7 +172,7 @@ const FAQ = () => {
                     </a>
                     , and{' '}
                     <a 
-                      href="https://github.com/the-ahuja-lab/evolf-pipeline" 
+                      href="https://github.com/the-ahuja-lab/EvOlf" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-accent hover:underline"

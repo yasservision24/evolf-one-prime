@@ -49,7 +49,7 @@ const PrivacyPolicy = () => {
                   You can access our open-source pipeline and run it locally:
                   <br />
                   <a 
-                    href="https://github.com/evolf/evolf-pipeline" 
+                    href="https://github.com/the-ahuja-lab/evolf-pipeline" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-accent hover:underline inline-flex items-center gap-1 mt-2"

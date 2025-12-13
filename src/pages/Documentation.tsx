@@ -130,8 +130,17 @@ const Documentation = () => {
 
           <div className="mt-8 p-6 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
-              Maintained by <strong>The Ahuja Lab</strong>
+              Maintained by{" "}
+              <a
+                href="https://www.ahuja-lab.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm mt-4 font-semibold"
+              >
+                The Ahuja Lab
+              </a>
             </p>
+
           </div>
         </div>
       </main>
