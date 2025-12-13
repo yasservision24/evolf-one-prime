@@ -146,7 +146,7 @@ const PredictionDashboard: React.FC = () => {
                           Need to process multiple SMILES/Sequence pairs?
                         </h4>
                         <p className="text-sm text-blue-700 dark:text-blue-400 mb-2">
-                          For batch processing of multiple ligand-receptor pairs, please use our command-line pipeline available on GitHub.
+                          For batch processing of multiple ligand-receptor pairs, please use our local EvOlf pipeline available on GitHub.
                         </p>
                         <a
                           href="https://github.com/the-ahuja-lab/evolf-pipeline"
@@ -154,7 +154,7 @@ const PredictionDashboard: React.FC = () => {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                         >
-                          <span>Visit EvOlf Pipeline Repository</span>
+                          <span>Visit EvOlf  Local Pipeline Repository</span>
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                       </div>
