@@ -63,7 +63,7 @@ const Documentation = () => {
             <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
               <ExternalLink className="h-5 w-5 text-accent" />
               <a 
-                href="/api"
+                href="/api-docs"
                 className="text-accent hover:underline font-semibold"
               >
                 Go to API Documentation
