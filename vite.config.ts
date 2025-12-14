@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     // listen on all interfaces (keeps your "::" behavior)
     host: "::",
-    port: 8080,
+    port: 8000,
 
     // Allow these hosts to access the dev server (required for requests from your domain)
     // Include your production domain and local hosts used for testing.
@@ -24,20 +24,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-
-  // Cache busting - add content hash to all file names
-  build: {
-    rollupOptions: {
-      output: {
-        // Add hash to entry files
-        entryFileNames: 'assets/[name]-[hash].js',
-        // Add hash to chunk files
-        chunkFileNames: 'assets/[name]-[hash].js',
-        // Add hash to asset files (CSS, images, etc.)
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-      },
     },
   },
 }));
